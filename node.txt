@@ -1,0 +1,224 @@
+Participants/Home
+Partcipants/my agenda
+Participants/schedule
+Participants/speakers
+Participants/speaker detail
+In files ki apis lagni hain isme hai
+
+
+
+Module Name: Participants
+
+1. Add Participant to Agenda
+URL: POST /participants/agenda
+
+Body:
+    {
+    "userId": 1,
+    "sessionId": 2,
+    "eventId": 3
+    }
+
+Response:
+    {
+    "message": "Added to agenda successfully"
+    }
+Errors:
+400 Bad Request if participant already added
+
+
+2. Get Participant Details by User ID
+URL: GET /participants/participants/:participantId
+Params:
+    userId (number)
+Response:
+[
+    {
+    "eventId": 3,
+    "eventTitle": "Event Name",
+    "sessions": [
+    {
+    "sessionId": 2,
+    "sessionTitle": "Session Name"
+            }
+        ]
+    }
+]
+Errors:
+404 Not Found if no participant exists for the user
+3. Get All Participants by Event ID
+URL: GET /participants/event/:eventId
+Params:
+eventId (number)
+Response:
+{
+"totalSessions": 3,
+"totalParticipants": 10,
+"participants": [
+{
+"userId": 1,
+"userName": "John Doe",
+"sessions": [
+{
+"sessionId": 2,
+"sessionTitle": "Session Name",
+"totalParticipantsPerSession": 5
+}
+]
+}
+]
+}
+Errors:
+404 Not Found if no participants found for the event
+4. Get Participants by Session ID
+URL: GET /participants/session/:sessionId
+Params:
+sessionId (number)
+Response:
+{
+"session": {
+"id": 2,
+"title": "Session Name",
+"startTime": "2025-09-15T10:00:00Z",
+"endTime": "2025-09-15T12:00:00Z",
+"location": "Room 101"
+},
+"event": {
+"id": 3,
+"title": "Event Name",
+"description": "Event Description",
+"startTime": "2025-09-15T09:00:00Z",
+"endTime": "2025-09-15T17:00:00Z"
+},
+"participants": [
+{
+"userId": 1,
+"userName": "John Doe"
+}
+]
+}
+Errors:
+404 Not Found if session does not exist
+Module Name: Speakers
+1. Create Speaker
+URL: POST /speakers
+Body:
+{
+"userId": 1,
+"designations": ["Keynote Speaker"],
+"bio": "Speaker bio here",
+"expertise": ["AI", "Web Development"],
+"tags": ["Technology", "Innovation"],
+"category": "Tech",
+"country": "USA",
+"website": "https://example.com",
+"youtube": "https://youtube.com/example",
+"facebook": "https://facebook.com/example",
+"linkedin": "https://linkedin.com/in/example",
+"twitter": "https://twitter.com/example",
+"featured": true,
+"verified": true,
+"priority": 1,
+"isActive": true
+}
+Response:
+{
+"id": 1,
+"userId": 1,
+"designations": ["Keynote Speaker"],
+"bio": "Speaker bio here",
+"expertise": ["AI", "Web Development"],
+"tags": ["Technology", "Innovation"],
+"category": "Tech",
+"country": "USA",
+"website": "https://example.com",
+"youtube": "https://youtube.com/example",
+"facebook": "https://facebook.com/example",
+"linkedin": "https://linkedin.com/in/example",
+"twitter": "https://twitter.com/example",
+"featured": true,
+"verified": true,
+"priority": 1,
+"isActive": true,
+"createdAt": "2025-09-15T12:00:00Z",
+"updatedAt": "2025-09-15T12:00:00Z"
+}
+2. Get All Speakers
+URL: GET /speakers
+Response:
+[
+{
+"id": 1,
+"user": {
+"name": "John Doe",
+"email": "john@example.com",
+"phone": "1234567890",
+"file": "profile.jpg"
+},
+"designations": ["Keynote Speaker"],
+"bio": "Speaker bio here",
+"expertise": ["AI", "Web Development"],
+"tags": ["Technology", "Innovation"],
+"category": "Tech",
+"country": "USA",
+"featured": true,
+"verified": true,
+"priority": 1,
+"isActive": true
+}
+]
+3. Get Speaker by ID
+URL: GET /speakers/:id
+Params:
+id (number)
+Response:
+{
+"id": 1,
+"user": {
+"name": "John Doe",
+"email": "john@example.com",
+"phone": "1234567890",
+"file": "profile.jpg"
+},
+"designations": ["Keynote Speaker"],
+"bio": "Speaker bio here",
+"expertise": ["AI", "Web Development"],
+"tags": ["Technology", "Innovation"],
+"category": "Tech",
+"country": "USA",
+"featured": true,
+"verified": true,
+"priority": 1,
+"isActive": true,
+"createdAt": "2025-09-15T12:00:00Z",
+"updatedAt": "2025-09-15T12:00:00Z"
+}
+Errors:
+404 Not Found if speaker ID does not exist
+4. Update Speaker
+URL: PATCH /speakers/:id
+Params:
+id (number)
+Body:
+{
+"bio": "Updated bio",
+"featured": false
+}
+Response:
+{
+"id": 1,
+"userId": 1,
+"bio": "Updated bio",
+"featured": false,
+"updatedAt": "2025-09-15T13:00:00Z"
+}
+5. Delete Speaker
+URL: DELETE /speakers/:id
+Params:
+id (number)
+Response:
+{
+"message": "Speaker deleted successfully"
+}
+Errors:
+404 Not Found if speaker ID does not exist
