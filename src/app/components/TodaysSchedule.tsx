@@ -9,7 +9,7 @@ export default function TodaysSchedule() {
   <div className="flex justify-between items-center mb-4 px-2 md:px-4">
     <h2 className="text-lg md:text-xl font-semibold text-black">Today's Schedule</h2>
     <p className="text-black hover:text-red-700 text-sm md:text-base font-medium cursor-pointer">
-      <Link href={"/participants/ViewAllSessions"}>View All</Link>
+
     </p>
   </div>
 

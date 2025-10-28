@@ -101,134 +101,101 @@ const VenueMaps: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-end p-0 gap-8 w-full max-w-[1280px] h-auto absolute left-20 top-38">
-      <div className="flex flex-row items-center p-0 gap-8 w-[1280px] h-6">
-        <Link href="/Organizer/Dashboard">
-          <FaArrowLeft className="w-9 h-9 text-[#7e0505]" />
-        </Link>
-        <h1 className="font-medium text-4xl leading-6 text-[#282828]">Venue Maps</h1>
-      </div>
+   <div className="flex flex-col items-center p-6 gap-8 w-full max-w-[1280px] mx-auto">
+  {/* Header */}
+  <div className="flex flex-row items-center gap-4 w-full">
+    <Link href="/Organizer/Dashboard">
+      <FaArrowLeft className="w-9 h-9 text-[#7e0505]" />
+    </Link>
+    <h1 className="font-medium text-4xl text-[#282828]">Venue Maps</h1>
+  </div>
 
-      <div className="flex flex-row items-start p-0 gap-6 w-[1280px] h-[103px]">
-        <div className="flex flex-col items-start p-5 gap-8 w-[410.67px] h-[103px] bg-white border border-[#E6E6E6] shadow rounded-3xl">
-          <div className="flex flex-row items-center p-0 gap-8 w-[356.67px] h-[63px]">
-            <div className="w-12 h-12 bg-[#DBEAFE] rounded-2xl flex items-center justify-center">
-              <FaCalendar className="w-5 h-7 text-[#2563EB]" />
-            </div>
-            <div className="flex flex-col items-start p-0 gap-4">
-              <span className="font-semibold text-6xl leading-[50%] text-[rgba(0,0,0,0.7)]">{data.totalSessions}</span>
-              <span className="font-normal text-lg leading-[140%] text-[#414141]">Total Sessions</span>
-            </div>
-          </div>
+  {/* Stats */}
+  <div className="flex flex-col sm:flex-row items-start gap-6 w-full">
+    {[
+      { icon: <FaCalendar className="w-5 h-7 text-[#2563EB]" />, label: 'Total Sessions', value: data.totalSessions, bg: 'bg-[#DBEAFE]' },
+      { icon: <FaPlay className="w-5 h-7 text-[#16A34A]" />, label: 'Ongoing', value: data.liveSessions, bg: 'bg-[#DCFCE7]' },
+      { icon: <FaClock className="w-5 h-7 text-[#CA8A04]" />, label: 'Scheduled', value: data.scheduledSessions, bg: 'bg-[#FEF9C3]' },
+    ].map((stat, idx) => (
+      <div key={idx} className="flex-1 flex items-center p-5 bg-white border border-[#E6E6E6] shadow rounded-3xl">
+        <div className={`w-12 h-12 ${stat.bg} rounded-2xl flex items-center justify-center`}>
+          {stat.icon}
         </div>
-
-        <div className="flex flex-col items-start p-5 gap-8 w-[410.67px] h-[103px] bg-white border border-[#E6E6E6] shadow rounded-3xl">
-          <div className="flex flex-row items-center p-0 gap-8 w-[356.67px] h-[63px]">
-            <div className="w-12 h-12 bg-[#DCFCE7] rounded-2xl flex items-center justify-center">
-              <FaPlay className="w-5 h-7 text-[#16A34A]" />
-            </div>
-            <div className="flex flex-col items-start p-0 gap-4">
-              <span className="font-semibold text-6xl leading-[50%] text-[rgba(0,0,0,0.7)]">{data.liveSessions}</span>
-              <span className="font-normal text-lg leading-[140%] text-[#414141]">Ongoing</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-start p-5 gap-8 w-[410.67px] h-[103px] bg-white border border-[#E6E6E6] shadow rounded-3xl">
-          <div className="flex flex-row items-center p-0 gap-8 w-[356.67px] h-[63px]">
-            <div className="w-12 h-12 bg-[#FEF9C3] rounded-2xl flex items-center justify-center">
-              <FaClock className="w-5 h-7 text-[#CA8A04]" />
-            </div>
-            <div className="flex flex-col items-start p-0 gap-4">
-              <span className="font-semibold text-6xl leading-[50%] text-[rgba(0,0,0,0.7)]">{data.scheduledSessions}</span>
-              <span className="font-normal text-lg leading-[140%] text-[#414141]">Scheduled</span>
-            </div>
-          </div>
+        <div className="flex flex-col ml-4">
+          <span className="font-semibold text-6xl text-[rgba(0,0,0,0.7)]">{stat.value}</span>
+          <span className="text-lg text-[#414141]">{stat.label}</span>
         </div>
       </div>
+    ))}
+  </div>
 
-      <LiveLoaction3 />
+  <LiveLoaction3 />
 
-      <div className="flex flex-row items-center p-0 gap-4 w-[1280px] h-11">
-        <div className="flex flex-col justify-center items-center p-4 gap-2.5 w-[1280px] h-11 border border-[#E8E8E8] rounded-2xl">
-          <div className="flex flex-row items-center p-0 gap-3 w-[1240px] h-6">
-            <FiSearch className="w-6 h-6 text-red-500" />
-            <span className="font-normal text-base leading-[140%] text-[#706f6f]">Search Venue</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-row items-center gap-8 w-[1280px] h-11">
-        <div className="flex flex-row items-center gap-[1000px] w-[1282px] h-11">
-          <div
-            className="flex flex-col justify-center items-center p-4 w-[205px] h-11 bg-[#9B2033] border border-[#9B2033] rounded-2xl cursor-pointer"
-            onClick={() => setIsPopupOpen(true)}
-          >
-            <div className="flex flex-row justify-center items-start gap-3">
-              <FaPlus className="w-3 h-3 text-white" />
-              <span className="font-normal text-sm text-white">Add New Venue</span>
-            </div>
-          </div>
-          <span className="font-medium text-base leading-6 text-[#282828]">View All</span>
-        </div>
-      </div>
-
-      <div className="flex flex-col items-start p-0 gap-6 w-[1280px] h-auto">
-        {data.events.map((event) => (
-          <div
-            key={event.id}
-            className="flex flex-row justify-between p-6 gap-6 w-[1280px] h-[213px] bg-white border border-[#D4D4D4] shadow rounded-3xl"
-          >
-            <div className="flex flex-row items-center gap-6">
-              <div className="w-24 h-24 bg-gradient-to-r from-green-500 to-green-400 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-medium">EV</span>
-              </div>
-              <div className="flex flex-col justify-center gap-2">
-                <span className="font-semibold text-lg text-[#282828]">{event.name}</span>
-                <span className="font-normal text-sm text-[#424242]">{event.description}</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-between items-end">
-              <span className="bg-[#F0F0F0] px-4 py-1 rounded-full font-semibold text-lg text-[#282828]">
-                {event.totalSessions} Sessions
-              </span>
-              <div className="flex flex-row gap-3">
-                <button
-                  className="flex justify-center items-center px-8 py-1 bg-[#9B2033] border border-[#9B2033] rounded-2xl text-white"
-                  onClick={() => handleDelete(event.id)}
-                  disabled={deleteLoadingId === event.id}
-                >
-                  {deleteLoadingId === event.id ? 'Deleting...' : 'Delete'}
-                </button>
-
-                <button
-                  className="flex justify-center items-center px-8 py-1 border border-[#8C8C8C] rounded-2xl"
-                  onClick={() => handleEdit(event.id)}
-                >
-                  <span className="font-bold text-sm text-[#282828]">Edit</span>
-                </button>
-
-                <Link
-                  href={event.googleMapLink}
-                  className="flex justify-center items-center px-8 py-1 border border-[#8C8C8C] rounded-2xl"
-                >
-                  <span className="font-bold text-sm text-[#282828]">View</span>
-                </Link>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Add new venue popup, no eventId passed here */}
-      <AddNewVenuePopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
-
-      {/* Edit event popup, eventId passed only to the edit component */}
-      {editPopup && selectedEventId && (
-        <EditEvent isOpen={editPopup} onClose={() => setEditPopup(false)} eventId={selectedEventId} />
-      )}
+  {/* Search */}
+  <div className="w-full flex justify-center">
+    <div className="flex items-center w-full max-w-[1280px] p-4 gap-3 border border-[#E8E8E8] rounded-2xl">
+      <FiSearch className="w-6 h-6 text-red-500" />
+      <span className="text-base text-[#706f6f]">Search Venue</span>
     </div>
+  </div>
+
+  {/* Add / View */}
+  <div className="flex justify-between items-center w-full max-w-[1280px]">
+    <div
+      className="flex items-center gap-2 p-3 bg-[#9B2033] rounded-2xl cursor-pointer"
+      onClick={() => setIsPopupOpen(true)}
+    >
+      <FaPlus className="w-3 h-3 text-white" />
+      <span className="text-white text-sm">Add New Venue</span>
+    </div>
+    <span className="text-base font-medium text-[#282828]">View All</span>
+  </div>
+
+  {/* Venue Cards */}
+  <div className="flex flex-col gap-6 w-full">
+    {data.events.map((event) => (
+      <div key={event.id} className="flex flex-col md:flex-row justify-between p-6 gap-6 w-full bg-white border border-[#D4D4D4] shadow rounded-3xl">
+        <div className="flex items-center gap-6">
+          <div className="w-24 h-24 bg-gradient-to-r from-green-500 to-green-400 rounded-full flex items-center justify-center">
+            <span className="text-white text-xs font-medium">EV</span>
+          </div>
+          <div className="flex flex-col justify-center gap-2">
+            <span className="font-semibold text-lg text-[#282828]">{event.name}</span>
+            <span className="text-sm text-[#424242]">{event.description}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col md:items-end gap-3">
+          <span className="bg-[#F0F0F0] px-4 py-1 rounded-full font-semibold text-lg text-[#282828]">
+            {event.totalSessions} Sessions
+          </span>
+          <div className="flex flex-wrap gap-3">
+            <button
+              className="px-8 py-1 bg-[#9B2033] text-white rounded-2xl"
+              onClick={() => handleDelete(event.id)}
+              disabled={deleteLoadingId === event.id}
+            >
+              {deleteLoadingId === event.id ? 'Deleting...' : 'Delete'}
+            </button>
+            <button
+              className="px-8 py-1 border border-[#8C8C8C] rounded-2xl"
+              onClick={() => handleEdit(event.id)}
+            >
+              Edit
+            </button>
+            <Link href={event.googleMapLink} className="px-8 py-1 border border-[#8C8C8C] rounded-2xl">
+              View
+            </Link>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <AddNewVenuePopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
+  {editPopup && selectedEventId && <EditEvent isOpen={editPopup} onClose={() => setEditPopup(false)} eventId={selectedEventId} />}
+</div>
+
   )
 }
 

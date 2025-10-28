@@ -81,105 +81,108 @@ export default function Page() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] px-4 md:px-10 py-6 space-y-8 relative">
-      <div className="flex items-center gap-3">
-        <Link href="/Organizer/Dashboard">
-          <FaArrowLeft className="text-red-800 w-[20px] h-[20px] cursor-pointer" />
-        </Link>
-        <h1 className="text-xl font-bold text-gray-900 ml-5">Manage Participants</h1>
+<div className="min-h-screen bg-[#FAFAFA] px-4 md:px-8 lg:px-10 py-6 space-y-8">
+  {/* Header */}
+  <div className="flex items-center gap-3">
+    <Link href="/Organizer/Dashboard">
+      <FaArrowLeft className="text-red-800 w-5 h-5 cursor-pointer" />
+    </Link>
+    <h1 className="text-xl font-bold text-gray-900 ml-2 sm:ml-5">Manage Participants</h1>
+  </div>
+
+  {/* Filters/Search */}
+  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
+      <FaSearch className="text-red-900 mr-2 mt-1" />
+      <input type="text" placeholder="Search sessions or speakers" className="outline-none text-sm w-full" />
+    </div>
+
+    <div className="flex gap-2 flex-wrap md:flex-nowrap">
+      {filters.map(filter => (
+        <button
+          key={filter}
+          onClick={() => setActiveFilter(filter)}
+          className={`px-4 py-1 rounded-full text-sm font-medium ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-gray-800"}`}
+        >
+          {filter}
+        </button>
+      ))}
+    </div>
+
+    <div className="flex items-center border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700 mt-2 md:mt-0">
+      <FaCalendarAlt className="mr-2 text-gray-500" />
+      Jan 2024 - Dec 2024
+    </div>
+  </div>
+
+  {/* Stats */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {statsItems.map((item, idx) => (
+      <div key={idx} className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition">
+        <div className={`w-10 h-10 rounded-md ${item.iconBg} flex items-center justify-center mr-3 sm:mr-4`}>
+          {item.icon}
+        </div>
+        <div className="flex-1">
+          <p className="text-lg sm:text-[22px] font-bold text-black leading-none">{item.value}</p>
+          <p className="text-sm text-gray-600">{item.label}</p>
+        </div>
       </div>
+    ))}
+  </div>
 
-      <div className="flex flex-wrap justify-between items-center gap-4">
-        <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
-          <FaSearch className="text-red-900 mr-2 mt-1" />
-          <input type="text" placeholder="Search sessions or speakers" className="outline-none text-sm w-full" />
-        </div>
-
-        <div className="flex gap-3 flex-wrap">
-          {filters.map(filter => (
-            <button
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={`px-4 py-1 rounded-full text-sm font-medium ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-gray-800"}`}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex items-center border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700">
-          <FaCalendarAlt className="mr-2 text-gray-500" />
-          Jan 2024 - Dec 2024
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {statsItems.map((item, idx) => (
-          <div key={idx} className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition">
-            <div className={`w-10 h-10 rounded-md ${item.iconBg} flex items-center justify-center mr-4`}>
-              {item.icon}
-            </div>
-            <div className="flex-1">
-              <p className="text-[22px] font-bold text-black leading-none">{item.value}</p>
-              <p className="text-sm text-gray-600">{item.label}</p>
+  {/* Participants List */}
+  <div className="w-full max-w-full mx-auto bg-white rounded-lg shadow-md p-4 sm:p-6">
+    {loading ? (
+      <p className="text-center text-gray-500">Loading participants...</p>
+    ) : participants.length === 0 ? (
+      <p className="text-center text-gray-500">No participants found</p>
+    ) : (
+      participants.map(user => (
+        <div key={user.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 rounded-md p-4 mb-4 shadow-sm gap-4 sm:gap-2">
+          <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
+            <img
+              src={user.file ? user.file : "/Images/default-user.png"}
+              alt={user.name}
+              className="rounded-full object-cover w-10 h-10"
+            />
+            <div className="flex flex-col">
+              <div className="flex items-baseline space-x-2">
+                <h2 className="font-semibold text-gray-900">{user.name}</h2>
+                <h3 className="text-gray-600 text-sm">{user.organization}</h3>
+              </div>
+              <p className="text-sm text-gray-500">{user.email}</p>
             </div>
           </div>
-        ))}
-      </div>
 
-      <div className="max-w-8xl mx-auto bg-white rounded-lg shadow-md p-6">
-        {loading ? (
-          <p className="text-center text-gray-500">Loading participants...</p>
-        ) : participants.length === 0 ? (
-          <p className="text-center text-gray-500">No participants found</p>
-        ) : (
-          participants.map(user => (
-            <div key={user.id} className="flex items-center justify-between bg-gray-50 rounded-md p-4 shadow-sm mb-4">
-              <div className="flex items-center space-x-4">
-                <img
-                  src={user.file ? user.file : "/Images/default-user.png"}
-                  alt={user.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full object-cover"
-                  style={{ width: "40px", height: "40px" }}
-                />
-                <div>
-                  <div className="flex items-baseline space-x-2">
-                    <h2 className="font-semibold text-gray-900">{user.name}</h2>
-                    <h3 className="text-gray-600 text-sm">{user.organization}</h3>
-                  </div>
-                  <p className="text-sm text-gray-500">{user.email}</p>
-                </div>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => handleDelete(user)}
-                  className="bg-red-800 text-white px-6 py-1 rounded-md hover:bg-red-900 transition"
-                >
-                  Delete Account
-                </button>
-                <button
-                  onClick={() => handleBlock(user)}
-                  className={`px-4 py-1 rounded-md border transition ${
-                    user.isBlocked
-                      ? 'bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200'
-                      : 'bg-green-100 text-green-800 border-green-300 hover:bg-green-200'
-                  }`}
-                >
-                  {user.isBlocked ? 'Suspended' : 'Active'}
-                </button>
-                <button
-                  onClick={() => router.push(`/Organizer/ManageParticipants/bookmark?userId=${user.id}`)}
-                  className="border border-gray-300 px-4 py-1 rounded-md text-black hover:bg-gray-100 transition"
-                >
-                  View
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+            <button
+              onClick={() => handleDelete(user)}
+              className="bg-red-800 text-white px-4 py-1 rounded-md hover:bg-red-900 transition flex-1 sm:flex-none"
+            >
+              Delete Account
+            </button>
+            <button
+              onClick={() => handleBlock(user)}
+              className={`px-4 py-1 rounded-md border flex-1 sm:flex-none transition ${
+                user.isBlocked
+                  ? 'bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200'
+                  : 'bg-green-100 text-green-800 border-green-300 hover:bg-green-200'
+              }`}
+            >
+              {user.isBlocked ? 'Suspended' : 'Active'}
+            </button>
+            <button
+              onClick={() => router.push(`/Organizer/ManageParticipants/bookmark?userId=${user.id}`)}
+              className="border border-gray-300 px-4 py-1 rounded-md text-black hover:bg-gray-100 transition flex-1 sm:flex-none"
+            >
+              View
+            </button>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+</div>
+
   )
 }

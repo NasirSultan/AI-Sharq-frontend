@@ -59,18 +59,16 @@ export default function Navbar() {
 
   return (
     <nav className="w-full bg-white shadow-md px-6 py-6 flex items-center justify-between">
-      <div
-        className="flex items-center cursor-pointer"
-        onClick={() => router.push('/participants/Home')}
-      >
-        <Image
-          src="/images/logo1.png"
-          alt="Logo"
-          width={150}
-          height={150}
-          className="object-contain"
-        />
-      </div>
+    <div className="flex items-center">
+  <Image
+    src="/images/logo1.png"
+    alt="Logo"
+    width={150}
+    height={150}
+    className="object-contain"
+  />
+</div>
+
 
       <div className="flex items-center gap-6">
         {/* Notifications */}

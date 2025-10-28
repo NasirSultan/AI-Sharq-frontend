@@ -56,6 +56,7 @@ export default function SignIn() {
             window.localStorage.setItem('name', user.name || '')
             window.localStorage.setItem('picUrl', user.picUrl || user.Pic_url || '')
           }
+            sessionStorage.setItem('cameFromApp', 'true')
         }
 
         if (user.role !== 'sponsor' && user.role !== 'exhibitor') {
@@ -86,138 +87,151 @@ export default function SignIn() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-10 mt-10 mr-6 items-center justify-center lg:justify-start">
-      <div className="hidden lg:block">
-        <ImageComponent />
+ <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center px-4 md:px-10 pt-10 pb-32 relative bg-gray-50">
+  {/* Left Image for large screens */}
+  <div className="hidden lg:flex lg:flex-shrink-0 lg:mr-10">
+    <ImageComponent />
+  </div>
+
+  {/* Sign-in Card */}
+ <div className="relative w-full max-w-[400px] bg-white border border-gray-300 rounded-2xl shadow-md p-4 sm:p-6 flex flex-col gap-4 z-10">
+  <div className="flex flex-col items-center mb-3">
+    <Image
+      src="/images/logo1.png"
+      alt="Al Sharq Logo"
+      width={120}
+      height={36}
+      className="object-contain mb-4"
+    />
+    <h1 className="text-lg sm:text-xl font-medium text-gray-800 text-center leading-snug">
+      Sign In to <br />
+      <strong className="text-[#9B2033]">AL SHARQ CONFERENCE</strong>
+    </h1>
+  </div>
+
+  <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-1 w-full">
+      <label className="text-sm text-[#262626]">Email Address*</label>
+      <div className="flex items-center gap-2 w-full border border-[#DEDEDE] rounded-lg px-2 py-1.5">
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter Your Email Address"
+          value={formData.email}
+          onChange={handleChange}
+          className="text-sm text-[#616161] border-none outline-none w-full"
+        />
+        <FaEnvelope className="w-4 h-4 text-[#9C9C9C]" />
       </div>
-
-      <div className="relative w-full max-w-[450px] h-auto bg-white border border-gray-300 rounded-[20px] shadow-[0px_4px_110.3px_rgba(68,68,68,0.25)] p-8 flex flex-col gap-10">
-        <div className="flex flex-col items-center mb-4">
-          <Image
-            src="/images/logo1.png"
-            alt="Al Sharq Logo"
-            width={157}
-            height={47}
-            className="object-contain mb-[30px]"
-          />
-          <h1 className="text-2xl font-medium text-gray-800 text-center leading-tight">
-            Sign In to <br />
-            <strong className="text-[#9B2033]">AL SHARQ CONFERENCE</strong>
-          </h1>
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full max-w-[405px]">
-          <div className="flex flex-col gap-3 w-full">
-            <label className="text-base text-[#262626]">Email Address*</label>
-            <div className="flex items-center gap-3 w-full border border-[#DEDEDE] rounded-lg px-4 py-3">
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter Your Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                className="text-base text-[#616161] border-none outline-none w-full"
-              />
-              <FaEnvelope className="w-5 h-5 text-[#9C9C9C]" />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3 w-full">
-            <label className="text-base text-[#262626]">Password*</label>
-            <div className="flex items-center gap-3 w-full border border-[#DEDEDE] rounded-lg px-4 py-3">
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter Your Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="text-base text-[#616161] border-none outline-none w-full"
-              />
-              <FaEyeSlash className="w-5 h-5 text-[#9C9C9C]" />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="rememberMe"
-                checked={formData.rememberMe}
-                onChange={handleChange}
-                className="w-4 h-4 bg-white border border-[#282828] rounded"
-              />
-              <label className="text-base text-[#282828]">Remember me</label>
-            </div>
-            <Link href="/authentication/ForgetPassword">
-              <span className="text-base text-[#9B2033]">Forget Password?</span>
-            </Link>
-          </div>
-
-          <LoadingButton text="Sign In" loading={loading} color="bg-[#9B2033]" />
-        </form>
-
-        <div className="flex flex-col items-center gap-4 w-full max-w-[405px]">
-          <div className="flex items-center gap-4 w-full">
-            <hr className="flex-1 border border-[#546056] opacity-20" />
-            <span className="text-sm text-[#6C7278]">Or</span>
-            <hr className="flex-1 border border-[#546056] opacity-20" />
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-2 w-full">
-            <button className="flex items-center justify-center gap-2 flex-1 border border-[#DEDEDE] rounded-lg text-base text-[#1E1E1E] px-4 py-3">
-              <FaGoogle className="w-6 h-6" />
-              Google
-            </button>
-            <button className="flex items-center justify-center gap-2 flex-1 border border-[#DEDEDE] rounded-lg text-base text-[#1E1E1E] px-4 py-3">
-              <FaFacebookF className="w-6 h-6" />
-              Facebook
-            </button>
-            <button className="flex items-center justify-center gap-2 flex-1 border border-[#DEDEDE] rounded-lg text-base text-[#1E1E1E] px-4 py-3">
-              <FaApple className="w-6 h-6" />
-              Apple
-            </button>
-          </div>
-        </div>
-
-        <p className="text-base text-center text-[#282828]">
-          New to website?{' '}
-          <a className="text-blue-600" href="/authentication/SignUp">
-            Sign Up
-          </a>
-        </p>
-      </div>
-
-      <Image
-        src="/images/line.png"
-        alt="Logo"
-        width={1729}
-        height={127}
-        className="absolute top-[1010px]"
-      />
-
-      <style jsx>{`
-        @media (max-width: 1024px) {
-          .absolute {
-            position: static;
-          }
-        }
-        @media (max-width: 768px) {
-          .p-8 {
-            padding: 1.5rem;
-          }
-          .gap-10 {
-            gap: 2rem;
-          }
-        }
-        @media (max-width: 480px) {
-          .text-2xl {
-            font-size: 1.25rem;
-          }
-          .rounded-[20px] {
-            border-radius: 12px;
-          }
-        }
-      `}</style>
     </div>
+
+    <div className="flex flex-col gap-1 w-full">
+      <label className="text-sm text-[#262626]">Password*</label>
+      <div className="flex items-center gap-2 w-full border border-[#DEDEDE] rounded-lg px-2 py-1.5">
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter Your Password"
+          value={formData.password}
+          onChange={handleChange}
+          className="text-sm text-[#616161] border-none outline-none w-full"
+        />
+        <FaEyeSlash className="w-4 h-4 text-[#9C9C9C]" />
+      </div>
+    </div>
+
+    <div className="flex flex-col sm:flex-row items-center justify-between w-full">
+      <div className="flex items-center gap-2 mb-1 sm:mb-0">
+        <input
+          type="checkbox"
+          name="rememberMe"
+          checked={formData.rememberMe}
+          onChange={handleChange}
+          className="w-3.5 h-3.5 bg-white border border-[#282828] rounded"
+        />
+        <label className="text-sm text-[#282828]">Remember me</label>
+      </div>
+      <Link href="/authentication/ForgetPassword">
+        <span className="text-sm text-[#9B2033] hover:underline">Forget Password?</span>
+      </Link>
+    </div>
+
+    <LoadingButton text="Sign In" loading={loading} color="bg-[#9B2033]" />
+  </form>
+
+  <div className="flex flex-col items-center gap-3 w-full mt-3">
+    <div className="flex items-center gap-2 w-full">
+      <hr className="flex-1 border border-[#546056] opacity-20" />
+      <span className="text-xs text-[#6C7278]">Or</span>
+      <hr className="flex-1 border border-[#546056] opacity-20" />
+    </div>
+
+    <div className="flex flex-col sm:flex-row gap-1 w-full mt-2">
+      <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
+        <FaGoogle className="w-4 h-4" />
+        Google
+      </button>
+      <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
+        <FaFacebookF className="w-4 h-4" />
+        Facebook
+      </button>
+      <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
+        <FaApple className="w-4 h-4" />
+        Apple
+      </button>
+    </div>
+  </div>
+
+  <p className="text-sm text-center text-[#282828] mt-3">
+    New to website?{' '}
+    <a className="text-blue-600 hover:underline" href="/authentication/SignUp">
+      Sign Up
+    </a>
+  </p>
+</div>
+
+
+  {/* Bottom line image */}
+  <div className="absolute bottom-0 left-0 w-full">
+    <Image
+      src="/images/line.png"
+      alt="Line"
+      width={1729}
+      height={127}
+      className="w-full object-contain"
+    />
+  </div>
+
+  <style jsx>{`
+    @media (max-width: 1024px) {
+      .lg\\:flex {
+        display: none !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .p-6 {
+        padding: 1.5rem;
+      }
+      .gap-6 {
+        gap: 1.25rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .text-xl {
+        font-size: 1rem;
+      }
+      .rounded-2xl {
+        border-radius: 12px;
+      }
+      .px-4 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+  `}</style>
+</div>
+
+  
+
   )
 }

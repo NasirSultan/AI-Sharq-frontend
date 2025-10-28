@@ -26,6 +26,9 @@ export default function SessionPage({ params }: PageProps) {
   const userId = useSelector((state: RootState) => state.user.userId)
   const eventId = useSelector((state: RootState) => state.event.id)
 
+
+console.log 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -229,11 +232,32 @@ export default function SessionPage({ params }: PageProps) {
           {session.event?.title}
         </div>
 
-        <p className="text-xs text-gray-600">
-          {session.registrationRequired
-            ? "Registration Required"
-            : "No Registration Required"}
-        </p>
+     <div className="flex items-center justify-between">
+  <p className="text-xs text-gray-600">
+    {session.registrationRequired
+      ? "Registration Required"
+      : "No Registration Required"}
+  </p>
+
+  {session.registrationRequired ? (
+    <button
+      onClick={() => {
+        router.push(`/participants/RegisterSession/${id}`)
+      }}
+      className="bg-red-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-red-700"
+    >
+      Register Now
+    </button>
+  ) : (
+    <button
+      disabled
+      className="bg-gray-300 text-gray-500 text-xs font-semibold px-4 py-2 rounded-lg cursor-not-allowed"
+    >
+      Not Required
+    </button>
+  )}
+</div>
+
       </div>
 
       <RelatedSessionsGrid />

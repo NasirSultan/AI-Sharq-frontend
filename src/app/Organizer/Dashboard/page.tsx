@@ -69,7 +69,7 @@ export default function Dashboard() {
           data.recentUsers.map((user: any) => ({
             name: user.name,
             email: user.email,
-   file: user.file ? user.file : "/Images/default-user.png",
+            file: user.file ? user.file : "/Images/default-user.png",
 
           }))
         );
@@ -83,163 +83,132 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="p-2 space-y-8 bg-[#F9F9F9] min-h-screen">
-      <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4">
-        <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
-          <FaSearch className="text-red-900 mr-2" />
-          <input type="text" placeholder="Search" className="outline-none text-sm w-full" />
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {filters.map((filter) => (
-            <button key={filter} onClick={() => setActiveFilter(filter)} className={`px-4 py-1 rounded-xl text-sm font-medium ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-black"}`}>
-              {filter}
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700">
-          <FaCalendarAlt className="mr-2 text-gray-500" />
-          Jan 2024 - Dec 2024
-        </div>
-      </div>
+<div className="container mx-auto p-4 space-y-8 bg-[#F9F9F9] min-h-screen">
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-9">
-        {stats.map((item, idx) => (
-          <div key={idx} className="relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition">
-            <div className="flex justify-between items-start mb-3">
-              <div className="w-9 h-9 rounded-md bg-gray-100 flex items-center justify-center">{item.icon}</div>
-              <div className="bg-green-50 text-green-600 text-xs px-2 py-1 rounded-full font-semibold flex items-center gap-1">▲ {item.percent}</div>
-            </div>
-            <p className="text-[22px] font-bold text-black mb-1">
-              {item.value} <span className="text-green-600 text-sm font-semibold">{item.change}</span>
-            </p>
-            <p className="text-sm text-gray-600">{item.label}</p>
-          </div>
-        ))}
-      </div>
-
-      <TodaysSchedule />
-
-      {/* Quick Access */}
-      <section className="bg-white p-6 rounded-xl shadow">
-        <h2 className="text-xl font-semibold mb-6 text-black">Quick Access</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-          {quickAccessItems.map((item) => (
-            <Link href={item.Link} key={item.label}>
-              <div className="flex flex-col items-center text-center bg-white border border-gray-300 rounded-xl p-4 hover:shadow-md transition cursor-pointer">
-                <Image src={item.Image} alt={item.label} width={40} height={40} className="mb-2" />
-                <p className="font-semibold text-black text-sm">{item.label}</p>
-                <p className="text-xs text-gray-500">{item.desc}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-    <section className="bg-white p-6 rounded-xl shadow">
-        <h2 className="text-xl font-semibold mb-6 text-black">
-          Tools & Support
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Box 1 */}
-          <div className="flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md transition cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className="bg-gray-100 p-2 rounded-md">
-                <Image
-                  src="/Images/qr.png"
-                  alt="QR Scanner"
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div>
-                <p className="font-semibold text-black text-sm">QR Scanner</p>
-                <p className="text-xs text-gray-500">Validate check-ins</p>
-              </div>
-            </div>
-            <span className="text-[#9B2033] text-lg font-bold">
-              <Link href="/Organizer/Dashboard">
-                <FaArrowRight />
-              </Link>
-            </span>
-          </div>
-
-          {/* Box 2 */}
-          <div className="flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md transition cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className="bg-[#E3FFF7] p-2 rounded-md">
-                <Image
-                  src="/Images/reports.png"
-                  alt="Reports"
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div>
-                <p className="font-semibold text-black text-sm">Reports</p>
-                <p className="text-xs text-gray-500">Analytics & exports</p>
-              </div>
-            </div>
-            <span className="text-[#9B2033] text-lg font-bold">
-              <Link href="/Organizer/Report">
-                <FaArrowRight />
-              </Link>
-            </span>
-          </div>
-
-          {/* Box 3 */}
-          <div className="flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md transition cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className="bg-[#FFF3F3] p-2 rounded-md">
-                <Image
-                  src="/Images/Faqs.png"
-                  alt="Manage FAQ"
-                  width={40}
-                  height={40}
-                />
-              </div>
-              <div>
-                <p className="font-semibold text-black text-sm">Manage FAQ</p>
-                <p className="text-xs text-gray-500">Help & guidance</p>
-              </div>
-            </div>
-            <span className="text-[#9B2033] text-lg font-bold">
-              <Link href="/Organizer/Dashboard">
-                <FaArrowRight />
-              </Link>
-            </span>
-          </div>
-        </div>
-      </section>
-      {/* Recent Participants */}
-      <div className="flex justify-between items-center mb-4 ml-10">
-        <h2 className="text-lg font-semibold text-black">Recent Participants</h2>
-        <a href="#" className="text-sm text-gray-600 hover:underline">View All</a>
-      </div>
-
-      <section className="p-6 bg-white rounded-xl shadow-sm max-w-8xl mx-auto">
-        <div className="space-y-3">
-          {participants.map((participant, index) => (
-            <div key={index} className="flex items-center space-x-4 border border-gray-200 rounded-full p-3">
-<img
-  src={participant.file ? participant.file : "/Images/default-user.png"}
-  alt={participant.name}
-  width={40}
-  height={40}
-  className="rounded-full object-cover"
-  style={{ width: "40px", height: "40px" }}
-/>
-
-
-
-              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 w-full text-sm text-gray-700">
-                <h3 className="font-semibold text-black">{participant.name}</h3>
-
-                <p>{participant.email}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+  {/* Search & Filters */}
+  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
+      <FaSearch className="text-red-900 mr-2" />
+      <input type="text" placeholder="Search" className="outline-none text-sm w-full" />
     </div>
+
+    <div className="flex flex-wrap gap-3">
+      {filters.map((filter) => (
+        <button
+          key={filter}
+          onClick={() => setActiveFilter(filter)}
+          className={`px-4 py-1 rounded-xl text-sm font-medium ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-black"}`}
+        >
+          {filter}
+        </button>
+      ))}
+    </div>
+
+    <div className="flex items-center border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700">
+      <FaCalendarAlt className="mr-2 text-gray-500" />
+      Jan 2024 - Dec 2024
+    </div>
+  </div>
+
+  {/* Stats Cards */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {stats.map((item, idx) => (
+      <div key={idx} className="relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition">
+        <div className="flex justify-between items-start mb-3">
+          <div className="w-9 h-9 rounded-md bg-gray-100 flex items-center justify-center">{item.icon}</div>
+          <div className="bg-green-50 text-green-600 text-xs px-2 py-1 rounded-full font-semibold flex items-center gap-1">▲ {item.percent}</div>
+        </div>
+        <p className="text-[22px] font-bold text-black mb-1">
+          {item.value} <span className="text-green-600 text-sm font-semibold">{item.change}</span>
+        </p>
+        <p className="text-sm text-gray-600">{item.label}</p>
+      </div>
+    ))}
+  </div>
+
+  <TodaysSchedule />
+
+  {/* Quick Access */}
+  <section className="bg-white p-6 rounded-xl shadow">
+    <h2 className="text-xl font-semibold mb-6 text-black">Quick Access</h2>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+      {quickAccessItems.map((item) => (
+        <Link href={item.Link} key={item.label}>
+          <div className="flex flex-col items-center text-center bg-white border border-gray-300 rounded-xl p-4 hover:shadow-md transition cursor-pointer">
+            <Image src={item.Image} alt={item.label} width={40} height={40} className="mb-2" />
+            <p className="font-semibold text-black text-sm">{item.label}</p>
+            <p className="text-xs text-gray-500">{item.desc}</p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  </section>
+
+  {/* Tools & Support */}
+  <section className="bg-white p-6 rounded-xl shadow">
+    <h2 className="text-xl font-semibold mb-6 text-black">Tools & Support</h2>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {[{
+        title: "QR Scanner",
+        desc: "Validate check-ins",
+        img: "/Images/qr.png",
+        link: "/Organizer/Dashboard",
+        bg: "bg-gray-100"
+      },{
+        title: "Reports",
+        desc: "Analytics & exports",
+        img: "/Images/reports.png",
+        link: "/Organizer/Report",
+        bg: "bg-[#E3FFF7]"
+      },{
+        title: "Manage FAQ",
+        desc: "Help & guidance",
+        img: "/Images/Faqs.png",
+        link: "/Organizer/Dashboard",
+        bg: "bg-[#FFF3F3]"
+      }].map((item, idx) => (
+        <div key={idx} className="flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md transition cursor-pointer">
+          <div className="flex items-center gap-3">
+            <div className={`${item.bg} p-2 rounded-md`}>
+              <Image src={item.img} alt={item.title} width={24} height={24} />
+            </div>
+            <div>
+              <p className="font-semibold text-black text-sm">{item.title}</p>
+              <p className="text-xs text-gray-500">{item.desc}</p>
+            </div>
+          </div>
+          <span className="text-[#9B2033] text-lg font-bold">
+            <Link href={item.link}><FaArrowRight /></Link>
+          </span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {/* Recent Participants */}
+  <div className="flex justify-between items-center">
+    <h2 className="text-lg font-semibold text-black">Recent Participants</h2>
+  
+  </div>
+
+  <section className="p-6 bg-white rounded-xl shadow-sm">
+    <div className="space-y-3">
+      {participants.map((participant, index) => (
+        <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between border border-gray-200 rounded-full p-3 gap-2 sm:gap-4">
+          <img
+            src={participant.file || "/Images/default-user.png"}
+            alt={participant.name}
+            className="rounded-full object-cover w-10 h-10"
+          />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 w-full text-sm text-gray-700">
+            <h3 className="font-semibold text-black">{participant.name}</h3>
+            <p>{participant.email}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</div>
+
   );
 }

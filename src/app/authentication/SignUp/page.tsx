@@ -63,169 +63,166 @@ export default function SignUp() {
   }
 
   return (
-    <div className="flex items-center justify-center gap-20">
-      <ImageComponent />
+   <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center px-3 pt-6 pb-16 relative bg-gray-50 gap-4">
+  {/* Left Image for large screens */}
+  <div className="hidden lg:flex lg:flex-shrink-0 lg:mr-4">
+    <ImageComponent />
+  </div>
 
-      <div className="w-[525px] h-[926px] bg-white border border-gray-300 rounded-2xl shadow-lg p-10 flex gap-10 m-14">
-        <div className="w-[525px] flex flex-col items-center gap-10">
-          <Image
-            src="/images/logo1.png"
-            alt="Al Sharq Logo"
-            width={157}
-            height={47}
-            className="w-[157px] h-[47px]"
+  {/* Sign-up Card */}
+  <div className="w-full max-w-[320px] bg-white border border-gray-300 rounded-lg shadow-md p-3 sm:p-4 flex flex-col gap-4 relative z-10">
+    <div className="flex flex-col items-center gap-3">
+      <Image
+        src="/images/logo1.png"
+        alt="Al Sharq Logo"
+        width={120}
+        height={36}
+        className="object-contain"
+      />
+
+      <h1 className="text-base sm:text-lg font-medium text-gray-800 text-center leading-snug">
+        Sign Up to <br />
+        <strong className="text-[#9B2033]">AL SHARQ CONFERENCE</strong>
+      </h1>
+    </div>
+
+    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2.5">
+      {/* Full Name */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-gray-700">Full Name*</label>
+        <div className="relative">
+          <input
+            type="text"
+            name="fullName"
+            placeholder="Enter Your Name"
+            value={formData.fullName}
+            onChange={handleChange}
+            className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
+            required
           />
-
-          <h1 className="text-2xl font-medium text-gray-800 text-center leading-tight">
-            Sign Up to <br />{' '}
-            <strong className="text-[#9B2033]">AL SHARQ CONFERENCE</strong>
-          </h1>
-
-          <form
-            onSubmit={handleSubmit}
-            className="w-full max-w-[405px] flex flex-col gap-6"
-          >
-            <div className="flex flex-col gap-3">
-              <label className="text-base font-normal text-gray-700">
-                Full Name*
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="fullName"
-                  placeholder="Enter Your Name"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="w-full h-[53px] border border-gray-300 rounded-lg px-5 py-4 text-base text-gray-400 focus:outline-none focus:border-gray-500"
-                  required
-                />
-                <FaUser className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <label className="text-base font-normal text-gray-700">
-                Email Address*
-              </label>
-              <div className="relative">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Enter Your Email Address"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full h-[53px] border border-gray-300 rounded-lg px-5 py-4 text-base text-gray-400 focus:outline-none focus:border-gray-500"
-                  required
-                />
-                <FaEnvelope className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <label className="text-base font-normal text-gray-700">
-                Phone Number
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="Enter Your Phone Number"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full h-[53px] border border-gray-300 rounded-lg px-5 py-4 text-base text-gray-400 focus:outline-none focus:border-gray-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <label className="text-base font-normal text-gray-700">
-                Password*
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Enter Your Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full h-[53px] border border-gray-300 rounded-lg px-5 py-4 text-base text-gray-400 focus:outline-none focus:border-gray-500"
-                  required
-                />
-                <FaEyeSlash className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <label className="text-base font-normal text-gray-700">
-                Confirm Password*
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="Confirm Your Password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full h-[53px] border border-gray-300 rounded-lg px-5 py-4 text-base text-gray-400 focus:outline-none focus:border-gray-500"
-                  required
-                />
-                <FaEyeSlash className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              </div>
-            </div>
-
-            {error && (
-              <p className="text-red-600 text-sm text-center">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full h-[54px] text-white text-base font-medium rounded-lg transition ${
-                loading
-                  ? 'bg-red-400 cursor-not-allowed'
-                  : 'bg-red-700 hover:bg-red-800'
-              }`}
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
-
-            <div className="flex items-center gap-4">
-              <hr className="flex-1 border-gray-300 opacity-20" />
-              <span className="text-sm text-gray-500">Or</span>
-              <hr className="flex-1 border-gray-300 opacity-20" />
-            </div>
-
-            <div className="flex gap-2">
-              <button className="flex-1 h-[59px] border border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition">
-                <FaGoogle className="w-6 h-6" />
-                <span className="text-base text-gray-800">Google</span>
-              </button>
-              <button className="flex-1 h-[59px] border border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition">
-                <FaFacebookF className="w-6 h-6" />
-                <span className="text-base text-gray-800">Facebook</span>
-              </button>
-              <button className="flex-1 h-[59px] border border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition">
-                <FaApple className="w-6 h-6" />
-                <span className="text-base text-gray-800">Apple</span>
-              </button>
-            </div>
-
-            <p className="text-base text-gray-800 text-center">
-              Already have an account?{' '}
-              <a className="text-blue-600" href="/authentication/SignIn">
-                Sign In
-              </a>
-            </p>
-          </form>
+          <FaUser className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
         </div>
       </div>
-      <Image
-        src="/images/line.png"
-        alt="Logo"
-        width={1729}
-        height={127}
-        className="absolute top-[1010px]"
-      />
-    </div>
+
+      {/* Email */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-gray-700">Email Address*</label>
+        <div className="relative">
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter Your Email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
+            required
+          />
+          <FaEnvelope className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+        </div>
+      </div>
+
+      {/* Phone */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-gray-700">Phone Number</label>
+        <input
+          type="text"
+          name="phone"
+          placeholder="Enter Your Phone Number"
+          value={formData.phone}
+          onChange={handleChange}
+          className="w-full h-9 border border-gray-300 rounded-md px-2.5 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
+        />
+      </div>
+
+      {/* Password */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-gray-700">Password*</label>
+        <div className="relative">
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter Your Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
+            required
+          />
+          <FaEyeSlash className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+        </div>
+      </div>
+
+      {/* Confirm Password */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-gray-700">Confirm Password*</label>
+        <div className="relative">
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Your Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
+            required
+          />
+          <FaEyeSlash className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+        </div>
+      </div>
+
+      {error && <p className="text-red-600 text-xs text-center">{error}</p>}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className={`w-full h-9 text-white text-sm font-medium rounded-md transition ${
+          loading
+            ? 'bg-red-400 cursor-not-allowed'
+            : 'bg-red-700 hover:bg-red-800'
+        }`}
+      >
+        {loading ? 'Creating...' : 'Create Account'}
+      </button>
+
+      <div className="flex items-center gap-2">
+        <hr className="flex-1 border-gray-300 opacity-20" />
+        <span className="text-xs text-gray-500">Or</span>
+        <hr className="flex-1 border-gray-300 opacity-20" />
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-1">
+        <button className="flex-1 h-9 border border-gray-300 rounded-md flex items-center justify-center gap-1.5 hover:bg-gray-50 transition text-sm">
+          <FaGoogle className="w-4 h-4" />
+          Google
+        </button>
+        <button className="flex-1 h-9 border border-gray-300 rounded-md flex items-center justify-center gap-1.5 hover:bg-gray-50 transition text-sm">
+          <FaFacebookF className="w-4 h-4" />
+          Facebook
+        </button>
+        <button className="flex-1 h-9 border border-gray-300 rounded-md flex items-center justify-center gap-1.5 hover:bg-gray-50 transition text-sm">
+          <FaApple className="w-4 h-4" />
+          Apple
+        </button>
+      </div>
+
+      <p className="text-xs text-gray-800 text-center mt-1">
+        Already have an account?{' '}
+        <a className="text-blue-600 hover:underline" href="/authentication/SignIn">
+          Sign In
+        </a>
+      </p>
+    </form>
+  </div>
+
+  {/* Bottom line image */}
+  <div className="absolute bottom-0 left-0 w-full">
+    <Image
+      src="/images/line.png"
+      alt="Line"
+      width={1729}
+      height={127}
+      className="w-full object-contain"
+    />
+  </div>
+</div>
+
   )
 }

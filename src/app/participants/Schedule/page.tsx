@@ -10,7 +10,7 @@ import api from "@/config/api"
 const filters = ["Daily", "Weekly", "10 Days", "90 Days", "All Time"]
 
 export default function ConferenceSchedulePage() {
-  const [activeFilter, setActiveFilter] = useState("Daily")
+  const [activeFilter, setActiveFilter] = useState("All Time")
   const [search, setSearch] = useState("")
   const [sessions, setSessions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -35,18 +35,15 @@ export default function ConferenceSchedulePage() {
     if (userId && eventId) fetchSessions()
   }, [userId, eventId])
 
-  // filter + search logic
   const filteredSessions = useMemo(() => {
     let data = [...sessions]
 
-    // simple search by title
     if (search.trim()) {
       data = data.filter((s) =>
         s.title.toLowerCase().includes(search.toLowerCase())
       )
     }
 
-    // filter by activeFilter
     if (activeFilter === "Daily") {
       const today = new Date().toDateString()
       data = data.filter(
@@ -75,14 +72,13 @@ export default function ConferenceSchedulePage() {
           new Date(s.startTime) >= now && new Date(s.startTime) <= nextNinety
       )
     }
-    // "All Time" returns everything
+
     return data
   }, [sessions, search, activeFilter])
 
   return (
     <>
       <div className="p-6 md:p-10 min-h-screen font-sans">
-        {/* Header */}
         <div className="flex items-center gap-2 mb-6">
           <Link href="/participants/Home">
             <FaArrowLeft className="text-red-800 w-[20px] h-[20px] cursor-pointer" />
@@ -92,7 +88,6 @@ export default function ConferenceSchedulePage() {
           </h1>
         </div>
 
-        {/* Search, Filters, Date, Icon */}
         <div className="flex md:flex-nowrap justify-between mb-6 gap-3 flex-wrap">
           <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-[385px]">
             <FaSearch className="text-red-900 mr-2" />
@@ -131,7 +126,6 @@ export default function ConferenceSchedulePage() {
           </div>
         </div>
 
-        {/* Banner */}
         <div className="bg-red-900 text-white p-4 rounded-lg flex justify-between items-center mb-6">
           <div>
             <p className="mt-2 text-lg font-medium">My Agenda</p>
@@ -155,7 +149,6 @@ export default function ConferenceSchedulePage() {
           </button>
         </div>
 
-        {/* Agenda Grid */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <p className="text-lg">Loading sessions...</p>
@@ -165,100 +158,101 @@ export default function ConferenceSchedulePage() {
             <p className="text-lg">No sessions found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {filteredSessions.map((session, index) => (
-              <div
-                key={`${session.sessionId}-${index}`}
-                className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col justify-between h-[420px]"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-sm font-semibold text-black">
-                    {session.title}
-                  </h2>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+  {filteredSessions.map((session, index) => (
+    <div
+      key={`${session.sessionId}-${index}`}
+      className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col justify-between h-[460px]"
+    >
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-sm font-semibold text-black">{session.title}</h2>
+      </div>
 
-                <p className="text-xs text-gray-500 mb-3">
-                  {session.description || "No description"}
-                </p>
-                <div className="border border-b-gray-300"></div>
+      <p className="text-xs text-gray-500 mb-3">
+        {session.description || "No description"}
+      </p>
+      <div className="border border-b-gray-300 mb-3"></div>
 
-                {session.speakers && session.speakers.length > 0 ? (
-                  session.speakers.map((sp: any, idx: number) => (
-                    <div
-                      key={`${sp.speakerId}-${idx}`}
-                      className="flex items-center text-xs text-gray-600 mb-1 space-x-2"
-                    >
-                      <img
-                        src={`/uploads/${sp.user.file}`}
-                        alt={sp.user.name}
-                        className="w-6 h-6 rounded-full object-cover"
-                      />
-                      <span>{sp.user.name}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex items-center text-xs text-gray-600 mb-1 space-x-2">
-                    <img
-                      src="/images/img (9).png"
-                      alt="Speaker"
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                    <span>Unknown Speaker</span>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center text-xs text-gray-600">
-                    <FaCalendarAlt className="text-blue-700" />
-                    <span className="ml-1">
-                      {new Date(session.startTime).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}{" "}
-                      -{" "}
-                      {new Date(session.endTime).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                  <span className="px-2 py-2 rounded-xl text-xs font-semibold bg-blue-100 text-blue-700">
-                    {session.category}
-                  </span>
-                </div>
-
-                <div className="flex text-xs text-gray-900 mb-2 items-center justify-between">
-                  <span>Duration:</span>
-                  <span>
-                    {Math.round(
-                      (new Date(session.endTime).getTime() -
-                        new Date(session.startTime).getTime()) /
-                        60000
-                    )}{" "}
-                    minutes
-                  </span>
-                </div>
-                <div className="flex text-xs text-gray-900 mb-2 items-center justify-between">
-                  <span>Room:</span>
-                  <span>{session.location || "Not specified"}</span>
-                </div>
-
-                <div className="text-xs text-gray-600 mb-2">
-                  <span className="font-semibold">Event: </span>
-                  {session.event?.title}
-                </div>
-
-                <Link
-                  href={`/participants/SessionDetail/${session.sessionId}`}
-                  className="w-full"
-                >
-                  <button className="w-full bg-[#9B2033] text-white py-2 text-sm rounded-md hover:bg-red-700 transition">
-                    View Details
-                  </button>
-                </Link>
-              </div>
-            ))}
+      {session.speakers && session.speakers.length > 0 ? (
+        session.speakers.map((sp: any, idx: number) => (
+          <div
+            key={`${sp.speakerId}-${idx}`}
+            className="flex items-center text-xs text-gray-600 mb-1 space-x-2"
+          >
+            <img
+              src={`/uploads/${sp.user.file}`}
+              alt={sp.user.name}
+              className="w-6 h-6 rounded-full object-cover"
+            />
+            <span>{sp.user.name}</span>
           </div>
+        ))
+      ) : (
+        <div className="flex items-center text-xs text-gray-600 mb-1 space-x-2">
+          <img
+            src="/images/img (9).png"
+            alt="Speaker"
+            className="w-6 h-6 rounded-full object-cover"
+          />
+          <span>Unknown Speaker</span>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between mt-3 mb-2">
+        <div className="flex items-center text-xs text-gray-600">
+          <FaCalendarAlt className="text-blue-700" />
+          <span className="ml-1">
+            {new Date(session.startTime).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}{" "}
+            -{" "}
+            {new Date(session.endTime).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
+        </div>
+        <span className="px-2 py-1 rounded-xl text-xs font-semibold bg-blue-100 text-blue-700">
+          {session.category}
+        </span>
+      </div>
+
+      <div className="text-xs text-gray-900 mb-1 flex justify-between">
+        <span>Duration:</span>
+        <span>
+          {Math.round(
+            (new Date(session.endTime).getTime() -
+              new Date(session.startTime).getTime()) /
+              60000
+          )}{" "}
+          minutes
+        </span>
+      </div>
+
+      <div className="text-xs text-gray-900 mb-3 flex justify-between">
+        <span>Room:</span>
+        <span>{session.location || "Not specified"}</span>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Link
+          href={`/participants/SessionDetail1/${session.sessionId}`}
+          className="w-full"
+        >
+          <button className="w-full bg-[#9B2033] text-white py-2 text-sm rounded-md hover:bg-red-700 transition">
+            View Details
+          </button>
+        </Link>
+
+        <button className="w-full bg-blue-600 text-white py-2 text-sm rounded-md hover:bg-blue-700 transition">
+          Join
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
         )}
       </div>
 

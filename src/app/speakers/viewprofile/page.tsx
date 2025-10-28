@@ -182,7 +182,7 @@ export default function SpeakerProfileView() {
         </div>
       </div>
 
-      <div className="w-full flex justify-center fixed bottom-0">
+      <div className="w-full flex justify-center bottom-0">
         <Image src="/images/line.png" alt="Line" width={1450} height={127} className="w-full max-w-screen-xl" />
       </div>
 

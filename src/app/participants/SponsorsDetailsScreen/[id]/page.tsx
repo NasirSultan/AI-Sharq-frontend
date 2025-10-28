@@ -1,14 +1,12 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
-
-import Image from 'next/image'
-import { FaGlobe, FaEnvelope, FaPhone, FaArrowLeft, FaCrown } from 'react-icons/fa'
-import { FaLinkedin, FaTwitter, FaYoutube } from 'react-icons/fa'
+import Image from "next/image"
+import { FaGlobe, FaEnvelope, FaPhone, FaArrowLeft, FaCrown, FaLinkedin, FaTwitter, FaYoutube } from "react-icons/fa"
+import Link from "next/link"
 import RelatedSessionsGrid from "@/app/components/relatedsession"
-import Link from 'next/link'
-import api from '@/config/api'
-
+import api from "@/config/api"
+import { useRouter } from 'next/navigation'
 interface SocialMedia {
   name: string
   website: string
@@ -50,6 +48,7 @@ interface SponsorDetails {
 }
 
 const SponsorsDetailsScreen: React.FC = () => {
+    const router = useRouter()
   const params = useParams()
   const { id } = params
   const [sponsor, setSponsor] = useState<SponsorDetails | null>(null)
@@ -68,88 +67,87 @@ const SponsorsDetailsScreen: React.FC = () => {
     fetchSponsor()
   }, [id])
 
-
   if (!sponsor) return null
 
   return (
-    <div className="relative w-full h-screen">
-      {/* Cover Section with pic_url */}
-      {/* Cover Section with pic_url or fallback */}
-      {/* Cover Section with pic_url or fallback */}
-      {/* Cover Section with fixed default image */}
-     {/* Cover Section with backend pic_url or fallback */}
+    <div className="relative w-full min-h-screen bg-gray-50 overflow-hidden">
+      {/* COVER SECTION (unchanged) */}
+     {/* COVER SECTION */}
 <div
-  className="absolute w-[1440px] h-[231px] bg-cover bg-center"
+  className="absolute w-full max-w-[1440px] h-[231px] bg-cover bg-center left-1/2 -translate-x-1/2 sm:h-[250px] md:h-[280px]"
   style={{
-    backgroundImage: `url(${sponsor.pic_url || '/images/building.jpg'})`,
+    backgroundImage: `url(${sponsor.pic_url || "/images/building.jpg"})`,
   }}
 >
-  {/* Arrow Back Button */}
-  <div className="absolute w-[40px] h-[40px] left-[20px] top-[20px] rounded-full flex items-center justify-center cursor-pointer">
-    <Link href="/participants/Sponsors&Exhibitors">
-      <FaArrowLeft className="text-red-800 w-[20px] h-[20px] cursor-pointer" />
-    </Link>
-  </div>
-
-  {/* Gold Sponsors Label with Crown */}
-  <div className="absolute flex flex-row justify-center items-center gap-2 left-[1149px] top-[39px] w-[211.25px] h-[37px] bg-[#FFFEEF] rounded-full px-3 py-2">
-    <FaCrown className="text-yellow-400 w-[20.25px] h-[15.75px] flex-none" />
-    <span className="text-[#282828] font-medium text-2xl leading-6 tracking-tight font-['IBM_Plex_Sans']">
+  {/* Back Button */}
+ 
+       <div
+   className="absolute w-10 h-10 left-4 sm:left-6 top-4 sm:top-6 rounded-full flex items-center justify-center cursor-pointer bg-white/80 hover:bg-white transition-colors"
+   onClick={() => router.back()}
+ >
+   <FaArrowLeft className="text-red-800 w-5 h-5" />
+ </div>
+  {/* Gold Sponsors Label */}
+  <div className="absolute flex flex-row justify-center items-center gap-2 right-5 top-5 sm:right-8 sm:top-8 px-3 py-1.5 bg-[#FFFEEF] rounded-full w-auto sm:w-auto">
+    <FaCrown className="text-yellow-400 w-5 h-4 sm:w-5.5 sm:h-4.5" />
+    <span className="text-[#282828] font-medium text-lg sm:text-2xl leading-6 tracking-tight">
       Gold Sponsors
     </span>
   </div>
 </div>
 
-      {/* Profile Pic Placeholder with Company Name */}
-      <div
-        className="absolute w-[177px] h-[177px] top-[140px] flex items-center justify-center rounded-full text-white font-semibold text-xl"
-        style={{ left: 'calc(50% - 177px/2 - 550.5px)', background: 'linear-gradient(90deg, #3B82F6 0%, #2563EB 100%)' }}
-      >
-        {sponsor.name}
-      </div>
+{/* PROFILE CIRCLE ON LEFT */}
+<div
+  className="absolute w-40 h-40 sm:w-44 sm:h-44 top-[140px] sm:top-[160px] left-5 sm:left-8 flex items-center justify-center rounded-full text-white font-semibold text-lg sm:text-xl"
+  style={{
+    background: "linear-gradient(90deg, #3B82F6 0%, #2563EB 100%)",
+  }}
+>
+  {sponsor.name}
+</div>
 
-      {/* Main Content */}
-      <div className="absolute w-[1280px] h-[1336px] left-[80px] top-[351px] flex flex-col gap-11">
+
+      {/* MAIN SECTION */}
+      <div className="relative mt-[400px] sm:mt-[380px] mx-auto w-[90%] max-w-[1280px] flex flex-col gap-10">
         {/* Contact Sponsor Button */}
-        <button className="w-44 h-12 bg-[#9B2033] text-white rounded-md font-medium text-base mb-4 p-3 flex items-center justify-center">
+        <button className="w-44 h-12 bg-[#9B2033] text-white rounded-md font-medium text-base mx-auto sm:mx-0">
           Contact Sponsor
         </button>
 
-        <div className="flex flex-row gap-5 w-full h-[241px]">
-          {/* Company Description */}
-          <div className="w-[940px] h-[270px] p-8 bg-white border border-gray-300 shadow-sm rounded-2xl flex flex-col gap-6">
-            <h2 className="text-lg font-semibold text-[#282828]">{sponsor.name}</h2>
-            <p className="text-sm text-[#424242] leading-5">{sponsor.description}</p>
+        {/* Description & Contact */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <h2 className="text-lg font-semibold text-[#282828] mb-3">{sponsor.name}</h2>
+            <p className="text-sm sm:text-base text-[#424242] leading-6">{sponsor.description}</p>
           </div>
 
-          {/* Contact Information */}
-          <div className="w-[325px] h-[270px] p-8 bg-white border border-gray-300 shadow-sm rounded-2xl flex flex-col gap-3">
-            <h2 className="text-lg font-semibold text-[#282828]">Contact Information</h2>
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-row items-center gap-4">
+          <div className="w-full lg:w-[325px] p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <h2 className="text-lg font-semibold text-[#282828] mb-4">Contact Information</h2>
+            <div className="flex flex-col gap-5">
+              <div className="flex items-center gap-4">
                 <div className="w-9 h-9 bg-blue-100 rounded-2xl flex items-center justify-center">
                   <FaGlobe className="text-blue-600" />
                 </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-700">Website</span>
-                  <span className="text-sm text-blue-600">{sponsor.contacts[0]?.name}</span>
+                <div>
+                  <span className="text-sm font-medium text-gray-700 block">Website</span>
+                  <span className="text-sm text-blue-600 break-all">{sponsor.contacts[0]?.name}</span>
                 </div>
               </div>
-              <div className="flex flex-row items-center gap-4">
+              <div className="flex items-center gap-4">
                 <div className="w-9 h-9 bg-green-100 rounded-2xl flex items-center justify-center">
                   <FaEnvelope className="text-green-600" />
                 </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-700">Email</span>
-                  <span className="text-sm text-black">{sponsor.contacts[0]?.email}</span>
+                <div>
+                  <span className="text-sm font-medium text-gray-700 block">Email</span>
+                  <span className="text-sm text-black break-all">{sponsor.contacts[0]?.email}</span>
                 </div>
               </div>
-              <div className="flex flex-row items-center gap-4">
+              <div className="flex items-center gap-4">
                 <div className="w-9 h-9 bg-purple-100 rounded-2xl flex items-center justify-center">
                   <FaPhone className="text-purple-600" />
                 </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-700">Phone</span>
+                <div>
+                  <span className="text-sm font-medium text-gray-700 block">Phone</span>
                   <span className="text-sm text-black">{sponsor.contacts[0]?.phone}</span>
                 </div>
               </div>
@@ -157,42 +155,47 @@ const SponsorsDetailsScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Representatives */}
-        <div className="flex flex-row gap-5 w-full">
-          <div className="w-[625px] h-[389px] p-10 bg-white border border-gray-300 shadow-sm rounded-2xl flex flex-col gap-10">
-            <h2 className="text-2xl font-medium text-[#282828]">Representatives</h2>
+        {/* Representatives & Products */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 p-8 bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <h2 className="text-2xl font-medium text-[#282828] mb-6">Representatives</h2>
             <div className="flex flex-col gap-3">
               {sponsor.representatives.map(rep => (
-                <div key={rep.id} className="w-full h-18 p-4 bg-white border border-gray-200 shadow-sm rounded-lg flex flex-row justify-between items-center">
-                  <div className="flex flex-row items-center gap-3">
+                <div
+                  key={rep.id}
+                  className="flex justify-between items-center p-4 border border-gray-100 rounded-lg shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
                     <Image
-                      src={rep.user.photo ? `/uploads/${rep.user.photo}` : '/images/default-avatar.png'}
+                      src={rep.user.photo ? `/uploads/${rep.user.photo}` : "/images/default-avatar.png"}
                       alt={rep.user.name}
                       width={40}
                       height={40}
                       className="rounded-full"
                     />
-                    <div className="flex flex-col gap-2">
-                      <span className="text-base font-medium text-[#282828]">{rep.user.name}</span>
+                    <div>
+                      <span className="text-base font-medium text-[#282828] block">{rep.user.name}</span>
                       <span className="text-sm text-gray-600">{rep.user.organization}</span>
                     </div>
                   </div>
-                  <span className="text-base font-medium text-red-700">Connect</span>
+                  <span className="text-base font-medium text-red-700 cursor-pointer">Connect</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Products */}
-          <div className="w-[625px] h-[389px] p-10 bg-white border border-gray-300 shadow-sm rounded-2xl flex flex-col gap-10">
-            <h2 className="text-2xl font-medium text-[#282828]">Products & Services</h2>
+          <div className="flex-1 p-8 bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <h2 className="text-2xl font-medium text-[#282828] mb-6">Products & Services</h2>
             <div className="flex flex-col gap-3">
               {sponsor.products.map(product => (
-                <div key={product.id} className="w-full h-16 p-4 bg-white border border-gray-200 shadow-sm rounded-lg flex flex-row items-center gap-4">
+                <div
+                  key={product.id}
+                  className="flex items-center gap-4 p-4 border border-gray-100 rounded-lg shadow-sm"
+                >
                   <div className="w-9 h-9 bg-blue-100 rounded-2xl flex items-center justify-center">
                     <FaGlobe className="text-blue-600" />
                   </div>
-                  <div className="flex flex-col gap-1 flex-1">
+                  <div className="flex flex-col flex-1">
                     <span className="text-base font-medium text-[#282828]">{product.title}</span>
                     <span className="text-sm text-gray-600">{product.description}</span>
                   </div>
@@ -202,45 +205,49 @@ const SponsorsDetailsScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Sessions Sponsored */}
-        <div className="flex flex-row justify-between items-center w-full">
-          <h2 className="text-2xl font-medium text-[#282828]">Sessions Sponsored</h2>
-          <span className="text-base font-medium text-[#282828] cursor-pointer">View All</span>
+        {/* Sessions Section */}
+        <div className="flex justify-between items-center">
+          {/* <h2 className="text-2xl font-medium text-[#282828]">Sessions Sponsored</h2> */}
+   
         </div>
+{/* 
+        <RelatedSessionsGrid /> */}
 
-        <RelatedSessionsGrid />
-
-        {/* Follow Us Section */}
-        <div className="flex flex-col items-start gap-4 w-full mt-8">
-          <h2 className="text-2xl font-medium text-[#282828] mb-4">Follow Us</h2>
-          <div className="flex flex-row gap-6 w-full">
+        {/* Social Section */}
+        <div className="flex flex-col items-start gap-4 mt-8">
+          <h2 className="text-2xl font-medium text-[#282828]">Follow Us</h2>
+          <div className="flex flex-wrap gap-4 w-full">
             {sponsor.socialMedia.map((s, index) => (
-              <a
-                key={index}
-                href={s.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="basis-[30%] shrink-0"
-              >
+              <a key={index} href={s.website} target="_blank" rel="noopener noreferrer" className="w-full sm:w-[30%]">
                 <button
-                  className={`w-full h-12 rounded-lg flex items-center justify-center gap-3
-            ${s.name === 'LinkedIn' ? 'bg-blue-600' : ''}
-            ${s.name === 'Twitter' ? 'bg-blue-400' : ''}
-            ${s.name === 'YouTube' ? 'bg-red-500' : ''}`}
+                  className={`w-full h-12 rounded-lg flex items-center justify-center gap-3 text-white ${
+                    s.name === "LinkedIn"
+                      ? "bg-blue-600"
+                      : s.name === "Twitter"
+                      ? "bg-blue-400"
+                      : s.name === "YouTube"
+                      ? "bg-red-500"
+                      : "bg-gray-600"
+                  }`}
                 >
-                  {s.name === 'LinkedIn' && <FaLinkedin className="text-white" />}
-                  {s.name === 'Twitter' && <FaTwitter className="text-white" />}
-                  {s.name === 'YouTube' && <FaYoutube className="text-white" />}
-                  <span className="text-base font-normal text-white">{s.name}</span>
+                  {s.name === "LinkedIn" && <FaLinkedin />}
+                  {s.name === "Twitter" && <FaTwitter />}
+                  {s.name === "YouTube" && <FaYoutube />}
+                  <span className="text-base font-normal">{s.name}</span>
                 </button>
               </a>
             ))}
           </div>
         </div>
-
       </div>
 
-      <Image src="/images/line.png" alt="Logo" width={1729} height={127} className="absolute top-[1910px]" />
+      <Image
+        src="/images/line.png"
+        alt="line"
+        width={1729}
+        height={127}
+        className="mt-16 mx-auto block relative"
+      />
     </div>
   )
 }
