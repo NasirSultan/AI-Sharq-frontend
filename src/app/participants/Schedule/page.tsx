@@ -6,7 +6,8 @@ import Link from "next/link"
 import { useSelector } from "react-redux"
 import { RootState } from "@/lib/store/store"
 import api from "@/config/api"
-
+import { useRouter } from "next/navigation" 
+import LoadingButton from "@/app/components/LoadingButton"
 const filters = ["Daily", "Weekly", "10 Days", "90 Days", "All Time"]
 
 export default function ConferenceSchedulePage() {
@@ -14,9 +15,11 @@ export default function ConferenceSchedulePage() {
   const [search, setSearch] = useState("")
   const [sessions, setSessions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-
+const router = useRouter()
   const userId = useSelector((state: RootState) => state.user.userId)
   const eventId = useSelector((state: RootState) => state.event.id)
+const [joinLoadingId, setJoinLoadingId] = useState<string | null>(null)
+
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -245,9 +248,21 @@ export default function ConferenceSchedulePage() {
           </button>
         </Link>
 
-        <button className="w-full bg-blue-600 text-white py-2 text-sm rounded-md hover:bg-blue-700 transition">
-          Join
-        </button>
+    <LoadingButton
+  text="Join"
+  loading={joinLoadingId === session.sessionId}
+  color="bg-blue-600"
+  onClick={() => {
+    setJoinLoadingId(session.sessionId)
+    localStorage.setItem("sessionName", session.title)
+    setTimeout(() => {
+      router.push(`/agora/joingsession`)
+    }, 1000)
+  }}
+/>
+
+
+
       </div>
     </div>
   ))}
