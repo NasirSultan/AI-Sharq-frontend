@@ -30,7 +30,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     if (!isPublic) {
       // If not logged in
       if (!token) {
-        router.replace("/authentication/signin")
+        router.replace("/authentication/SignIn")
         return
       }
 
