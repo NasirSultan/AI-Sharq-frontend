@@ -6,7 +6,7 @@ import { FaArrowLeft } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store/store'
 import api from '@/config/api'
-
+import { useRouter } from "next/navigation"
 interface User {
   id: number
   name: string
@@ -43,7 +43,7 @@ const ChatPage: React.FC = () => {
   const [newMessage, setNewMessage] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [unreadCounts, setUnreadCounts] = useState<{ [userId: number]: number }>({})
-
+const router = useRouter()
   // Generate Google Avatar URL based on user name
   const getAvatarUrl = (user: User) => {
     // Use the first letter of the name for the avatar
@@ -151,9 +151,10 @@ const ChatPage: React.FC = () => {
       {/* Header */}
       <div className="shrink-0 bg-white border-b border-gray-200">
         <div className="flex items-center gap-2 py-4 px-6">
-          <Link href="/participants/Home">
-            <FaArrowLeft className="text-red-800 w-5 h-5 cursor-pointer" />
-          </Link>
+      <FaArrowLeft
+  onClick={() => router.back()}
+  className="text-red-800 w-5 h-5 cursor-pointer hover:text-red-900 transition"
+/>
           <h1 className="text-xl font-semibold text-black ml-4">Chats</h1>
         </div>
       </div>

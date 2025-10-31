@@ -30,7 +30,7 @@ const quickAccessItems = [
     label: 'Networking',
     desc: 'Connect & chat',
     img: '/images/div (4).png',
-    Link: '/participants/Networking',
+    Link: '/participants/MyConnections',
   },
   {
     label: 'Venue Maps',

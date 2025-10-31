@@ -79,7 +79,7 @@ export default function SpeakerSessions() {
               <FaMessage className="text-[#9B2033] text-xl" />
             </div>
             <h2 className="text-lg font-semibold text-[#9B2033]">Chats List</h2>
-            <Link href="/speakers/Messages" className="ml-auto">
+            <Link href="/participants/MyConnections" className="ml-auto">
               <FaArrowRight className="text-[#9B2033] text-2xl" />
             </Link>
           </div>
@@ -218,7 +218,14 @@ export default function SpeakerSessions() {
           ))}
         </div>
 
-        <Image src="/images/line.png" alt="Line" width={1729} height={127} className="w-full mt-6" />
+<Image
+  src="/images/line.png"
+  alt="Line"
+  width={1729}
+  height={127}
+  className="w-full mt-6"
+/>
+
 
       </div>
     </div>

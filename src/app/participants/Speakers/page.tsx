@@ -55,7 +55,7 @@ export default function SpeakersPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-6 p-4 max-w-5xl mx-auto">
+      <div className="flex flex-col gap-6 p-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-6">
           <Link href="/participants/Home">
             <FaArrowLeft className="text-red-800 w-5 h-5 cursor-pointer" />
@@ -159,7 +159,7 @@ export default function SpeakersPage() {
       <Image
         src="/images/line.png"
         alt="Line"
-        width={1200}
+        width={2200}
         height={100}
         className="absolute"
       />

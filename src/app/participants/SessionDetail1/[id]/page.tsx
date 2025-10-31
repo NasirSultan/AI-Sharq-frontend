@@ -9,6 +9,9 @@ import { useSelector } from "react-redux"
 import { RootState } from "@/lib/store/store"
 import { useRouter } from "next/navigation"
 import LoadingButton from "@/app/components/LoadingButton"
+import { FaVideo, FaArrowRight } from "react-icons/fa";
+import { useDispatch } from "react-redux"
+import { setSpeakerId } from "@/lib/store/features/speaker/speakerSlice"
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -21,10 +24,12 @@ export default function SessionPage({ params }: PageProps) {
   const [bookmarked, setBookmarked] = useState(false)
   const [bookmarkLoading, setBookmarkLoading] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
+const [joining, setJoining] = useState(false)
 
   const router = useRouter()
   const userId = useSelector((state: RootState) => state.user.userId)
   const eventId = useSelector((state: RootState) => state.event.id)
+const dispatch = useDispatch()
 
 
 console.log 
@@ -72,12 +77,40 @@ console.log
       setBookmarkLoading(false)
     }
   }
-
+const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : null;
   if (loading)
     return (
       <div className="flex justify-center mt-20">
-        <LoadingButton text="Loading session..." loading={true} color="bg-red-600" />
-      </div>
+  <button
+    disabled
+    className="flex items-center gap-2 px-6 py-2 rounded-lg font-medium text-red-6 cursor-not-allowed"
+  >
+    <svg
+      className="animate-spin h-5 w-5 text-red-600"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      ></circle>
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v8H4z"
+      ></path>
+    </svg>
+    Loading session...
+  </button>
+</div>
+
+
+
     )
 
   if (!session) return <p className="text-center mt-10">No session found</p>
@@ -169,19 +202,122 @@ console.log
         <p className="text-sm text-gray-600">{session.description}</p>
       </div>
 
-    {session.speakers?.length > 0 && (
+{session.location?.toLowerCase() === "online" && (
+  <div
+    onClick={() => {
+      if (joining) return
+      const now = new Date()
+      const start = new Date(session.startTime)
+      const end = new Date(session.endTime)
+      const isLive = now >= start && now <= end
+
+      if (!isLive) return
+
+      setJoining(true)
+      localStorage.setItem("sessionName", session.title)
+      setTimeout(() => {
+        router.push(`/agora/joinsession`)
+      }, 1000)
+    }}
+    className={`flex items-center gap-3 p-4 rounded-2xl shadow transition ${
+      joining
+        ? "bg-[#ffdada]"
+        : "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
+    } ${
+      new Date() < new Date(session.startTime) ||
+      new Date() > new Date(session.endTime)
+        ? "opacity-60 cursor-not-allowed"
+        : ""
+    }`}
+  >
+    <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center relative overflow-hidden">
+      {joining ? (
+        <svg
+          className="animate-spin h-5 w-5 text-[#9B2033]"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v8H4z"
+          ></path>
+        </svg>
+      ) : (
+        <>
+          {new Date() >= new Date(session.startTime) &&
+          new Date() <= new Date(session.endTime) ? (
+            <>
+              <span className="absolute w-12 h-12 rounded-full border-2 border-[#9B2033]/40 animate-wave"></span>
+              <span className="absolute w-12 h-12 rounded-full border border-[#9B2033]/30 animate-wave-delayed"></span>
+              <FaVideo className="text-[#9B2033] text-xl relative z-10 animate-pulse-smooth" />
+            </>
+          ) : (
+            <FaVideo className="text-[#9B2033] text-xl opacity-50" />
+          )}
+        </>
+      )}
+    </div>
+
+    <div>
+      <h2 className="text-lg font-semibold text-[#9B2033]">
+        {joining
+          ? "Joining..."
+          : new Date() >= new Date(session.startTime) &&
+            new Date() <= new Date(session.endTime)
+          ? "Join Live Session"
+          : "Session Not Live"}
+      </h2>
+      <p className="text-xs text-[#9B2033]">
+        {joining
+          ? "Redirecting..."
+          : new Date() >= new Date(session.startTime) &&
+            new Date() <= new Date(session.endTime)
+          ? "Click to join the live session"
+          : "You can join only during live time"}
+      </p>
+    </div>
+
+    {!joining && (
+      <FaArrowRight className="text-[#9B2033] text-2xl ml-auto" />
+    )}
+  </div>
+)}
+
+
+
+
+
+
+{session.speakers?.length > 0 && (
   <div className="space-y-4">
     <h3 className="text-md font-semibold text-black">Speakers</h3>
     {session.speakers.map((speaker: any) => (
       <div
         key={speaker.id}
-        className="flex items-start bg-white border border-gray-200 rounded-xl p-5 shadow-sm relative"
+        
+       onClick={() => {
+  dispatch(setSpeakerId(speaker.id))
+  router.push(`/participants/SpeakerDetails/${speaker.id}`)
+}}
+
+        className="flex items-start bg-white border border-gray-200 rounded-xl p-5 shadow-sm relative cursor-pointer hover:shadow-md transition"
       >
-        <img
-          src={speaker.user?.photo || "/images/img (13).png"}
-          alt={speaker.user?.name}
-          className="w-20 h-20 rounded-full object-cover"
-        />
+       <img
+  src={speaker.user?.file || "/images/img (13).png"}
+  alt={speaker.user?.name}
+  className="w-20 h-20 rounded-full object-cover"
+/>
+
         <div className="flex-1 flex flex-col ml-4 text-xs text-gray-800 space-y-1">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2 flex-wrap">
@@ -206,14 +342,15 @@ console.log
         </div>
 
         {speaker.tags?.[0] && (
-         <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-xl ml-auto self-start">
-  {speaker.tags[0]}
-</span>
+          <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-xl ml-auto self-start">
+            {speaker.tags[0]}
+          </span>
         )}
       </div>
     ))}
   </div>
 )}
+
 
 
       <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
@@ -239,11 +376,10 @@ console.log
       : "No Registration Required"}
   </p>
 
-  {session.registrationRequired ? (
+{userRole === "participant" && (
+  session.registrationRequired ? (
     <button
-      onClick={() => {
-        router.push(`/participants/RegisterSession/${id}`)
-      }}
+      onClick={() => router.push(`/participants/RegisterSession/${id}`)}
       className="bg-red-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-red-700"
     >
       Register Now
@@ -255,12 +391,14 @@ console.log
     >
       Not Required
     </button>
-  )}
+  )
+)}
+
 </div>
 
       </div>
 
-      <RelatedSessionsGrid />
+ {userRole !== "speaker" && <RelatedSessionsGrid />}
 
       <section className="space-y-3">
         <h2 className="text-base font-semibold text-black">Who's Attending</h2>
@@ -280,20 +418,7 @@ console.log
               {session.registrationCount} registered attendees
             </span>
           </div>
-          <button className="text-red-700 hover:text-red-900">
-            <svg
-              width="30"
-              height="26"
-              viewBox="0 0 30 26"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M29.3722 11.4704C30.2093 12.3164 30.2093 13.6904 29.3722 14.5364L18.6573 25.3655C17.8202 26.2115 16.4607 26.2115 15.6236 25.3655C14.7865 24.5195 14.7865 23.1455 15.6236 22.2995L22.6888 15.1658H2.14298C0.957643 15.1658 0 14.198 0 13C0 11.802 0.957643 10.8342 2.14298 10.8342H22.6821L15.6303 3.70051C14.7932 2.85448 14.7932 1.48054 15.6303 0.634518C16.4674 -0.211506 17.8269 -0.211506 18.664 0.634518L29.3789 11.4636L29.3722 11.4704Z"
-                fill="#9B2033"
-              />
-            </svg>
-          </button>
+          
         </div>
       </section>
 

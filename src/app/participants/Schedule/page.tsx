@@ -256,7 +256,7 @@ const [joinLoadingId, setJoinLoadingId] = useState<string | null>(null)
     setJoinLoadingId(session.sessionId)
     localStorage.setItem("sessionName", session.title)
     setTimeout(() => {
-      router.push(`/agora/joingsession`)
+      router.push(`/agora/joinsession`)
     }, 1000)
   }}
 />

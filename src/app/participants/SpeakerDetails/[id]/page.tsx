@@ -7,13 +7,13 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import api from "@/config/api"
 import SpeakerSession from "../Speakersession/page"
-
+import { useRouter } from 'next/navigation'
 const SpeakerDetails = () => {
   const params = useParams()
   const speakerId = params?.id
 
   const [speaker, setSpeaker] = useState<any>(null)
-
+  const router = useRouter()
   useEffect(() => {
     const fetchSpeaker = async () => {
       if (!speakerId) return
@@ -30,12 +30,16 @@ const SpeakerDetails = () => {
   if (!speaker) return <p className="text-center mt-20">Loading...</p>
 
   return (
-    <div className="flex flex-col items-center p-6 gap-10 max-w-5xl mx-auto min-h-screen">
+<>
+
+  <div className="flex flex-col items-center gap-5 max-w-full lg:max-w-6xl mx-auto min-h-screen">
+
       {/* Header */}
-      <div className="flex items-center gap-4 w-full">
-        <Link href="/participants/Speakers">
-          <FaArrowLeft className="text-red-800 w-6 h-6 cursor-pointer" />
-        </Link>
+      <div className="flex items-center gap-4 w-full mt-5 ">
+         <FaArrowLeft
+      onClick={() => router.back()}
+      className="text-red-800 w-6 h-6 cursor-pointer"
+    />
         <h1 className="text-2xl font-medium text-gray-900">Speaker Details</h1>
       </div>
 
@@ -85,7 +89,7 @@ const SpeakerDetails = () => {
       </div>
 
       {/* Contact & Social */}
-      <div className="w-full p-5 bg-white border border-gray-300 shadow-sm rounded-xl">
+      <div className="w-full bg-white">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Connect & Contact</h3>
         <div className="flex flex-wrap gap-3">
           {speaker.linkedin && (
@@ -131,9 +135,27 @@ const SpeakerDetails = () => {
             </a>
           )}
         </div>
+     
+     
+     
       </div>
+
+
     </div>
-  )
+    
+  <div className="relative w-full mt-12">
+      <Image
+        src="/images/line.png"
+        alt="Line"
+        width={2200}
+        height={100}
+        className="w-full object-contain"
+      />
+    </div>
+
+
+</>
+)
 }
 
 export default SpeakerDetails

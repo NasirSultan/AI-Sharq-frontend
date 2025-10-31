@@ -56,6 +56,12 @@ const AgoraTokenCard = () => {
     try {
       localStorage.setItem("sessionUserName", userName.trim())
       localStorage.setItem("agoraToken", token)
+      
+      // Store user ID as Agora ID in localStorage
+      if (userId) {
+        localStorage.setItem("agoraId", userId.toString())
+      }
+      
       setShowSuccessPopup(true)
       setTimeout(() => {
         router.push("/agora")
@@ -63,6 +69,14 @@ const AgoraTokenCard = () => {
     } finally {
       setButtonLoading(false)
     }
+  }
+
+const handleSkip = () => {
+  router.back()
+}
+
+  const handleRefresh = () => {
+    window.location.reload()
   }
 
   return (
@@ -90,6 +104,9 @@ const AgoraTokenCard = () => {
               className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-sm focus:outline-none focus:ring-2 focus:ring-red-600"
             />
           </div>
+          
+    
+        
         </div>
 
         <div className="pt-4">
@@ -100,6 +117,16 @@ const AgoraTokenCard = () => {
             color="bg-red-600 w-full"
             disabled={!userName.trim() || !token || buttonLoading}
           />
+        </div>
+
+        {/* New action buttons */}
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={handleSkip}
+            className="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
+          >
+            Skip to Schedule
+          </button>
         </div>
 
         <div className="mt-4 text-center">
