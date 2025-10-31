@@ -20,52 +20,29 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     if (typeof window === "undefined") return
 
     const token = localStorage.getItem("token")
-
-    if (!(router.push as any)._patched) {
-      const originalPush = router.push
-      ;(router.push as any) = (url: string, ...args: any[]) => {
-        sessionStorage.setItem("cameFromApp", "true")
-        originalPush(url, ...args)
-      }
-      ;(router.push as any)._patched = true
-
-      document.addEventListener("click", (e) => {
-        const link = (e.target as HTMLElement).closest("a")
-        if (link && link.href && link.origin === window.location.origin) {
-          sessionStorage.setItem("cameFromApp", "true")
-        }
-      })
-    }
-
     const lastPage = sessionStorage.getItem("lastPage")
     const navigationType = performance.getEntriesByType("navigation")[0]?.type
-    const isRefresh = navigationType === "reload"
-    const isBackForward = navigationType === "back_forward"
+    const isManualAccess = navigationType === "navigate" && lastPage !== pathname
 
-    setTimeout(() => {
-      const cameFromApp = sessionStorage.getItem("cameFromApp")
+    sessionStorage.setItem("lastPage", pathname)
 
-      if (!isPublic && !token) {
-        router.replace("/authentication/SignIn")
+    // If visiting a private route
+    if (!isPublic) {
+      // If not logged in
+      if (!token) {
+        router.replace("/authentication/signin")
         return
       }
 
-      if (!isPublic && token) {
-        const isSamePageRefresh = lastPage === pathname
-        const isManualAccess =
-          !cameFromApp && !isRefresh && !isBackForward && !isSamePageRefresh
-
-        // Allow browser back/forward navigation
-        if (isManualAccess && !isBackForward) {
-          router.replace("/authentication/SignIn")
-          return
-        }
+      // If logged in, allow full navigation
+      if (token) {
+        setIsChecking(false)
+        return
       }
+    }
 
-      sessionStorage.setItem("lastPage", pathname)
-      sessionStorage.removeItem("cameFromApp")
-      setIsChecking(false)
-    }, 0)
+    // If public route, no restriction
+    setIsChecking(false)
   }, [pathname, isPublic, router])
 
   const hideNavbar = pathname === "/" || pathname.startsWith("/authentication/")
