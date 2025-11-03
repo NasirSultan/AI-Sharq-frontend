@@ -116,7 +116,7 @@ const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : 
   if (!session) return <p className="text-center mt-10">No session found</p>
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8 relative">
+    <div className="p-6 max-w-6xl mx-auto space-y-8 relative">
       {showPopup && (
         <div className="fixed top-5 right-5 bg-green-600 text-white px-4 py-2 rounded-xl shadow-md">
           Added to your agenda
@@ -151,10 +151,10 @@ const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : 
 
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-3">
         <div className="flex justify-between text-xs font-semibold text-red-700">
-          <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-xl">
+          <span className="bg-purple-100 text-purple-700 px-2 mt-3 py-1 rounded-xl">
             {session.category}
           </span>
-          <div className="text-right text-gray-700">
+          <div className="text-right text-red-700">
             <div>
               {new Date(session.startTime).toLocaleTimeString([], {
                 hour: "2-digit",
@@ -380,19 +380,20 @@ const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : 
   session.registrationRequired ? (
     <button
       onClick={() => router.push(`/participants/RegisterSession/${id}`)}
-      className="bg-red-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-red-700"
+      className="bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded-lg hover:bg-red-700 cursor-pointer"
     >
       Register Now
     </button>
   ) : (
     <button
       disabled
-      className="bg-gray-300 text-gray-500 text-xs font-semibold px-4 py-2 rounded-lg cursor-not-allowed"
+      className="bg-gray-300 text-gray-500 text-xs font-semibold px-2 py-1 rounded-lg cursor-not-allowed"
     >
       Not Required
     </button>
   )
 )}
+
 
 </div>
 

@@ -5,88 +5,136 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store/store'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { FaQrcode, FaUsers, FaMapMarkedAlt } from 'react-icons/fa'
 import api from '@/config/api'
+import UserQRModal from './UserQRModal'
 
 export default function Navbar() {
   const router = useRouter()
   const userId = useSelector((state: RootState) => state.user.userId)
 
-  const [user, setUser] = useState({
-    name: '',
-    file: '',
-  })
-
+  const [user, setUser] = useState({ name: '', file: '' })
   const [loading, setLoading] = useState(true)
+  const [showQR, setShowQR] = useState(false)
+  const [unreadMessages, setUnreadMessages] = useState(false)
+  const [unreadNotifications, setUnreadNotifications] = useState(false)
+  const [role, setRole] = useState<string | null>(null)
 
   useEffect(() => {
-    const role = localStorage.getItem('role')
+    const storedRole = localStorage.getItem('role')
+    setRole(storedRole)
 
-    // If role is exhibitor or sponsor, take data from localStorage
-    if (role === 'exhibitor' || role === 'sponsor') {
+    if (storedRole === 'exhibitor' || storedRole === 'sponsor') {
       const name = localStorage.getItem('name')
       const file = localStorage.getItem('picUrl')
-
       setUser({
         name: name || 'User',
         file: file || '/images/default-avatar.png',
       })
-
       setLoading(false)
-      return
-    }
-
-    // Otherwise, call user API
-    const fetchUser = async () => {
-      try {
-        if (!userId) return
-
-        const res = await api.get(`/admin/users/${userId}`)
-        const data = res.data
-
-        setUser({
-          name: data.name || '',
-          file: data.file || '',
-        })
-      } catch (err) {
-        console.error('Error loading user', err)
-      } finally {
-        setLoading(false)
+    } else if (userId) {
+      const fetchUser = async () => {
+        try {
+          const res = await api.get(`/admin/users/${userId}`)
+          const data = res.data
+          setUser({
+            name: data.name || '',
+            file: data.file || '',
+          })
+        } catch (err) {
+          console.error('Error loading user', err)
+        } finally {
+          setLoading(false)
+        }
       }
+      fetchUser()
     }
 
-    fetchUser()
+    const unreadMsgs = localStorage.getItem('unreadMessages') === 'true'
+    const unreadNotifs = localStorage.getItem('unreadNotifications') === 'true'
+    setUnreadMessages(unreadMsgs)
+    setUnreadNotifications(unreadNotifs)
   }, [userId])
+
+  const handleLogoClick = () => {
+    if (role === 'speaker') router.push('/speakers/ManageSessions')
+    else if (role === 'participant') router.push('/participants/Home')
+    else if (role === 'exhibitor') router.push('/Exhibitors/dashboard')
+    else if (role === 'sponsor') router.push('/sponsors/ManageSessions')
+    else if (role === 'organizer') router.push('/Organizer/Dashboard')
+    else router.push('/')
+  }
+
+  const handleMessagesClick = () => {
+    setUnreadMessages(false)
+    localStorage.setItem('unreadMessages', 'false')
+    router.push('/participants/Masseges')
+  }
+
+  const handleNotificationsClick = () => {
+    setUnreadNotifications(false)
+    localStorage.setItem('unreadNotifications', 'false')
+    router.push('/participants/Masseges')
+  }
+
+  const handleVenuesClick = () => {
+    if (role === 'participant') router.push('/participants/vanue')
+    else if (role === 'organizer') router.push('/organizer/Venues')
+  }
+
+  const showChatAndNetworking =
+    role === 'organizer' || role === 'speaker' || role === 'participant'
 
   return (
     <nav className="w-full bg-white shadow-md px-6 py-6 flex items-center justify-between">
-    <div className="flex items-center">
-  <Image
-    src="/images/logo1.png"
-    alt="Logo"
-    width={150}
-    height={150}
-    className="object-contain"
-  />
-</div>
+      <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
+        <Image
+          src="/images/logo1.png"
+          alt="Logo"
+          width={150}
+          height={150}
+          className="object-contain"
+        />
+      </div>
 
+      <div className="flex items-center gap-4">
+        {showChatAndNetworking && (
+          <button
+            onClick={() => router.push('/participants/MyConnections')}
+            className="p-3 bg-red-100 text-red-700 rounded-full shadow transition cursor-pointer"
+          >
+            <FaUsers className="w-4 h-4" />
+          </button>
+        )}
 
-      <div className="flex items-center gap-6">
-        {/* Notifications */}
-        <div
-          className="relative cursor-pointer"
-          onClick={() => router.push('/participants/Masseges')}
+        <button
+          onClick={() => setShowQR(true)}
+          className="p-3 text-red-700 rounded-full shadow transition bg-red-100 cursor-pointer"
         >
-          <div className="w-10 h-10 flex items-center p-2 justify-center bg-red-100 rounded-full shadow-sm">
-            <img src="/images/tabler-icon-bell-filled.png" alt="Notifications" />
+          <FaQrcode className="w-4 h-4" />
+        </button>
+
+        {(role === 'participant' || role === 'organizer') && (
+          <button
+            onClick={handleVenuesClick}
+            className="p-3 bg-red-100 text-red-700 rounded-full shadow transition cursor-pointer"
+          >
+            <FaMapMarkedAlt className="w-4 h-4" />
+          </button>
+        )}
+
+        {showChatAndNetworking && (
+          <div className="relative cursor-pointer" onClick={handleMessagesClick}>
+            <div className="w-10 h-10 flex items-center p-2 justify-center bg-red-100 rounded-full shadow-sm">
+              <img src="/images/tabler-icon-bell-filled.png" alt="Notifications" />
+            </div>
+            {unreadMessages && (
+              <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#234D70] rounded-full border border-white"></span>
+            )}
           </div>
-          <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#234D70] rounded-full border border-white"></span>
-        </div>
+        )}
 
-        {/* Messages */}
-        <div
-          className="relative cursor-pointer"
-          onClick={() => router.push('/participants/Messages')}
-        >
+        <div className="relative cursor-pointer" onClick={handleNotificationsClick}>
           <div className="w-10 h-10 flex items-center p-2 justify-center bg-red-100 rounded-full shadow-sm">
             <svg
               width="21"
@@ -105,29 +153,21 @@ export default function Navbar() {
               />
             </svg>
           </div>
-          <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#234D70] rounded-full border border-white"></span>
+          {unreadNotifications && (
+            <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#234D70] rounded-full border border-white"></span>
+          )}
         </div>
 
-        {/* User Info */}
         {!loading && (
           <div
             className="flex items-center gap-3 cursor-pointer"
             onClick={() => {
-              const role = localStorage.getItem('role')
-
-              if (role === 'speaker') {
-                router.push('/speakers/viewprofile')
-              } else if (role === 'participant') {
-                router.push('/participants/view')
-              } else if (role === 'exhibitor') {
-                router.push('/Exhibitors/viewprofle')
-              } else if (role === 'sponsor') {
-                router.push('/sponsors/viewprofile')
-              }else if (role === 'organizer') {
-                router.push('/participants/view')
-              } else {
-                router.push('/')
-              }
+              if (role === 'speaker') router.push('/speakers/viewprofile')
+              else if (role === 'participant') router.push('/participants/view')
+              else if (role === 'exhibitor') router.push('/Exhibitors/viewprofle')
+              else if (role === 'sponsor') router.push('/sponsors/viewprofile')
+              else if (role === 'organizer') router.push('/participants/view')
+              else router.push('/')
             }}
           >
             <img
@@ -139,13 +179,7 @@ export default function Navbar() {
               <span className="text-sm text-red-500">Welcome</span>
               <span className="flex items-center gap-1 font-medium text-gray-800">
                 {user.name || 'User'}
-                <svg
-                  width="10"
-                  height="5"
-                  viewBox="0 0 10 5"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg width="10" height="5" viewBox="0 0 10 5" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M0 5L5 0L10 5H0Z" fill="#414141" />
                 </svg>
               </span>
@@ -153,6 +187,8 @@ export default function Navbar() {
           </div>
         )}
       </div>
+
+      <UserQRModal show={showQR} userId={userId || ''} onClose={() => setShowQR(false)} />
     </nav>
   )
 }

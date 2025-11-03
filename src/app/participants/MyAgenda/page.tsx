@@ -156,11 +156,10 @@ export default function MyAgendaPage() {
                 <button
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    activeFilter === filter
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeFilter === filter
                       ? "bg-[#86002B] text-white shadow-md"
                       : "bg-white border border-gray-300 text-gray-700 hover:border-red-700 hover:text-red-800 shadow-sm"
-                  }`}
+                    }`}
                 >
                   {filter}
                 </button>
@@ -216,38 +215,38 @@ export default function MyAgendaPage() {
                 </div>
 
                 {/* Speaker */}
-               {/* Speakers - Handle multiple speakers */}
-<div className="mb-5">
-  <div className="flex items-center text-base text-gray-600 mb-3">
+                {/* Speakers - Handle multiple speakers */}
+                <div className="mb-5">
+                  <div className="flex items-center text-base text-gray-600 mb-3">
 
-  </div>
-  <div className="flex flex-wrap gap-3">
-    {session.speakers?.length > 0 ? (
-      session.speakers.map((speaker, speakerIndex) => (
-        <div key={speakerIndex} className="flex items-center gap-2">
-          <img
-            src={speaker.pic || "/images/img (9).png"}
-            className="w-8 h-8 rounded-full object-cover"
-            alt={speaker.fullName}
-            onError={(e) => {
-              e.currentTarget.src = "/images/img (9).png"
-            }}
-          />
-          <span className="text-sm text-gray-700">{speaker.fullName}</span>
-        </div>
-      ))
-    ) : (
-      <div className="flex items-center gap-2">
-        <img
-          src="/images/img (9).png"
-          className="w-8 h-8 rounded-full object-cover"
-          alt="Unknown Speaker"
-        />
-        <span className="text-sm text-gray-700">Unknown Speaker</span>
-      </div>
-    )}
-  </div>
-</div>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {session.speakers?.length > 0 ? (
+                      session.speakers.map((speaker, speakerIndex) => (
+                        <div key={speakerIndex} className="flex items-center gap-2">
+                          <img
+                            src={speaker.pic || "/images/img (9).png"}
+                            className="w-8 h-8 rounded-full object-cover"
+                            alt={speaker.fullName}
+                            onError={(e) => {
+                              e.currentTarget.src = "/images/img (9).png"
+                            }}
+                          />
+                          <span className="text-sm text-gray-700">{speaker.fullName}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <img
+                          src="/images/img (9).png"
+                          className="w-8 h-8 rounded-full object-cover"
+                          alt="Unknown Speaker"
+                        />
+                        <span className="text-sm text-gray-700">Unknown Speaker</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 <hr className="border-t border-gray-200 mb-4" />
 
@@ -263,12 +262,12 @@ export default function MyAgendaPage() {
                     <span className="text-gray-700">
                       {session.startTime && session.endTime
                         ? `${session.startTime.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })} - ${session.endTime.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}`
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })} - ${session.endTime.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}`
                         : "Time TBD"}
                     </span>
                   </div>

@@ -1,16 +1,12 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { FaArrowLeft, FaCalendar, FaClock, FaPlay } from 'react-icons/fa'
+import React, { useState, useEffect, useRef } from 'react'
+import { FaCalendar, FaClock, FaPlay } from 'react-icons/fa'
 import { FiSearch } from 'react-icons/fi'
-import dynamic from 'next/dynamic'
-import Link from 'next/link'
 import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import api from '@/config/api'
 import { setEventId } from '@/lib/store/features/event/eventSlice'
-
-const LiveLoaction3 = dynamic(() => import('@/app/components/LiveLoaction3'), { ssr: false })
 
 type EventType = {
   id: number
@@ -30,6 +26,8 @@ type DataType = {
 const VenueMaps: React.FC = () => {
   const dispatch = useDispatch()
   const router = useRouter()
+  const mapRef = useRef<HTMLDivElement>(null)
+  const mapInstanceRef = useRef<any>(null)
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<DataType>({
     totalSessions: 0,
@@ -53,13 +51,141 @@ const VenueMaps: React.FC = () => {
     fetchData()
   }, [])
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-[500px]">Loading...</div>
+  const extractCoordinates = (link: string) => {
+    // Try format: @31.5309789,74.3038425
+    let match = link.match(/@([\d.-]+),([\d.-]+)/)
+    if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) }
+    
+    // Try format: ?q=31.5309789,74.3038425
+    match = link.match(/[?&]q=([\d.-]+),([\d.-]+)/)
+    if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) }
+    
+    // Try format: ll=31.5309789,74.3038425
+    match = link.match(/ll=([\d.-]+),([\d.-]+)/)
+    if (match) return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) }
+    
+    return null
   }
 
-  const handleCardClick = (eId: number) => {
-    dispatch(setEventId(eId))
-    router.push('/participants/Home')
+  useEffect(() => {
+    if (!mapRef.current || data.events.length === 0) return
+
+    const loadMapbox = async () => {
+      if (!(window as any).mapboxgl) {
+        const script = document.createElement('script')
+        script.src = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'
+        script.async = true
+        const link = document.createElement('link')
+        link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css'
+        link.rel = 'stylesheet'
+        document.head.appendChild(link)
+        document.body.appendChild(script)
+        await new Promise((resolve) => (script.onload = resolve))
+      }
+
+      const mapboxgl = (window as any).mapboxgl
+      mapboxgl.accessToken =
+        'pk.eyJ1Ijoicml6aWVhZ2xpbmVzIiwiYSI6ImNtaGc3aGt4bjBlb2YycnNjbDBldnh3ejUifQ.sAY7q13HBaq80LoOUAT0oQ'
+
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove()
+        mapInstanceRef.current = null
+      }
+
+      // Default center
+      const defaultCenter = { lat: 31.5204, lng: 74.3587 }
+      const firstEventCoords = extractCoordinates(data.events[0]?.googleMapLink) || defaultCenter
+
+      const map = new mapboxgl.Map({
+        container: mapRef.current,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [firstEventCoords.lng, firstEventCoords.lat],
+        zoom: 12,
+      })
+
+      // Create bounds object to fit all markers
+      const bounds = new mapboxgl.LngLatBounds()
+      let validEventCount = 0
+
+      data.events.forEach((event) => {
+        const coords = extractCoordinates(event.googleMapLink)
+        if (!coords) {
+          console.warn(`Could not extract coordinates for event: ${event.name}`, event.googleMapLink)
+          return
+        }
+
+        validEventCount++
+        
+        // Extend bounds to include this marker
+        bounds.extend([coords.lng, coords.lat])
+
+        // Create marker
+        const marker = new mapboxgl.Marker({ color: '#EF4444' })
+          .setLngLat([coords.lng, coords.lat])
+          .addTo(map)
+
+        // Create a permanent popup (always visible)
+        const popup = new mapboxgl.Popup({ 
+          offset: 25,
+          closeButton: false,
+          closeOnClick: false,
+          className: 'permanent-popup'
+        })
+          .setLngLat([coords.lng, coords.lat])
+          .setHTML(`<div style="font-weight:600;cursor:pointer;font-size:14px;">${event.name}</div>`)
+          .setMaxWidth('200px')
+          .addTo(map)
+
+        // Click event on marker
+        marker.getElement().addEventListener('click', () => {
+          localStorage.setItem('eventLocation', event.googleMapLink)
+          localStorage.setItem('eventId', String(event.id))
+          dispatch(setEventId(event.id))
+          router.push('/participants/Home')
+        })
+
+        // Also make the popup clickable
+        const popupElement = popup.getElement()
+        if (popupElement) {
+          popupElement.style.cursor = 'pointer'
+          popupElement.addEventListener('click', () => {
+            localStorage.setItem('eventLocation', event.googleMapLink)
+            localStorage.setItem('eventId', String(event.id))
+            dispatch(setEventId(event.id))
+            router.push('/participants/Home')
+          })
+        }
+      })
+
+      // Fit map to show all markers with padding
+      map.on('load', () => {
+        if (validEventCount > 1 && !bounds.isEmpty()) {
+          map.fitBounds(bounds, {
+            padding: { top: 80, bottom: 80, left: 80, right: 80 },
+            maxZoom: 15
+          })
+        } else if (validEventCount === 0) {
+          console.warn('No valid event coordinates found')
+        }
+      })
+
+      mapInstanceRef.current = map
+    }
+
+    loadMapbox()
+
+    return () => {
+      if (mapInstanceRef.current) {
+        try {
+          mapInstanceRef.current.remove()
+        } catch (err) {}
+        mapInstanceRef.current = null
+      }
+    }
+  }, [data, dispatch, router])
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-[500px]">Loading...</div>
   }
 
   const filteredEvents = data.events.filter((event) =>
@@ -67,8 +193,7 @@ const VenueMaps: React.FC = () => {
   )
 
   return (
-    <div className="flex flex-col items-center w-full max-w-[1280px] mx-auto px-4 py-8 gap-8">
-
+    <div className="flex flex-col items-center w-full max-w-[1080px] mx-auto px-4 py-8 gap-8">
       <div className="grid xl:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6 w-full">
         <div className="flex flex-col items-start p-5 gap-4 bg-white border border-[#E6E6E6] shadow rounded-2xl w-full">
           <div className="flex items-center gap-6">
@@ -107,7 +232,7 @@ const VenueMaps: React.FC = () => {
         </div>
       </div>
 
-      <LiveLoaction3 />
+      <div ref={mapRef} className="w-full h-[500px] rounded-2xl border border-gray-300" />
 
       <div className="w-full">
         <div className="flex items-center p-3 border border-[#E8E8E8] rounded-2xl bg-white">
@@ -127,7 +252,12 @@ const VenueMaps: React.FC = () => {
           filteredEvents.map((event) => (
             <div
               key={event.id}
-              onClick={() => handleCardClick(event.id)}
+              onClick={() => {
+                localStorage.setItem('eventLocation', event.googleMapLink)
+                localStorage.setItem('eventId', String(event.id))
+                dispatch(setEventId(event.id))
+                router.push('/participants/Home')
+              }}
               className="flex flex-row justify-between items-center p-6 bg-white border border-[#D4D4D4] shadow rounded-2xl cursor-pointer hover:bg-gray-50 transition w-full"
             >
               <div className="flex items-center gap-4">

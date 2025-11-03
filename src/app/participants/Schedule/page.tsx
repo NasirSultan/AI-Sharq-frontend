@@ -81,7 +81,8 @@ const [joinLoadingId, setJoinLoadingId] = useState<string | null>(null)
 
   return (
     <>
-      <div className="p-6 md:p-10 min-h-screen font-sans">
+<div className="p-6 md:p-10 min-h-screen font-sans max-w-6xl mx-auto">
+
         <div className="flex items-center gap-2 mb-6">
           <Link href="/participants/Home">
             <FaArrowLeft className="text-red-800 w-[20px] h-[20px] cursor-pointer" />

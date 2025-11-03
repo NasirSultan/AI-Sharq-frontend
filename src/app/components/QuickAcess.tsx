@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { HiOutlineMap } from 'react-icons/hi'
+import EventLocationMap from './EventLocationMap'
 
 const quickAccessItems = [
   {
@@ -26,47 +26,39 @@ const quickAccessItems = [
     img: '/images/div (3).png',
     Link: '/participants/Sponsors&Exhibitors',
   },
-  {
-    label: 'Networking',
-    desc: 'Connect & chat',
-    img: '/images/div (4).png',
-    Link: '/participants/MyConnections',
-  },
-  {
-    label: 'Venue Maps',
-    desc: 'Find your way',
-    icon: <HiOutlineMap className="w-10 h-10 text-red-500 mb-3" />,
-    Link: '/participants/vanue',
-  },
 ]
 
 export default function QuickAccess() {
   return (
-    <section className="bg-white p-6 md:p-10 rounded-2xl shadow-md w-full border border-gray-200">
-      <h2 className="text-lg md:text-xl font-semibold mb-6 text-[#282828]">Quick Access</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
-        {quickAccessItems.map((item) => {
-          const content = (
-            <div className="flex flex-col items-center text-center bg-[#F9FAFB] hover:bg-white border border-gray-200 hover:border-red-400 rounded-xl p-6 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
-              {item.icon ? (
-                item.icon
-              ) : (
-                <img src={item.img} alt={item.label} className="w-12 h-12 mb-3 object-contain" />
-              )}
+   <section className="w-full bg-white  md:p-5 md:px-8 rounded-2xl ">
+  <div className="flex flex-col md:flex-row gap-5 w-full">
+   <div className="w-full md:w-1/2">
+      <EventLocationMap />
+    </div>
+   
+   
+    <div className="w-full md:w-1/2">
+     
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 w-full">
+        {quickAccessItems.map((item) => (
+          <Link href={item.Link} key={item.label} className="block w-full">
+            <div className="flex flex-col items-center justify-center text-center bg-[#F9FAFB] hover:bg-white border border-gray-200 hover:border-red-400 rounded-xl p-6 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer h-full">
+              <img
+                src={item.img}
+                alt={item.label}
+                className="w-12 h-12 mb-3 object-contain"
+              />
               <p className="font-semibold text-[#1F2937]">{item.label}</p>
               <p className="text-sm text-gray-500">{item.desc}</p>
             </div>
-          )
-
-          return item.Link ? (
-            <Link href={item.Link} key={item.label} className="block">
-              {content}
-            </Link>
-          ) : (
-            <div key={item.label}>{content}</div>
-          )
-        })}
+          </Link>
+        ))}
       </div>
-    </section>
+    </div>
+
+    
+  </div>
+</section>
+
   )
 }

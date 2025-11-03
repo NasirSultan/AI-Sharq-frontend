@@ -11,6 +11,8 @@ import { QRCodeCanvas as QRCode } from 'qrcode.react'
 import { FaPen } from 'react-icons/fa'
 import LoadingButton from './../../components/LoadingButton'
 import LogoutButton from './../../components/LogoutButton'
+import UserQRModal from './../../components/UserQRModal'
+
 export default function UserProfileView() {
     const router = useRouter()
     const userId = useSelector((state: RootState) => state.user.userId)
@@ -141,31 +143,8 @@ export default function UserProfileView() {
             />
 
             {/* QR Modal */}
-            {showQR && (
-                <div
-                    onClick={() => setShowQR(false)}
-                    className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
-                >
-                    <div className="bg-white p-6 rounded-2xl shadow-lg" onClick={(e) => e.stopPropagation()}>
-                        <QRCode
-                            value={`${window.location.origin}/participants/profile/${userId}`}
-                            size={180}
-                            bgColor="#ffffff"
-                            fgColor="#000000"
-                            includeMargin={true}
-                            ref={qrRef}
-                        />
-                        <div className="mt-4">
-                            <LoadingButton
-                                text="Download QR Code"
-                                loading={qrLoading}
-                                onClick={handleDownloadQR}
-                                color="bg-red-600"
-                            />
-                        </div>
-                    </div>
-                </div>
-            )}
+            <UserQRModal show={showQR} userId={userId} onClose={() => setShowQR(false)} />
+
         </>
     )
 }

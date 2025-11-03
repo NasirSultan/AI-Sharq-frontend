@@ -1,0 +1,67 @@
+'use client'
+
+import { useRef, useState } from 'react'
+import { QRCodeCanvas as QRCode } from 'qrcode.react'
+import LoadingButton from './LoadingButton'
+
+export default function UserQRModal({
+  show,
+  userId,
+  onClose,
+}: {
+  show: boolean
+  userId: string
+  onClose: () => void
+}) {
+  const qrRef = useRef<HTMLCanvasElement | null>(null)
+  const [qrLoading, setQrLoading] = useState(false)
+
+  const handleDownloadQR = async () => {
+    setQrLoading(true)
+    try {
+      if (qrRef.current) {
+        const canvas = qrRef.current
+        const url = canvas.toDataURL('image/png')
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `user-${userId}-qr.png`
+        a.click()
+      }
+    } catch (err) {
+      console.error('QR download error', err)
+    } finally {
+      setQrLoading(false)
+    }
+  }
+
+  if (!show) return null
+
+  return (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center"
+      >
+        <QRCode
+          value={`${window.location.origin}/participants/profile/${userId}`}
+          size={180}
+          bgColor="#ffffff"
+          fgColor="#000000"
+          includeMargin={true}
+          ref={qrRef}
+        />
+        <div className="mt-4">
+          <LoadingButton
+            text="Download QR Code"
+            loading={qrLoading}
+            onClick={handleDownloadQR}
+            color="bg-red-600"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
