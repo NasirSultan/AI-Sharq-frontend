@@ -11,6 +11,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
   const publicPaths = ["/", "/authentication/signin", "/authentication/signup"]
   const isPublic = publicPaths.includes(pathname)
+  const hideNavbar = pathname === "/" || pathname.startsWith("/authentication/")
 
   const handleGoBack = () => {
     router.back()
@@ -26,33 +27,34 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
     sessionStorage.setItem("lastPage", pathname)
 
-    // If visiting a private route
     if (!isPublic) {
-      // If not logged in
       if (!token) {
         router.replace("/authentication/SignIn")
         return
       }
 
-      // If logged in, allow full navigation
       if (token) {
         setIsChecking(false)
         return
       }
     }
 
-    // If public route, no restriction
     setIsChecking(false)
   }, [pathname, isPublic, router])
-
-  const hideNavbar = pathname === "/" || pathname.startsWith("/authentication/")
 
   if (isChecking && !isPublic) return null
 
   return (
     <>
-      {!hideNavbar && <Navbar onGoBack={handleGoBack} />}
-      {children}
+      {!hideNavbar && (
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <Navbar onGoBack={handleGoBack} />
+        </div>
+      )}
+
+      <main className={!hideNavbar ? "pt-20" : ""}>
+        {children}
+      </main>
     </>
   )
 }

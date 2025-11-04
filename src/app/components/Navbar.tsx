@@ -86,7 +86,8 @@ export default function Navbar() {
     role === 'organizer' || role === 'speaker' || role === 'participant'
 
   return (
-    <nav className="w-full bg-white shadow-md px-6 py-6 flex items-center justify-between">
+<nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md px-4 py-4 flex items-center justify-between mb-2">
+
       <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
         <Image
           src="/images/logo1.png"

@@ -143,7 +143,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-10">
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-gray-300 border-t-red-900 rounded-full animate-spin"></div>
           </div>
         ) : emptyMessage ? (
           <div className="flex justify-center items-center h-64">
@@ -169,43 +169,50 @@ export default function Home() {
 
             {/* Banners Section */}
            <div className="space-y-4">
-  {banners.map((banner, index) => {
+  {[
+    ...(banners.find((b) => b.type === "Live") ? [banners.find((b) => b.type === "Live")!] : []),
+    ...banners.filter((b) => b.type !== "Live"),
+  ].map((banner, index) => {
     const { bgColor, textColor } = banner;
     return (
       <div
         key={index}
         className={`${bgColor} rounded-2xl shadow-md p-6 flex flex-col md:flex-row justify-between items-start md:items-center transition-all duration-200 hover:shadow-lg`}
       >
-       <div className="space-y-2">
-<span
-  className={`inline-flex px-4 py-1 rounded-full text-xs font-semibold items-center space-x-2 ${
-    banner.type === "Live" ? "bg-red-800 text-white" : "bg-[#9E9E5C] text-white"
-  }`}
->
-  {banner.type === "Live" && (
-    <div className="relative flex items-center">
-      <span className="absolute inline-flex h-4 w-4 bg-white rounded-full opacity-75 animate-ping"></span>
-      <span className="relative inline-flex  ml-1 h-2 w-2 bg-white rounded-full"></span>
-    </div>
-  )}
-  <span>{banner.type}</span>
-</span>
+        <div className="space-y-2">
+          <span
+            className={`inline-flex px-4 py-1 rounded-full text-xs font-semibold items-center space-x-2 ${
+              banner.type === "Live"
+                ? "bg-red-800 text-white"
+                : "bg-[#9E9E5C] text-white"
+            }`}
+          >
+            {banner.type === "Live" && (
+              <div className="relative flex items-center">
+                <span className="absolute inline-flex h-4 w-4 bg-white rounded-full opacity-75 animate-ping"></span>
+                <span className="relative inline-flex ml-1 h-2 w-2 bg-white rounded-full"></span>
+              </div>
+            )}
+            <span>{banner.type}</span>
+          </span>
 
+          <h3 className={`text-xl font-bold ${textColor}`}>
+            {banner.category} start at{" "}
+            {banner.startTime && banner.endTime ? banner.startTime : ""}
+          </h3>
 
-  <h3 className={`text-xl font-bold ${textColor}`}>
-    {banner.category} start at{" "}
-    {banner.startTime && banner.endTime ? banner.startTime : ""}
-  </h3>
-  <p className={`text-sm ${textColor}`}>
-    {banner.subtitle} -{" "}
-    {motivationalLines[index % motivationalLines.length]}
-  </p>
-</div>
+          <p className={`text-sm ${textColor}`}>
+            {banner.subtitle} -{" "}
+            {motivationalLines[index % motivationalLines.length]}
+          </p>
+        </div>
 
         <Link href={`/participants/SessionDetail1/${banner.sessionId}`}>
           <button className="cursor-pointer transition">
             <FaArrowRight
-              className={`text-xl ${index === 1 ? "text-red-700" : "text-white"}`}
+              className={`text-xl ${
+                index === 1 ? "text-red-900" : "text-white"
+              }`}
             />
           </button>
         </Link>
@@ -219,7 +226,7 @@ export default function Home() {
               <h2 className="text-xl font-semibold text-black">Today's Schedule</h2>
               <Link
                 href="/participants/ViewAllSessions"
-                className="text-red-700 text-sm font-medium hover:underline"
+                className="text-red-900 text-sm font-medium hover:underline"
               >
                 View All
               </Link>
@@ -235,7 +242,7 @@ export default function Home() {
                   <div className="flex items-center gap-4">
                     <div className="text-center">
                       <p className="text-gray-500 text-xs font-semibold">Next</p>
-                      <p className="text-red-700 text-lg font-bold">{session.startTime}</p>
+                      <p className="text-red-900 text-lg font-bold">{session.startTime}</p>
                     </div>
                     <div>
                       <p className="font-semibold text-black">{session.category}</p>
@@ -243,7 +250,7 @@ export default function Home() {
                     </div>
                   </div>
                   <Link href={`/participants/SessionDetail1/${session.sessionId}`}>
-                    <button className="text-red-700 hover:text-red-800">
+                    <button className="text-red-900 hover:text-red-900">
                       <FaArrowRight className="text-xl cursor-pointer" />
                     </button>
                   </Link>

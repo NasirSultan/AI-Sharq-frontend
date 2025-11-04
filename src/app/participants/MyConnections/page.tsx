@@ -52,7 +52,8 @@ const Networking: React.FC = () => {
   )
 
   return (
-  <div className="max-w-6xl mx-auto px-4 py-6">
+<div className="container mx-auto max-w-6xl px-4 py-6">
+
 
       {/* Header */}
       <div className="flex items-center gap-3 bg-[#FFEEEE] p-4 rounded-2xl shadow mb-6">
@@ -111,34 +112,35 @@ const Networking: React.FC = () => {
           </div>
 
           {/* Connections List */}
-          <div className="flex flex-col gap-4">
-            {filteredConnections.map(conn => (
-              <div
-                key={conn.connectionId}
-                className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 rounded-2xl shadow border border-[#D4D4D4] w-full"
-              >
-                {/* Profile Picture */}
-                <div className="w-24 h-24 relative rounded-full overflow-hidden flex-shrink-0">
-                  {conn.user.file ? (
-                    <Image src={conn.user.file} alt={conn.user.name} fill className="object-cover" />
-                  ) : (
-                    <Image src="/images/default.png" alt={conn.user.name} fill className="object-cover" />
-                  )}
-                </div>
+        <div className="flex flex-col gap-3">
+  {filteredConnections.map(conn => (
+    <div
+      key={conn.connectionId}
+      className="flex flex-col md:flex-row items-center gap-3 bg-white p-3 rounded-xl shadow border border-[#D4D4D4] w-full"
+    >
+      {/* Profile Picture */}
+      <div className="w-14 h-14  relative rounded-full overflow-hidden flex-shrink-0">
+        {conn.user.file ? (
+          <Image src={conn.user.file} alt={conn.user.name} fill className="object-cover " />
+        ) : (
+          <Image src="/images/default.png" alt={conn.user.name} fill className="object-cover" />
+        )}
+      </div>
 
-                {/* Name and Email */}
-                <div className="flex-1 flex flex-col justify-center gap-1">
-                  <h3 className="text-lg font-semibold text-[#282828]">{conn.user.name}</h3>
-                  <span className="text-sm text-[#282828]">{conn.user.email}</span>
-                </div>
+      {/* Name and Email */}
+      <div className="flex-1 flex flex-col justify-center gap-0.5">
+        <h3 className="text-base font-semibold text-[#282828]">{conn.user.name}</h3>
+        <span className="text-xs text-[#282828]">{conn.user.email}</span>
+      </div>
 
-                {/* Chat Icon */}
-                <div className="flex-shrink-0">
-                  <Image src="/images/chat.png" alt="Chat" width={34} height={34} />
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Chat Icon */}
+      <div className="flex-shrink-0">
+        <Image src="/images/chat.png" alt="Chat" width={28} height={28}  />
+      </div>
+    </div>
+  ))}
+</div>
+
         </>
       )}
     </div>

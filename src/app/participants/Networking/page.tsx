@@ -65,7 +65,8 @@ const Networking: React.FC = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-6">
+<div className="container mx-auto max-w-6xl px-4 py-6">
+
       <div className="flex flex-col gap-6">
         
         <div className="flex items-center gap-3 bg-[#FFEEEE] p-4 rounded-2xl shadow">

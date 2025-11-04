@@ -74,7 +74,7 @@ export default function UserProfileView() {
       <button
         type="button"
         onClick={() => router.push('/participants/SetUpYourProfile')}
-        className="p-3 bg-red-600 text-white rounded-full shadow hover:bg-red-700 transition"
+        className="p-3 bg-red-800 text-white rounded-full shadow hover:bg-red-900 transition cursor-pointer"
       >
         <FaPen className="w-4 h-4" />
       </button>

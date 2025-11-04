@@ -42,7 +42,7 @@ export default function QuickAccess() {
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 w-full">
         {quickAccessItems.map((item) => (
           <Link href={item.Link} key={item.label} className="block w-full">
-            <div className="flex flex-col items-center justify-center text-center bg-[#F9FAFB] hover:bg-white border border-gray-200 hover:border-red-400 rounded-xl p-6 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer h-full">
+            <div className="flex flex-col items-center justify-center text-center bg-[#F9FAFB] hover:bg-white border border-gray-200 hover:border-red-900 rounded-xl p-6 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer h-full">
               <img
                 src={item.img}
                 alt={item.label}

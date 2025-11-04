@@ -379,7 +379,7 @@ const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : 
 {userRole === "participant" && (
   session.registrationRequired ? (
     <button
-      onClick={() => router.push(`/participants/RegisterSession/${id}`)}
+      onClick={() => router.push(`/participants/SessionRegistration/${id}`)}
       className="bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded-lg hover:bg-red-700 cursor-pointer"
     >
       Register Now
