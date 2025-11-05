@@ -12,15 +12,16 @@ import {
   FaQuestionCircle,
   FaArrowRight,
   FaSpinner,
+  FaClipboardCheck
 } from "react-icons/fa"
 
 const toolsSupport = [
-  {
-    title: "QR Code Pass",
-    desc: "Entry & check-in",
-    icon: <FaQrcode className="text-xl text-gray-500" />,
-    Link: "/participants/view",
-  },
+{
+  title: "Register for Session",
+  desc: "View and join sessions using your registration",
+  icon: <FaClipboardCheck className="text-xl text-gray-500" />,
+  Link: "/participants/RegisterSession",
+},
   {
     title: "FAQ & Support",
     desc: "Help & guidance",

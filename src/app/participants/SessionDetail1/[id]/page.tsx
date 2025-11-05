@@ -22,23 +22,35 @@ export default function SessionPage({ params }: PageProps) {
   const [session, setSession] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [bookmarked, setBookmarked] = useState(false)
+  const [isRegistered, setIsRegistered] = useState(false)
   const [bookmarkLoading, setBookmarkLoading] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
-const [joining, setJoining] = useState(false)
+  const [popupMessage, setPopupMessage] = useState("")
+  const [joining, setJoining] = useState(false)
 
   const router = useRouter()
   const userId = useSelector((state: RootState) => state.user.userId)
   const eventId = useSelector((state: RootState) => state.event.id)
-const dispatch = useDispatch()
+  const dispatch = useDispatch()
 
-
-console.log 
+  const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : null;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await api.get(`/sessions/detail/${id}`)
         setSession(res.data)
+
+        // Fetch user status only for participants
+        if (userRole === "participant" && userId) {
+          try {
+            const statusRes = await api.get(`/sessions/${id}/user-status/${userId}`)
+            setBookmarked(statusRes.data.isBookmarked)
+            setIsRegistered(statusRes.data.isRegistered)
+          } catch (err) {
+            console.error("Failed to fetch user status", err)
+          }
+        }
       } catch (err) {
         console.error("Failed to fetch session", err)
       } finally {
@@ -46,9 +58,17 @@ console.log
       }
     }
     fetchData()
-  }, [id])
+  }, [id, userId, userRole])
 
   const handleBookmark = async () => {
+    if (bookmarked) {
+      // Already bookmarked, do nothing or show message
+      setPopupMessage("Already in your agenda")
+      setShowPopup(true)
+      setTimeout(() => setShowPopup(false), 2000)
+      return
+    }
+
     try {
       setBookmarkLoading(true)
       if (!userId || !eventId) {
@@ -63,11 +83,13 @@ console.log
       })
 
       setBookmarked(true)
+      setPopupMessage("Added to your agenda")
       setShowPopup(true)
       setTimeout(() => setShowPopup(false), 2000)
     } catch (err: any) {
       if (err.response && err.response.status === 400) {
         setBookmarked(true)
+        setPopupMessage("Already in your agenda")
         setShowPopup(true)
         setTimeout(() => setShowPopup(false), 2000)
       } else {
@@ -77,49 +99,77 @@ console.log
       setBookmarkLoading(false)
     }
   }
-const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+
+  const handleJoinSession = () => {
+    if (joining) return
+    
+    const now = new Date()
+    const start = new Date(session.startTime)
+    const end = new Date(session.endTime)
+    const isLive = now >= start && now <= end
+
+    if (!isLive) return
+
+    // Check if registration is required but user hasn't registered
+    if (session.registrationRequired && !isRegistered) {
+      setPopupMessage("Please register yourself to join")
+      setShowPopup(true)
+      setTimeout(() => setShowPopup(false), 3000)
+      return
+    }
+
+    setJoining(true)
+    localStorage.setItem("sessionName", session.title)
+    setTimeout(() => {
+      router.push(`/agora/joinsession`)
+    }, 1000)
+  }
+
   if (loading)
     return (
       <div className="flex justify-center mt-20">
-  <button
-    disabled
-    className="flex items-center gap-2 px-6 py-2 rounded-lg font-medium text-red-6 cursor-not-allowed"
-  >
-    <svg
-      className="animate-spin h-5 w-5 text-red-600"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      ></circle>
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v8H4z"
-      ></path>
-    </svg>
-    Loading session...
-  </button>
-</div>
-
-
-
+        <button
+          disabled
+          className="flex items-center gap-2 px-6 py-2 rounded-lg font-medium text-red-6 cursor-not-allowed"
+        >
+          <svg
+            className="animate-spin h-5 w-5 text-red-600"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8H4z"
+            ></path>
+          </svg>
+          Loading session...
+        </button>
+      </div>
     )
 
   if (!session) return <p className="text-center mt-10">No session found</p>
 
+  const now = new Date()
+  const start = new Date(session.startTime)
+  const end = new Date(session.endTime)
+  const isSessionLive = now >= start && now <= end
+  const canJoin = isSessionLive && (!session.registrationRequired || isRegistered)
+
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8 relative">
       {showPopup && (
-        <div className="fixed top-5 right-5 bg-green-600 text-white px-4 py-2 rounded-xl shadow-md">
-          Added to your agenda
+        <div className="fixed top-5 right-5 bg-green-600 text-white px-4 py-2 rounded-xl shadow-md z-50">
+          {popupMessage}
         </div>
       )}
 
@@ -133,7 +183,11 @@ const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : 
           <h1 className="text-xl font-semibold text-black">Session Details</h1>
         </div>
 
-        <button onClick={handleBookmark} disabled={bookmarkLoading} className="cursor-pointer">
+        <button 
+          onClick={handleBookmark} 
+          disabled={bookmarkLoading || bookmarked} 
+          className={`${bookmarked ? 'cursor-default' : 'cursor-pointer'}`}
+        >
           <svg
             width="20"
             height="26"
@@ -202,156 +256,131 @@ const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : 
         <p className="text-sm text-gray-600">{session.description}</p>
       </div>
 
-{session.location?.toLowerCase() === "online" && (
-  <div
-    onClick={() => {
-      if (joining) return
-      const now = new Date()
-      const start = new Date(session.startTime)
-      const end = new Date(session.endTime)
-      const isLive = now >= start && now <= end
-
-      if (!isLive) return
-
-      setJoining(true)
-      localStorage.setItem("sessionName", session.title)
-      setTimeout(() => {
-        router.push(`/agora/joinsession`)
-      }, 1000)
-    }}
-    className={`flex items-center gap-3 p-4 rounded-2xl shadow transition ${
-      joining
-        ? "bg-[#ffdada]"
-        : "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
-    } ${
-      new Date() < new Date(session.startTime) ||
-      new Date() > new Date(session.endTime)
-        ? "opacity-60 cursor-not-allowed"
-        : ""
-    }`}
-  >
-    <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center relative overflow-hidden">
-      {joining ? (
-        <svg
-          className="animate-spin h-5 w-5 text-[#9B2033]"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
+      {session.location?.toLowerCase() === "online" && userRole === "participant" && (
+        <div
+          onClick={handleJoinSession}
+          className={`flex items-center gap-3 p-4 rounded-2xl shadow transition ${
+            joining
+              ? "bg-[#ffdada]"
+              : canJoin
+              ? "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
+              : "bg-gray-100 cursor-not-allowed"
+          } ${!canJoin ? "opacity-60" : ""}`}
         >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          ></circle>
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v8H4z"
-          ></path>
-        </svg>
-      ) : (
-        <>
-          {new Date() >= new Date(session.startTime) &&
-          new Date() <= new Date(session.endTime) ? (
-            <>
-              <span className="absolute w-12 h-12 rounded-full border-2 border-[#9B2033]/40 animate-wave"></span>
-              <span className="absolute w-12 h-12 rounded-full border border-[#9B2033]/30 animate-wave-delayed"></span>
-              <FaVideo className="text-[#9B2033] text-xl relative z-10 animate-pulse-smooth" />
-            </>
-          ) : (
-            <FaVideo className="text-[#9B2033] text-xl opacity-50" />
+          <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center relative overflow-hidden">
+            {joining ? (
+              <svg
+                className="animate-spin h-5 w-5 text-[#9B2033]"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8H4z"
+                ></path>
+              </svg>
+            ) : (
+              <>
+                {canJoin ? (
+                  <>
+                    <span className="absolute w-12 h-12 rounded-full border-2 border-[#9B2033]/40 animate-wave"></span>
+                    <span className="absolute w-12 h-12 rounded-full border border-[#9B2033]/30 animate-wave-delayed"></span>
+                    <FaVideo className="text-[#9B2033] text-xl relative z-10 animate-pulse-smooth" />
+                  </>
+                ) : (
+                  <FaVideo className="text-[#9B2033] text-xl opacity-50" />
+                )}
+              </>
+            )}
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold text-[#9B2033]">
+              {joining
+                ? "Joining..."
+                : canJoin
+                ? "Join Live Session"
+                : session.registrationRequired && !isRegistered
+                ? "Registration Required"
+                : "Session Not Live"}
+            </h2>
+            <p className="text-xs text-[#9B2033]">
+              {joining
+                ? "Redirecting..."
+                : canJoin
+                ? "Click to join the live session"
+                : session.registrationRequired && !isRegistered
+                ? "Register yourself to join"
+                : "You can join only during live time"}
+            </p>
+          </div>
+
+          {!joining && (
+            <FaArrowRight className="text-[#9B2033] text-2xl ml-auto" />
           )}
-        </>
+        </div>
       )}
-    </div>
 
-    <div>
-      <h2 className="text-lg font-semibold text-[#9B2033]">
-        {joining
-          ? "Joining..."
-          : new Date() >= new Date(session.startTime) &&
-            new Date() <= new Date(session.endTime)
-          ? "Join Live Session"
-          : "Session Not Live"}
-      </h2>
-      <p className="text-xs text-[#9B2033]">
-        {joining
-          ? "Redirecting..."
-          : new Date() >= new Date(session.startTime) &&
-            new Date() <= new Date(session.endTime)
-          ? "Click to join the live session"
-          : "You can join only during live time"}
-      </p>
-    </div>
+      {session.speakers?.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-md font-semibold text-black">Speakers</h3>
+          {session.speakers.map((speaker: any) => (
+            <div
+              key={speaker.id}
+              onClick={() => {
+                dispatch(setSpeakerId(speaker.id))
+                router.push(`/participants/SpeakerDetails/${speaker.id}`)
+              }}
+              className="flex items-start bg-white border border-gray-200 rounded-xl p-5 shadow-sm relative cursor-pointer hover:shadow-md transition"
+            >
+              <img
+                src={speaker.user?.file || "/images/img (13).png"}
+                alt={speaker.user?.name}
+                className="w-20 h-20 rounded-full object-cover"
+              />
 
-    {!joining && (
-      <FaArrowRight className="text-[#9B2033] text-2xl ml-auto" />
-    )}
-  </div>
-)}
+              <div className="flex-1 flex flex-col ml-4 text-xs text-gray-800 space-y-1">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-semibold text-sm">
+                      {speaker.user?.name}
+                    </h4>
+                    {speaker.designations?.length > 0 && (
+                      <span className="text-gray-600">
+                        {speaker.designations.join(" • ")}
+                      </span>
+                    )}
+                  </div>
+                  {speaker.category && (
+                    <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded-xl">
+                      {speaker.category}
+                    </span>
+                  )}
+                </div>
+                {speaker.bio && (
+                  <p className="text-gray-600 leading-snug">{speaker.bio}</p>
+                )}
+              </div>
 
-
-
-
-
-
-{session.speakers?.length > 0 && (
-  <div className="space-y-4">
-    <h3 className="text-md font-semibold text-black">Speakers</h3>
-    {session.speakers.map((speaker: any) => (
-      <div
-        key={speaker.id}
-        
-       onClick={() => {
-  dispatch(setSpeakerId(speaker.id))
-  router.push(`/participants/SpeakerDetails/${speaker.id}`)
-}}
-
-        className="flex items-start bg-white border border-gray-200 rounded-xl p-5 shadow-sm relative cursor-pointer hover:shadow-md transition"
-      >
-       <img
-  src={speaker.user?.file || "/images/img (13).png"}
-  alt={speaker.user?.name}
-  className="w-20 h-20 rounded-full object-cover"
-/>
-
-        <div className="flex-1 flex flex-col ml-4 text-xs text-gray-800 space-y-1">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-semibold text-sm">
-                {speaker.user?.name}
-              </h4>
-              {speaker.designations?.length > 0 && (
-                <span className="text-gray-600">
-                  {speaker.designations.join(" • ")}
+              {speaker.tags?.[0] && (
+                <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-xl ml-auto self-start">
+                  {speaker.tags[0]}
                 </span>
               )}
             </div>
-            {speaker.category && (
-              <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded-xl">
-                {speaker.category}
-              </span>
-            )}
-          </div>
-          {speaker.bio && (
-            <p className="text-gray-600 leading-snug">{speaker.bio}</p>
-          )}
+          ))}
         </div>
-
-        {speaker.tags?.[0] && (
-          <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded-xl ml-auto self-start">
-            {speaker.tags[0]}
-          </span>
-        )}
-      </div>
-    ))}
-  </div>
-)}
-
-
+      )}
 
       <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
         <div className="flex flex-wrap gap-2">
@@ -369,37 +398,43 @@ const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : 
           {session.event?.title}
         </div>
 
-     <div className="flex items-center justify-between">
-  <p className="text-xs text-gray-600">
-    {session.registrationRequired
-      ? "Registration Required"
-      : "No Registration Required"}
-  </p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-gray-600">
+            {session.registrationRequired
+              ? "Registration Required"
+              : "No Registration Required"}
+          </p>
 
-{userRole === "participant" && (
-  session.registrationRequired ? (
-    <button
-      onClick={() => router.push(`/participants/SessionRegistration/${id}`)}
-      className="bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded-lg hover:bg-red-700 cursor-pointer"
-    >
-      Register Now
-    </button>
-  ) : (
-    <button
-      disabled
-      className="bg-gray-300 text-gray-500 text-xs font-semibold px-2 py-1 rounded-lg cursor-not-allowed"
-    >
-      Not Required
-    </button>
-  )
-)}
-
-
-</div>
-
+          {userRole === "participant" && (
+            session.registrationRequired ? (
+              isRegistered ? (
+                <button
+                  disabled
+                  className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-lg cursor-default"
+                >
+                  Already Registered
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push(`/participants/SessionRegistration/${id}`)}
+                  className="bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded-lg hover:bg-red-800 cursor-pointer"
+                >
+                  Register Now
+                </button>
+              )
+            ) : (
+              <button
+                disabled
+                className="bg-gray-300 text-gray-500 text-xs font-semibold px-2 py-1 rounded-lg cursor-not-allowed"
+              >
+                Not Required
+              </button>
+            )
+          )}
+        </div>
       </div>
 
- {userRole !== "speaker" && <RelatedSessionsGrid />}
+      {userRole !== "speaker" && <RelatedSessionsGrid />}
 
       <section className="space-y-3">
         <h2 className="text-base font-semibold text-black">Who's Attending</h2>
@@ -419,7 +454,6 @@ const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : 
               {session.registrationCount} registered attendees
             </span>
           </div>
-          
         </div>
       </section>
 

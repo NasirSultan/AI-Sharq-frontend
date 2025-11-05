@@ -12,6 +12,8 @@ import { setUserId } from '@/lib/store/features/user/userSlice'
 import { setSpeakerId } from '@/lib/store/features/speaker/speakerSlice'
 import { setSponsorId } from "@/lib/store/features/sponsor/sponsorSilice"
 import { setExhibitorId } from "@/lib/store/features/exhibitor/exhibitorSlice"
+import { setEventId } from "@/lib/store/features/event/eventSlice"
+
 import LoadingButton from './../../components/LoadingButton'
 
 export default function SignIn() {
@@ -42,7 +44,7 @@ export default function SignIn() {
         password: formData.password,
       })
 
-      const { token, user } = res.data
+      const { token, user, latestEventId } = res.data
 
       if (user && user.role) {
         if (typeof window !== 'undefined') {
@@ -59,6 +61,11 @@ export default function SignIn() {
             sessionStorage.setItem('cameFromApp', 'true')
         }
 
+
+    if (latestEventId) {
+        dispatch(setEventId(latestEventId))
+      }
+
         if (user.role !== 'sponsor' && user.role !== 'exhibitor') {
           dispatch(setUserId(user.id))
         }
@@ -72,7 +79,7 @@ export default function SignIn() {
           dispatch(setExhibitorId(user.exhibitorId))
         }
 
-        if (user.role === 'participant') router.push('/participants/vanue')
+        if (user.role === 'participant') router.push('/participants/Home')
         else if (user.role === 'speaker') router.push('/speakers/ManageSessions')
         else if (user.role === 'organizer') router.push('/Organizer/Dashboard')
         else if (user.role === 'sponsor') router.push('/sponsors/ManageSessions')

@@ -6,6 +6,7 @@ import Link from "next/link";
 import api from "@/config/api";
 import { useSearchParams } from 'next/navigation'
 const filtersList = ["Daily", "Weekly", "10 Days", "90 Days", "All Time"];
+import { useRouter } from "next/navigation"
 
 const parseDuration = (duration: string) => {
   if (!duration) return { startTime: null, endTime: null, minutes: 0 };
@@ -113,17 +114,18 @@ export default function MyAgendaPage() {
     setFilteredSessions(filtered);
     if (filtered.length === 0) setEmptyMessage("No sessions found");
   }, [activeFilter, searchText, allSessions]);
-
+  const router = useRouter()
   return (
     <>
-      <div className="p-6 md:p-10 min-h-screen font-sans">
-        <div className="flex items-center gap-2 mb-6">
-          <Link href="/participants/Home">
-            <FaArrowLeft className="text-red-800 w-5 h-5 cursor-pointer hover:text-red-600 transition" />
-          </Link>
-          <h1 className="text-xl font-semibold text-black">My Agenda</h1>
-        </div>
+     <div className="min-h-screen bg-[#FAFAFA] px-4 md:px-8 lg:px-10 py-6 space-y-8 max-w-6xl mx-auto">
 
+          <div className="flex items-center gap-2 mb-6">
+      <FaArrowLeft
+        className="text-red-900 w-5 h-5 cursor-pointer hover:text-red-700 transition"
+        onClick={() => router.back()}
+      />
+      <h1 className="text-xl font-semibold text-black">My Agenda</h1>
+    </div>
         <div className="flex md:flex-nowrap justify-between mb-6 md:gap-5 flex-wrap gap-3">
           <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-[385px] hover:border-red-700 transition">
             <FaSearch className="text-red-900 mr-2" />

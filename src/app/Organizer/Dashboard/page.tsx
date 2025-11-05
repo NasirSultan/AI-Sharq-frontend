@@ -47,13 +47,14 @@ export default function Dashboard() {
   const [activeFilter, setActiveFilter] = useState("Daily");
   const [stats, setStats] = useState<Stat[]>([]);
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchDashboard() {
+      setLoading(true);
       try {
         const { data } = await api.get("/admin/users/dashboard");
 
-        // dynamically calculate change as difference from value-1
         const dynamicStats: Stat[] = [
           { label: "Total Registrations", value: data.countTotalRegistration, percent: "2.3%", change: `+${data.countTotalRegistration - 1}`, icon: <FaUserPlus className="text-blue-500 text-xl" /> },
           { label: "Checked In Today", value: data.totalCheckin, percent: "1.5%", change: `+${data.totalCheckin - 0}`, icon: <FaCheckCircle className="text-green-500 text-xl" /> },
@@ -70,53 +71,44 @@ export default function Dashboard() {
             name: user.name,
             email: user.email,
             file: user.file ? user.file : "/Images/default-user.png",
-
           }))
         );
 
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchDashboard();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
-<div className="container mx-auto p-4 space-y-8 bg-[#F9F9F9] min-h-screen">
+<div className="container mx-auto max-w-6xl p-4 space-y-8 bg-[#F9F9F9] min-h-screen">
 
-  {/* Search & Filters */}
-  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
-      <FaSearch className="text-red-900 mr-2" />
-      <input type="text" placeholder="Search" className="outline-none text-sm w-full" />
-    </div>
-
-    <div className="flex flex-wrap gap-3">
-      {filters.map((filter) => (
-        <button
-          key={filter}
-          onClick={() => setActiveFilter(filter)}
-          className={`px-4 py-1 rounded-xl text-sm font-medium ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-black"}`}
-        >
-          {filter}
-        </button>
-      ))}
-    </div>
-
-    <div className="flex items-center border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700">
-      <FaCalendarAlt className="mr-2 text-gray-500" />
-      Jan 2024 - Dec 2024
-    </div>
-  </div>
+  <TodaysSchedule />
 
   {/* Stats Cards */}
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {stats.map((item, idx) => (
-      <div key={idx} className="relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition">
+      <div
+        key={idx}
+        className="relative bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-red-900 transition"
+      >
         <div className="flex justify-between items-start mb-3">
           <div className="w-9 h-9 rounded-md bg-gray-100 flex items-center justify-center">{item.icon}</div>
-          <div className="bg-green-50 text-green-600 text-xs px-2 py-1 rounded-full font-semibold flex items-center gap-1">▲ {item.percent}</div>
+          <div className="bg-green-50 text-green-600 text-xs px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+            ▲ {item.percent}
+          </div>
         </div>
         <p className="text-[22px] font-bold text-black mb-1">
           {item.value} <span className="text-green-600 text-sm font-semibold">{item.change}</span>
@@ -126,89 +118,99 @@ export default function Dashboard() {
     ))}
   </div>
 
-  <TodaysSchedule />
+
 
   {/* Quick Access */}
-  <section className="bg-white p-6 rounded-xl shadow">
-    <h2 className="text-xl font-semibold mb-6 text-black">Quick Access</h2>
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-      {quickAccessItems.map((item) => (
-        <Link href={item.Link} key={item.label}>
-          <div className="flex flex-col items-center text-center bg-white border border-gray-300 rounded-xl p-4 hover:shadow-md transition cursor-pointer">
-            <Image src={item.Image} alt={item.label} width={40} height={40} className="mb-2" />
-            <p className="font-semibold text-black text-sm">{item.label}</p>
-            <p className="text-xs text-gray-500">{item.desc}</p>
-          </div>
-        </Link>
-      ))}
-    </div>
-  </section>
+<section className="bg-white p-6 rounded-xl shadow">
+  <h2 className="text-xl font-semibold mb-6 text-black">Quick Access</h2>
+  <div className="flex flex-wrap gap-4">
+    {quickAccessItems.map((item) => (
+      <Link href={item.Link} key={item.label}>
+        <div className="flex flex-col items-center text-center bg-white border border-gray-300 rounded-xl p-4 hover:shadow-md hover:border-red-900 transition cursor-pointer">
+          <Image src={item.Image} alt={item.label} width={40} height={40} className="mb-2" />
+          <p className="font-semibold text-black text-sm">{item.label}</p>
+          <p className="text-xs text-gray-500">{item.desc}</p>
+        </div>
+      </Link>
+    ))}
+  </div>
+</section>
+
 
   {/* Tools & Support */}
-  <section className="bg-white p-6 rounded-xl shadow">
-    <h2 className="text-xl font-semibold mb-6 text-black">Tools & Support</h2>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {[{
-        title: "QR Scanner",
-        desc: "Validate check-ins",
-        img: "/Images/qr.png",
-        link: "/Organizer/Dashboard",
-        bg: "bg-gray-100"
-      },{
+ <section className="bg-white p-6 rounded-xl shadow">
+  <h2 className="text-xl font-semibold mb-6 text-black">Tools & Support</h2>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {[
+      {
         title: "Reports",
         desc: "Analytics & exports",
         img: "/Images/reports.png",
         link: "/Organizer/Report",
-        bg: "bg-[#E3FFF7]"
-      },{
+        bg: "bg-[#E3FFF7]",
+      },
+      {
         title: "Manage FAQ",
         desc: "Help & guidance",
         img: "/Images/Faqs.png",
         link: "/Organizer/Dashboard",
-        bg: "bg-[#FFF3F3]"
-      }].map((item, idx) => (
-        <div key={idx} className="flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md transition cursor-pointer">
-          <div className="flex items-center gap-3">
-            <div className={`${item.bg} p-2 rounded-md`}>
-              <Image src={item.img} alt={item.title} width={24} height={24} />
-            </div>
-            <div>
-              <p className="font-semibold text-black text-sm">{item.title}</p>
-              <p className="text-xs text-gray-500">{item.desc}</p>
-            </div>
+        bg: "bg-[#FFF3F3]",
+      },
+    ].map((item, idx) => (
+      <div
+        key={idx}
+        className="flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md hover:border-red-900 transition cursor-pointer"
+      >
+        <div className="flex items-center gap-3">
+          <div className={`${item.bg} p-2 rounded-md`}>
+            <Image src={item.img} alt={item.title} width={24} height={24} />
           </div>
-          <span className="text-[#9B2033] text-lg font-bold">
-            <Link href={item.link}><FaArrowRight /></Link>
-          </span>
+          <div>
+            <p className="font-semibold text-black text-sm">{item.title}</p>
+            <p className="text-xs text-gray-500">{item.desc}</p>
+          </div>
         </div>
-      ))}
-    </div>
-  </section>
+        <span className="text-[#9B2033] text-lg font-bold">
+          <Link href={item.link}>
+            <FaArrowRight />
+          </Link>
+        </span>
+      </div>
+    ))}
+  </div>
+</section>
 
   {/* Recent Participants */}
   <div className="flex justify-between items-center">
     <h2 className="text-lg font-semibold text-black">Recent Participants</h2>
-  
   </div>
 
   <section className="p-6 bg-white rounded-xl shadow-sm">
-    <div className="space-y-3">
-      {participants.map((participant, index) => (
-        <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between border border-gray-200 rounded-full p-3 gap-2 sm:gap-4">
-          <img
-            src={participant.file || "/Images/default-user.png"}
-            alt={participant.name}
-            className="rounded-full object-cover w-10 h-10"
-          />
-          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 w-full text-sm text-gray-700">
-            <h3 className="font-semibold text-black">{participant.name}</h3>
-            <p>{participant.email}</p>
+    {participants.length === 0 ? (
+      <p className="text-center text-gray-500 text-sm py-6">No participants exist</p>
+    ) : (
+      <div className="space-y-3">
+        {participants.map((participant, index) => (
+          <div
+            key={index}
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between border border-gray-200 rounded-full p-3 gap-2 sm:gap-4 hover:border-red-900 transition"
+          >
+            <img
+              src={participant.file || "/Images/default-user.png"}
+              alt={participant.name}
+              className="rounded-full object-cover w-10 h-10"
+            />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 w-full text-sm text-gray-700">
+              <h3 className="font-semibold text-black">{participant.name}</h3>
+              <p>{participant.email}</p>
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    )}
   </section>
 </div>
+
 
   );
 }

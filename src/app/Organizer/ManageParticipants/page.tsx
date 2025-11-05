@@ -76,12 +76,13 @@ export default function Page() {
 
   const statsItems = [
     { label: "Total Participants", value: stats.totalParticipants, icon: <FaRegListAlt className="text-blue-600" />, iconBg: "bg-blue-100" },
-    { label: "Total Bookmarks", value: stats.totalBookmarks, icon: <FaBookmark className="text-yellow-600" />, iconBg: "bg-yellow-100" },
-    { label: "Registrations Requests", value: stats.totalSessionRegistrations, icon: <FaPlay className="text-green-600" />, iconBg: "bg-green-100" }
+    { label: "Total Sessions Bookmark", value: stats.totalBookmarks, icon: <FaBookmark className="text-yellow-600" />, iconBg: "bg-yellow-100" },
+    { label: "Sessions Registration ", value: stats.totalSessionRegistrations, icon: <FaPlay className="text-green-600" />, iconBg: "bg-green-100" }
   ]
 
   return (
-<div className="min-h-screen bg-[#FAFAFA] px-4 md:px-8 lg:px-10 py-6 space-y-8">
+<div className="min-h-screen bg-[#FAFAFA] px-4 md:px-8 lg:px-10 py-6 space-y-8 max-w-6xl mx-auto">
+
   {/* Header */}
   <div className="flex items-center gap-3">
     <Link href="/Organizer/Dashboard">
@@ -157,13 +158,13 @@ export default function Page() {
           <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0">
             <button
               onClick={() => handleDelete(user)}
-              className="bg-red-800 text-white px-4 py-1 rounded-md hover:bg-red-900 transition flex-1 sm:flex-none"
+              className="bg-red-800 text-white px-4 py-1 rounded-md hover:bg-red-900 transition cursor-pointer flex-1 sm:flex-none"
             >
               Delete Account
             </button>
             <button
               onClick={() => handleBlock(user)}
-              className={`px-4 py-1 rounded-md border flex-1 sm:flex-none transition ${
+              className={`px-4 py-1 rounded-md border cursor-pointer flex-1 sm:flex-none transition ${
                 user.isBlocked
                   ? 'bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200'
                   : 'bg-green-100 text-green-800 border-green-300 hover:bg-green-200'
@@ -173,9 +174,9 @@ export default function Page() {
             </button>
             <button
               onClick={() => router.push(`/Organizer/ManageParticipants/bookmark?userId=${user.id}`)}
-              className="border border-gray-300 px-4 py-1 rounded-md text-black hover:bg-gray-100 transition flex-1 sm:flex-none"
+              className="border border-gray-300 px-4 py-1 rounded-md cursor-pointer text-black hover:bg-gray-100 transition flex-1 sm:flex-none"
             >
-              View
+              View Bookmarks
             </button>
           </div>
         </div>

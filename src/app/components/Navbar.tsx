@@ -79,7 +79,7 @@ export default function Navbar() {
 
   const handleVenuesClick = () => {
     if (role === 'participant') router.push('/participants/vanue')
-    else if (role === 'organizer') router.push('/organizer/Venues')
+    else if (role === 'organizer') router.push('/Organizer/VenueMaps')
   }
 
   const showChatAndNetworking =
