@@ -164,13 +164,14 @@ export default function SessionsSchedule() {
     }
   }
 
-  const handleView = (s: Session) => {
-    setBtnLoading(true)
-    localStorage.setItem('sessionId', s.id.toString())
-    dispatch(setEventId(s.eventId))
-    router.push('/Organizer/ManageSessions/sessiondetail')
-    setBtnLoading(false)
-  }
+const handleView = (s: Session) => {
+  setBtnLoading(true)
+  localStorage.setItem('sessionId', s.id.toString())
+  dispatch(setEventId(s.eventId))
+  router.push(`/participants/SessionDetail1/${s.id}`)
+  setBtnLoading(false)
+}
+
 
   const handleCreate = () => {
     setIsModalOpen(true)

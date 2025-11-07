@@ -13,7 +13,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import ChartStatistics from '../../components/ChartStatistics';
+import ChartStatistics from '../../../components/ChartStatistics';
 import ExportCsv from '../../../components/ExportCsv';
 import { FaArrowLeft, FaBuilding, FaCalendar, FaCheck, FaMicrophone, FaUsers } from 'react-icons/fa';
 import { FaPeopleGroup } from 'react-icons/fa6';
