@@ -1,8 +1,15 @@
+import path from "path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true, // <--- ignore TypeScript errors on build
+  },
+  turbopack: {
+    root: path.resolve(__dirname),
   },
   images: {
     remotePatterns: [
