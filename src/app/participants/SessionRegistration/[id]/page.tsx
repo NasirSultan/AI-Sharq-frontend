@@ -96,7 +96,7 @@ export default function RegisterSession({ params }: PageProps) {
             text="Register"
             onClick={handleRegister}
             loading={loading}
-            color="bg-red-600 w-full"
+            color="bg-red-900 w-full"
             disabled={!whyWantToJoin || !relevantExperience}
           />
         </div>
@@ -104,7 +104,7 @@ export default function RegisterSession({ params }: PageProps) {
         {showPopup && (
           <div
             className={`absolute top-2 left-1/2 transform -translate-x-1/2 text-sm px-4 py-2 rounded-lg shadow-md ${
-              showPopup.success ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+              showPopup.success ? "bg-green-100 text-green-700" : "bg-red-100 text-red-900"
             }`}
           >
             {showPopup.message}

@@ -114,7 +114,7 @@ const handleSkip = () => {
             text="Join Session"
             onClick={handleSaveAndJoin}
             loading={buttonLoading}
-            color="bg-red-600 w-full"
+            color="bg-red-900 w-full"
             disabled={!userName.trim() || !token || buttonLoading}
           />
         </div>
@@ -123,7 +123,7 @@ const handleSkip = () => {
         <div className="flex gap-2 mt-3">
           <button
             onClick={handleSkip}
-            className="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
+            className="flex-1 bg-white text-black py-2 px-4 rounded-lg hover:bg-red-300 transition-colors text-sm font-medium cursor-pointer"
           >
             Skip to Schedule
           </button>
@@ -131,7 +131,7 @@ const handleSkip = () => {
 
         <div className="mt-4 text-center">
           {fetchingToken && <p className="text-gray-500">Fetching token...</p>}
-          {error && <p className="text-red-600">Error: {error}</p>}
+          {error && <p className="text-red-900">Error: {error}</p>}
           {showSuccessPopup && (
             <p className="text-green-600 font-semibold">
               Token created successfully! Redirecting...

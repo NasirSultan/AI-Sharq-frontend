@@ -99,32 +99,33 @@ export default function UserProfileView() {
     {/* Basic Info */}
     <div className="w-full text-center">
       <p className="text-xl font-semibold text-gray-800">{user.role}</p>
-      <p className="text-sm text-gray-500">{user.organization}</p>
+   
     </div>
 
     {/* Details */}
-    <div className="w-full mt-4 grid grid-cols-2 gap-6">
-      <div className="flex flex-col gap-1">
-        <p className="text-sm text-gray-500">Full Name</p>
-        <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50">
-          {user.name}
-        </p>
-      </div>
+    <div className="w-full mt-4 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-6">
+  <div className="flex flex-col gap-1">
+    <p className="text-sm text-gray-500">Full Name</p>
+    <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50">
+      {user.name}
+    </p>
+  </div>
 
-      <div className="flex flex-col gap-1">
-        <p className="text-sm text-gray-500">Organization</p>
-        <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50">
- {user.organization ? user.organization : 'No organization exists yet'}
-        </p>
-      </div>
+  <div className="flex flex-col gap-1">
+    <p className="text-sm text-gray-500">Organization</p>
+    <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50">
+      {user.organization ? user.organization : 'No organization exists yet'}
+    </p>
+  </div>
 
-      <div className="flex flex-col gap-1 col-span-2">
-        <p className="text-sm text-gray-500">Email</p>
-        <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50 break-all">
-          {user.email}
-        </p>
-      </div>
-    </div>
+  <div className="flex flex-col gap-1 col-span-1 md:col-span-2">
+    <p className="text-sm text-gray-500">Email</p>
+    <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50 break-all">
+      {user.email}
+    </p>
+  </div>
+</div>
+
  
  <div className="w-full mt-8 flex justify-center">
   <LogoutButton />
