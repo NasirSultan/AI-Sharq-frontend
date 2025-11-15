@@ -222,9 +222,9 @@ const ExhibitorDetailsScreen: React.FC<PageProps> = ({ params }) => {
   }, [params])
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="text-lg">Loading...</p>
-    </div>
+     <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+      </div>
   )
 
   if (!exhibitor) return (
@@ -266,12 +266,9 @@ const ExhibitorDetailsScreen: React.FC<PageProps> = ({ params }) => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+ <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
         {/* Contact Button */}
-        <button className="w-full sm:w-44 h-12 bg-[#9B2033] text-white rounded-md font-medium text-base mb-6 sm:mb-8 flex items-center justify-center hover:bg-[#8a1c2e] transition-colors">
-          Contact Exhibitor
-        </button>
-
+      
         {/* Info Panels */}
         <div className="flex flex-col lg:flex-row gap-6 mb-8 sm:mb-10">
           {/* Description Panel */}

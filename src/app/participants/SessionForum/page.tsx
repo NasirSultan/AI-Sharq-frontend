@@ -314,7 +314,7 @@ export default function ForumsPage() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <span>{forum.totalComments} Posts</span>
+                  <span>{forum.totalComments} Comments</span>
                 </div>
               </div>
 

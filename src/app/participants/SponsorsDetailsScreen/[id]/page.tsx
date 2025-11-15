@@ -108,138 +108,142 @@ const SponsorsDetailsScreen: React.FC = () => {
 
 
       {/* MAIN SECTION */}
-      <div className="relative mt-[400px] sm:mt-[380px] mx-auto w-[90%] max-w-[1280px] flex flex-col gap-10">
-        {/* Contact Sponsor Button */}
-        <button className="w-44 h-12 bg-[#9B2033] text-white rounded-md font-medium text-base mx-auto sm:mx-0">
-          Contact Sponsor
-        </button>
+<div className="relative  sm:mt-80 mx-auto w-[90%] max-w-6xl flex flex-col gap-12">
+  {/* Contact Sponsor Button */}
+  
+  {/* Description & Contact */}
+  <div className="flex flex-col lg:flex-row gap-8  mt-8">
+    <div className="flex-1 p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+      <h2 className="text-lg font-semibold text-[#282828] mb-3">{sponsor.name}</h2>
+      <p className="text-sm sm:text-base text-[#424242] leading-6">{sponsor.description}</p>
+    </div>
 
-        {/* Description & Contact */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
-            <h2 className="text-lg font-semibold text-[#282828] mb-3">{sponsor.name}</h2>
-            <p className="text-sm sm:text-base text-[#424242] leading-6">{sponsor.description}</p>
+    <div className="w-full lg:w-[325px] p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+      <h2 className="text-lg font-semibold text-[#282828] mb-4">Contact Information</h2>
+      <div className="flex flex-col gap-5">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-blue-100 rounded-2xl flex items-center justify-center">
+            <FaGlobe className="text-blue-600" />
           </div>
-
-          <div className="w-full lg:w-[325px] p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
-            <h2 className="text-lg font-semibold text-[#282828] mb-4">Contact Information</h2>
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 bg-blue-100 rounded-2xl flex items-center justify-center">
-                  <FaGlobe className="text-blue-600" />
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-700 block">Website</span>
-                  <span className="text-sm text-blue-600 break-all">{sponsor.contacts[0]?.name}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 bg-green-100 rounded-2xl flex items-center justify-center">
-                  <FaEnvelope className="text-green-600" />
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-700 block">Email</span>
-                  <span className="text-sm text-black break-all">{sponsor.contacts[0]?.email}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 bg-purple-100 rounded-2xl flex items-center justify-center">
-                  <FaPhone className="text-purple-600" />
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-700 block">Phone</span>
-                  <span className="text-sm text-black">{sponsor.contacts[0]?.phone}</span>
-                </div>
-              </div>
-            </div>
+          <div>
+            <span className="text-sm font-medium text-gray-700 block">Website</span>
+            <span className="text-sm text-blue-600 break-all">{sponsor.contacts[0]?.name}</span>
           </div>
         </div>
-
-        {/* Representatives & Products */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 p-8 bg-white border border-gray-200 rounded-2xl shadow-sm">
-            <h2 className="text-2xl font-medium text-[#282828] mb-6">Representatives</h2>
-            <div className="flex flex-col gap-3">
-              {sponsor.representatives.map(rep => (
-                <div
-                  key={rep.id}
-                  className="flex justify-between items-center p-4 border border-gray-100 rounded-lg shadow-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <Image
-                      src={rep.user.photo ? `/uploads/${rep.user.photo}` : "/images/default-avatar.png"}
-                      alt={rep.user.name}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                    <div>
-                      <span className="text-base font-medium text-[#282828] block">{rep.user.name}</span>
-                      <span className="text-sm text-gray-600">{rep.user.organization}</span>
-                    </div>
-                  </div>
-                  <span className="text-base font-medium text-red-700 cursor-pointer">Connect</span>
-                </div>
-              ))}
-            </div>
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-green-100 rounded-2xl flex items-center justify-center">
+            <FaEnvelope className="text-green-600" />
           </div>
-
-          <div className="flex-1 p-8 bg-white border border-gray-200 rounded-2xl shadow-sm">
-            <h2 className="text-2xl font-medium text-[#282828] mb-6">Products & Services</h2>
-            <div className="flex flex-col gap-3">
-              {sponsor.products.map(product => (
-                <div
-                  key={product.id}
-                  className="flex items-center gap-4 p-4 border border-gray-100 rounded-lg shadow-sm"
-                >
-                  <div className="w-9 h-9 bg-blue-100 rounded-2xl flex items-center justify-center">
-                    <FaGlobe className="text-blue-600" />
-                  </div>
-                  <div className="flex flex-col flex-1">
-                    <span className="text-base font-medium text-[#282828]">{product.title}</span>
-                    <span className="text-sm text-gray-600">{product.description}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div>
+            <span className="text-sm font-medium text-gray-700 block">Email</span>
+            <span className="text-sm text-black break-all">{sponsor.contacts[0]?.email}</span>
           </div>
         </div>
-
-        {/* Sessions Section */}
-        <div className="flex justify-between items-center">
-          {/* <h2 className="text-2xl font-medium text-[#282828]">Sessions Sponsored</h2> */}
-   
-        </div>
-{/* 
-        <RelatedSessionsGrid /> */}
-
-        {/* Social Section */}
-        <div className="flex flex-col items-start gap-4 mt-8">
-          <h2 className="text-2xl font-medium text-[#282828]">Follow Us</h2>
-          <div className="flex flex-wrap gap-4 w-full">
-            {sponsor.socialMedia.map((s, index) => (
-              <a key={index} href={s.website} target="_blank" rel="noopener noreferrer" className="w-full sm:w-[30%]">
-                <button
-                  className={`w-full h-12 rounded-lg flex items-center justify-center gap-3 text-white ${
-                    s.name === "LinkedIn"
-                      ? "bg-blue-600"
-                      : s.name === "Twitter"
-                      ? "bg-blue-400"
-                      : s.name === "YouTube"
-                      ? "bg-red-500"
-                      : "bg-gray-600"
-                  }`}
-                >
-                  {s.name === "LinkedIn" && <FaLinkedin />}
-                  {s.name === "Twitter" && <FaTwitter />}
-                  {s.name === "YouTube" && <FaYoutube />}
-                  <span className="text-base font-normal">{s.name}</span>
-                </button>
-              </a>
-            ))}
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-purple-100 rounded-2xl flex items-center justify-center">
+            <FaPhone className="text-purple-600" />
+          </div>
+          <div>
+            <span className="text-sm font-medium text-gray-700 block">Phone</span>
+            <span className="text-sm text-black">{sponsor.contacts[0]?.phone}</span>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  {/* Representatives & Products */}
+  <div className="flex flex-col lg:flex-row gap-8">
+    <div className="flex-1 p-8 bg-white border border-gray-200 rounded-2xl shadow-sm">
+      <h2 className="text-2xl font-medium text-[#282828] mb-6">Representatives</h2>
+      <div className="flex flex-col gap-4">
+        {sponsor.representatives.map(rep => (
+          <div
+            key={rep.id}
+            className="flex justify-between items-center p-4 border border-gray-100 rounded-lg shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+            <img
+  src={
+    rep.user.photo
+      ? rep.user.photo.startsWith("http")
+        ? rep.user.photo
+        : `/uploads/${rep.user.photo}`
+      : rep.user.file
+      ? rep.user.file
+       : "/images/Ava.jpg"
+  }
+  alt={rep.user.name || "User"}
+  className="w-10 h-10 rounded-full"
+/>
+
+              <div>
+                <span className="text-base font-medium text-[#282828] block">{rep.user.name}</span>
+                <span className="text-sm text-gray-600">{rep.user.organization}</span>
+              </div>
+            </div>
+           
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div className="flex-1 p-8 bg-white border border-gray-200 rounded-2xl shadow-sm">
+      <h2 className="text-2xl font-medium text-[#282828] mb-6">Products & Services</h2>
+      <div className="flex flex-col gap-4">
+        {sponsor.products.map(product => (
+          <div
+            key={product.id}
+            className="flex items-center gap-4 p-4 border border-gray-100 rounded-lg shadow-sm"
+          >
+            <div className="w-10 h-10 bg-blue-100 rounded-2xl flex items-center justify-center">
+              <FaGlobe className="text-blue-600" />
+            </div>
+            <div className="flex flex-col flex-1">
+              <span className="text-base font-medium text-[#282828]">{product.title}</span>
+              <span className="text-sm text-gray-600">{product.description}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  {/* Social Section */}
+ <div className="flex flex-col items-start gap-4 mt-8 w-full">
+  <h2 className="text-2xl font-medium text-[#282828]">Follow Us</h2>
+  <div className="flex gap-4 w-full">
+    {sponsor.socialMedia.map((s, index) => (
+      <a
+        key={index}
+        href={s.website}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex-1"
+      >
+        <button
+          className={`w-full h-12 rounded-lg flex items-center justify-center gap-3 text-white ${
+            s.name === "LinkedIn"
+              ? "bg-blue-600"
+              : s.name === "Twitter"
+              ? "bg-blue-400"
+              : s.name === "YouTube"
+              ? "bg-red-900"
+              : "bg-gray-600"
+          }`}
+        >
+          {s.name === "LinkedIn" && <FaLinkedin />}
+          {s.name === "Twitter" && <FaTwitter />}
+          {s.name === "YouTube" && <FaYoutube />}
+          <span className="text-base font-normal">{s.name}</span>
+        </button>
+      </a>
+    ))}
+  </div>
+</div>
+
+</div>
+
 
       <Image
         src="/images/line.png"

@@ -27,10 +27,12 @@ const SponsorsExhibitorsPage: React.FC = () => {
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true)
         const res = await api.get(`/event/eventsrelatedsponsers/${eventId}`)
         const sponsors = res.data.sponsors.map((s: SponsorExhibitor) => ({
           ...s,
@@ -39,6 +41,8 @@ const SponsorsExhibitorsPage: React.FC = () => {
         setData({ sponsors, exhibitors: res.data.exhibitors })
       } catch (err) {
         console.error(err)
+      } finally {
+        setLoading(false)
       }
     }
     if (eventId) fetchData()
@@ -56,38 +60,59 @@ const SponsorsExhibitorsPage: React.FC = () => {
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto relative">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-3">
-        <div className="flex items-center gap-3">
-          <Link href="/participants/Home">
-            <FaArrowLeft className="text-red-800 w-5 h-5 cursor-pointer" />
-          </Link>
-          <h1 className="text-xl md:text-2xl font-bold text-black">Sponsors & Exhibitors</h1>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 md:gap-3">
-          <div className="flex items-center border border-gray-300 rounded-lg px-2 py-1 gap-2 w-full sm:w-56 md:w-64">
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="outline-none text-black w-full text-sm"
-            />
-          </div>
-          {['All', 'Gold Sponsor', 'Silver Sponsor', 'Exhibitor'].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 md:px-5 py-1 md:py-2 rounded-lg font-medium text-sm ${
-                selectedCategory === cat ? 'bg-red-600 text-white' : 'border border-gray-300 text-black'
-              }`}
-            >
-              {cat === 'Gold Sponsor' ? 'Gold Sponsors' : cat === 'Silver Sponsor' ? 'Silver Sponsors' : cat}
-            </button>
-          ))}
-        </div>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
       </div>
+    )
+  }
+
+  return (
+    <div className="p-4 md:p-6 max-w-6xl mx-auto relative">
+      {/* Header */}
+<div className="flex flex-col mb-6 gap-3">
+  {/* Header with back button */}
+  <div className="flex items-center gap-3">
+    <Link href="/participants/Home">
+      <FaArrowLeft className="text-red-900 w-5 h-5 cursor-pointer" />
+    </Link>
+    <h1 className="text-xl md:text-2xl font-bold text-black">Sponsors & Exhibitors</h1>
+  </div>
+
+  {/* Search input row */}
+  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-3 w-full">
+  {/* Search input */}
+  <div className="flex-1">
+    <div className="flex items-center border border-gray-300 rounded-lg px-2 py-2 gap-2 w-full">
+      <input
+        type="text"
+        placeholder="Search"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="outline-none text-black w-full text-sm"
+      />
+    </div>
+  </div>
+
+  {/* Category buttons */}
+  <div className="flex flex-wrap gap-2 md:gap-3 mt-2 md:mt-0 md:ml-4">
+    {['All', 'Gold Sponsor', 'Silver Sponsor', 'Exhibitor'].map((cat) => (
+      <button
+        key={cat}
+        onClick={() => setSelectedCategory(cat)}
+        className={`px-3 md:px-5 py-1 md:py-2 rounded-lg font-medium text-sm whitespace-nowrap ${
+          selectedCategory === cat ? 'bg-red-900 text-white' : 'border border-gray-300 text-black'
+        }`}
+      >
+        {cat === 'Gold Sponsor' ? 'Gold Sponsors' : cat === 'Silver Sponsor' ? 'Silver Sponsors' : cat}
+      </button>
+    ))}
+  </div>
+</div>
+
+</div>
+
 
       {/* Gold Sponsors */}
       {goldSponsors.length > 0 && (
