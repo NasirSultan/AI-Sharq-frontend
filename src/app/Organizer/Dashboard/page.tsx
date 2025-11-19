@@ -61,7 +61,7 @@ export default function Dashboard() {
           { label: "Active Sessions", value: data.totalActiveSession, percent: "0.5%", change: `+${data.totalActiveSession - 1}`, icon: <FaTv className="text-purple-500 text-xl" /> },
           { label: "Total Speakers", value: data.totalSpeaker, percent: "3.0%", change: `+${data.totalSpeaker - 1}`, icon: <FaMicrophone className="text-red-500 text-xl" /> },
           { label: "Total Sponsors", value: data.totalSponsor, percent: "4.2%", change: `+${data.totalSponsor - 1}`, icon: <FaHandshake className="text-yellow-500 text-xl" /> },
-          { label: "Total Participants", value: data.totalExhibitor, percent: "2.8%", change: `+${data.totalExhibitor - 1}`, icon: <FaUsers className="text-orange-500 text-xl" /> },
+          { label: "Recent Participants", value: data.totalExhibitor, percent: "2.8%", change: `+${data.totalExhibitor - 1}`, icon: <FaUsers className="text-orange-500 text-xl" /> },
         ];
 
         setStats(dynamicStats);
