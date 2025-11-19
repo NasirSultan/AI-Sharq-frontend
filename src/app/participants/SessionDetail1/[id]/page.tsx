@@ -271,14 +271,19 @@ export default function SessionPage({ params }: PageProps) {
       localStorage.setItem("sessionTags", JSON.stringify(session.tags))
     }
 
-    router.push("/participants/SessionForum", {
-      state: { id: id }
-    })
+    if (id) {
+      localStorage.setItem("sessionId", String(id))
+    }
+
+    router.push("/participants/SessionForum")
   }}
   className="flex items-center gap-2 font-semibold hover:text-white cursor-pointer"
 >
   <FaArrowRight className="text-[#9B2033] text-2xl ml-auto cursor-pointer hover:text-red-700" />
 </button>
+
+
+
 </div>
 
 

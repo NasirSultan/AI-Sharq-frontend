@@ -43,7 +43,8 @@ const colors = [
 
 export default function ForumsPage() {
   const [session, setSession] = useState<SessionData | null>(null)
-  const [id, setId] = useState<number | null>(12)
+const [id, setId] = useState<number | null>(null)
+
   const [searchTerm, setSearchTerm] = useState('')
   const [tagColors, setTagColors] = useState<Record<string, string>>({})
   const [activeTag, setActiveTag] = useState<string | null>(null)
@@ -52,6 +53,16 @@ export default function ForumsPage() {
   const [role, setRole] = useState('')
   const router = useRouter()
   const [btnLoading, setBtnLoading] = useState(false)
+
+useEffect(() => {
+  const savedId = localStorage.getItem("sessionId")
+
+  if (savedId) {
+    setId(Number(savedId))
+  }
+}, [])
+
+
 
     const handleClick = () => {
     setBtnLoading(true)
@@ -149,7 +160,7 @@ export default function ForumsPage() {
       </div>
     )
 
-  if (!session) return <div className="p-6 text-gray-600">Loading...</div>
+  if (!session) return <div className="p-6 text-gray-600"></div>
 
   const filteredForums = session.forums.filter(forum =>
     forum.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -178,10 +189,12 @@ export default function ForumsPage() {
           >
             <FaArrowLeft className="text-red-900 cursor-pointer" size={20} />
           </button>
+<div className="flex flex-col">
+  <h1 className="text-xl sm:text-2xl font-semibold text-red-900">
+    Forum
+  </h1>
+</div>
 
-          <h1 className="text-xl sm:text-2xl font-semibold text-red-900">
-            Forum 
-          </h1>
         </div>
 
 

@@ -43,6 +43,13 @@ type Stat = {
   iconBg: string
 }
 
+
+interface Session {
+  startTime: string | Date;
+  endTime: string | Date;
+}
+
+
 export default function SessionsSchedule() {
   const [activeFilter, setActiveFilter] = useState('All Time')
   const [sessions, setSessions] = useState<Session[]>([])
@@ -424,7 +431,15 @@ export default function SessionsSchedule() {
                 </div>
  <div className="flex text-xs text-gray-900 mb-2 items-center justify-between">
                   <span className="font-medium">Duration</span>
-                  <span className="text-right">{session.location}</span>
+                <div className="flex items-center text-gray-600 gap-2">
+ <span>
+  {Math.floor(
+    (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / 60000
+  )} min
+</span>
+
+</div>
+
                 </div>
                 {/* Location */}
                 <div className="flex text-xs text-gray-900 mb-2 items-center justify-between">
