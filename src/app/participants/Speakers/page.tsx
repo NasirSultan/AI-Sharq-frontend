@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "@/lib/store/store"
 import { setSpeakerId } from "@/lib/store/features/speaker/speakerSlice"
 import api from "@/config/api"
+import { useMemo } from "react"
 
 const tagColors: Record<string, string> = {
   Expert: "bg-blue-200 text-blue-800",
@@ -28,30 +29,52 @@ export default function SpeakersPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    if (!eventId) return
-    const fetchSpeakers = async () => {
-      try {
-        const res = await api.get(`/speakers/event/${eventId}/short-info`)
-        setSpeakers(res.data)
-      } catch (error) {
-        console.error("Error fetching speakers:", error)
-      }
-    }
-    fetchSpeakers()
-  }, [eventId])
 
-  const filteredSpeakers = speakers.filter((speaker) => {
-    const matchesFilter =
-      activeFilter === "All" || speaker.tags.includes(activeFilter)
+
+useEffect(() => {
+  if (!eventId) return
+
+  let isMounted = true
+
+  // Check cache first
+  const cachedSpeakers = localStorage.getItem(`speakers-${eventId}`)
+  if (cachedSpeakers) {
+    const data = JSON.parse(cachedSpeakers)
+    setSpeakers(data)
+    return
+  }
+
+  const fetchSpeakers = async () => {
+    try {
+      const res = await api.get(`/speakers/event/${eventId}/short-info`)
+      if (!isMounted) return
+      setSpeakers(res.data)
+      // Save to localStorage for quick navigation next time
+      localStorage.setItem(`speakers-${eventId}`, JSON.stringify(res.data))
+    } catch (error) {
+      console.error("Error fetching speakers:", error)
+    }
+  }
+
+  fetchSpeakers()
+
+  return () => {
+    isMounted = false
+  }
+}, [eventId])
+
+
+const filteredSpeakers = useMemo(() => {
+  return speakers.filter(speaker => {
+    const matchesFilter = activeFilter === "All" || speaker.tags.includes(activeFilter)
     const matchesSearch =
       speaker.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       speaker.bio.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      speaker.expertise.some((exp: string) =>
-        exp.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      speaker.expertise.some(exp => exp.toLowerCase().includes(searchQuery.toLowerCase()))
     return matchesFilter && matchesSearch
   })
+}, [speakers, activeFilter, searchQuery])
+
 
   return (
     <>

@@ -40,35 +40,54 @@ export default function MyAgendaPage() {
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [buttonLoading, setButtonLoading] = useState<string | null>(null)
 
-  const fetchSessions = async () => {
-    if (!eventId) {
-      setEmptyMessage("Event not selected")
-      setLoading(false)
-      return
-    }
-    try {
-      const res = await api.get(`/event/event-sessions/${eventId}`)
-      const data = res.data
-      const liveIds = (data.liveSessions || []).map((s: any) => s.sessionId)
-      const filteredAllSessions = (data.allSessions || []).filter(
-        (s: any) => !liveIds.includes(s.sessionId)
-      )
-      const combined = [...(data.liveSessions || []), ...filteredAllSessions]
-      const transformed = combined.map((s: any) => ({
-        ...s,
-        ...parseDuration(s.duration || ""),
-      }))
-      setSessions(transformed)
-      setFilteredSessions(transformed)
-      if (transformed.length === 0) setEmptyMessage("No sessions available")
-    } catch {
-      setEmptyMessage("Failed to load sessions")
-      setSessions([])
-      setFilteredSessions([])
-    } finally {
-      setLoading(false)
-    }
+const fetchSessions = async () => {
+  if (!eventId) {
+    setEmptyMessage("Event not selected")
+    setLoading(false)
+    return
   }
+
+  // Check localStorage cache
+  const cached = localStorage.getItem(`sessions-${eventId}`)
+if (cached) {
+  const cachedData = JSON.parse(cached).map((s: any) => ({
+    ...s,
+    startTime: s.startTime ? new Date(s.startTime) : null,
+    endTime: s.endTime ? new Date(s.endTime) : null,
+  }))
+  setSessions(cachedData)
+  setFilteredSessions(cachedData)
+  setLoading(false)
+  return
+}
+
+
+  try {
+    const res = await api.get(`/event/event-sessions/${eventId}`)
+    const data = res.data
+    const liveIds = (data.liveSessions || []).map((s: any) => s.sessionId)
+    const filteredAllSessions = (data.allSessions || []).filter(
+      (s: any) => !liveIds.includes(s.sessionId)
+    )
+    const combined = [...(data.liveSessions || []), ...filteredAllSessions]
+    const transformed = combined.map((s: any) => ({
+      ...s,
+      ...parseDuration(s.duration || "")
+    }))
+
+    setSessions(transformed)
+    setFilteredSessions(transformed)
+    localStorage.setItem(`sessions-${eventId}`, JSON.stringify(transformed))
+    if (transformed.length === 0) setEmptyMessage("No sessions available")
+  } catch {
+    setEmptyMessage("Failed to load sessions")
+    setSessions([])
+    setFilteredSessions([])
+  } finally {
+    setLoading(false)
+  }
+}
+
 
   useEffect(() => {
     fetchSessions()

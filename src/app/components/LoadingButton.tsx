@@ -18,7 +18,7 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
     <button
       onClick={onClick}
       disabled={loading}
-      className={`py-3 px-6 rounded-xl text-white flex items-center justify-center gap-2 
+      className={`py-3 px-6 rounded-xl text-white flex items-center justify-center gap-2 cursor-pointer
         ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:opacity-90'} ${color}`}
     >
       {loading && <FaSpinner className="animate-spin" />}

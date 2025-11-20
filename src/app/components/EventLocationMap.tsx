@@ -9,10 +9,11 @@ export default function EventLocationMap() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate getting saved link - replace with your actual storage method
-    const savedLink = 'https://maps.google.com/?q=31.5204,74.3587' // Default Lahore
-    if (savedLink) {
-      setMapLink(savedLink)
+    const saved = window.localStorage.getItem('eventLocation')
+    if (saved) {
+      setMapLink(saved)
+    } else {
+      setMapLink('https://maps.google.com/?q=31.5204,74.3587')
     }
   }, [])
 
@@ -20,13 +21,13 @@ export default function EventLocationMap() {
     if (!mapLink || !mapRef.current) return
 
     const script = document.createElement('script')
-    script.src = `https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js`
+    script.src = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'
     script.async = true
-    
+
     const link = document.createElement('link')
     link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css'
     link.rel = 'stylesheet'
-    
+
     document.head.appendChild(link)
     document.body.appendChild(script)
 
@@ -43,11 +44,9 @@ export default function EventLocationMap() {
   }, [mapLink])
 
   const extractCoordinates = (link) => {
-    // Match @lat,lng pattern
     const atMatch = link.match(/@([-\d.]+),([-\d.]+)/)
     if (atMatch) return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) }
 
-    // Match ?q=lat,lng or ?q=place pattern
     const qMatch = link.match(/[?&]q=([-+\w\s%.,]+)/)
     if (qMatch) {
       const decoded = decodeURIComponent(qMatch[1])
@@ -64,7 +63,8 @@ export default function EventLocationMap() {
   const initializeMap = async () => {
     if (!window.mapboxgl) return
 
-    window.mapboxgl.accessToken = 'pk.eyJ1Ijoicml6aWVhZ2xpbmVzIiwiYSI6ImNtaGc3aGt4bjBlb2YycnNjbDBldnh3ejUifQ.sAY7q13HBaq80LoOUAT0oQ'
+    window.mapboxgl.accessToken =
+      'pk.eyJ1Ijoicml6aWVhZ2xpbmVzIiwiYSI6ImNtaGc3aGt4bjBlb2YycnNjbDBldnh3ejUifQ.sAY7q13HBaq80LoOUAT0oQ'
 
     const mapData = extractCoordinates(mapLink)
     if (!mapData) {
@@ -72,11 +72,13 @@ export default function EventLocationMap() {
       return
     }
 
-    let center = [74.3587, 31.5204] // default: Lahore [lng, lat]
-    
-    if ('lat' in mapData && 'lng' in mapData) {
+    let center = [74.3587, 31.5204]
+
+    if (mapData.lat && mapData.lng) {
       center = [mapData.lng, mapData.lat]
-    } else if ('query' in mapData) {
+    }
+
+    if (mapData.query) {
       try {
         const response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
@@ -113,8 +115,8 @@ export default function EventLocationMap() {
 
   if (!mapLink) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-6  ">
-        <div className="text-center text-gray-500 py-10 bg-gray-50 rounded-2xl">
+      <div className="w-full max-w-4xl mx-auto p-6">
+        <div className="text-center text-red-900 py-10">
           No location found
         </div>
       </div>
@@ -122,26 +124,26 @@ export default function EventLocationMap() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto  sm:p-6 md:p-0 ">
-  <div className="relative w-full h-83 rounded-2xl border border-gray-300 overflow-hidden bg-gray-100">
-    {isLoading && (
-      <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
-        <div className="text-gray-600">Loading map...</div>
+    <div className="w-full max-w-4xl mx-auto sm:p-6 md:p-0 sm:m-2">
+      <div className="relative w-full h-83 rounded-2xl border border-gray-300 overflow-hidden bg-gray-100">
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
+            <div className="text-gray-600">Loading map...</div>
+          </div>
+        )}
+        <div ref={mapRef} className="w-full h-full" />
       </div>
-    )}
-    <div ref={mapRef} className="w-full h-full mb-6   m-6"  />
-  </div>
-  <div className="mt-4 text-sm text-gray-600">
-    <a 
-      href={mapLink} 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="text-blue-600 hover:text-blue-800 underline"
-    >
-      Open in Google Maps
-    </a>
-  </div>
-</div>
 
+      <div className="mt-2 text-sm text-red-900">
+        <a
+          href={mapLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          Open in Google Maps
+        </a>
+      </div>
+    </div>
   )
 }

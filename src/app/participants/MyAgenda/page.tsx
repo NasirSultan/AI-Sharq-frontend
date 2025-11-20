@@ -38,6 +38,19 @@ export default function MyAgendaPage() {
   const [loadingSession, setLoadingSession] = useState<string | null>(null)
 
   const fetchSessions = async () => {
+    const cached = localStorage.getItem(`sessions-${userId}-${eventId}`)
+    if (cached) {
+      const cachedData = JSON.parse(cached).map((s: any) => ({
+        ...s,
+        startTime: s.startTime ? new Date(s.startTime) : null,
+        endTime: s.endTime ? new Date(s.endTime) : null,
+      }))
+      setAllSessions(cachedData)
+      setFilteredSessions(cachedData)
+      setLoading(false)
+      return
+    }
+
     if (!eventId || !userId) {
       setEmptyMessage("Event not selected")
       setLoading(false)
@@ -65,6 +78,7 @@ export default function MyAgendaPage() {
       setAllSessions(sessions)
       setFilteredSessions(sessions)
       if (sessions.length === 0) setEmptyMessage("No bookmarked sessions")
+      localStorage.setItem(`sessions-${userId}-${eventId}`, JSON.stringify(sessions))
     } catch {
       setEmptyMessage("Failed to load sessions")
       setAllSessions([])
@@ -154,10 +168,11 @@ export default function MyAgendaPage() {
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeFilter === filter
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  activeFilter === filter
                     ? "bg-[#86002B] text-white shadow-md"
-                    : "bg-white border border-gray-300 text-gray-700 hover:border-red-700 hover:text-red-800 shadow-sm"
-                  }`}
+                    : "bg-white border border-gray-300 text-gray-700 hover:border-red-700 hover:text-red-800 shadow-sm cursor-pointer"
+                }`}
               >
                 {filter}
               </button>
@@ -198,21 +213,26 @@ export default function MyAgendaPage() {
                 {session.speakers?.length > 0 ? (
                   session.speakers.map((speaker, speakerIndex) => (
                     <div key={speakerIndex} className="flex items-center gap-2">
-                      <img
+                      <Image
                         src={speaker.pic || "/images/img (9).png"}
-                        className="w-7 h-7 rounded-full object-cover"
+                        width={28}
+                        height={28}
+                        className="rounded-full object-cover"
                         alt={speaker.fullName}
-                        onError={(e) => { e.currentTarget.src = "/images/img (9).png" }}
+                        unoptimized
                       />
                       <span className="text-sm text-gray-700">{speaker.fullName}</span>
                     </div>
                   ))
                 ) : (
                   <div className="flex items-center gap-2">
-                    <img
+                    <Image
                       src="/images/img (9).png"
-                      className="w-7 h-7 rounded-full object-cover"
+                      width={28}
+                      height={28}
+                      className="rounded-full object-cover"
                       alt="Unknown Speaker"
+                      unoptimized
                     />
                     <span className="text-sm text-gray-700">Unknown Speaker</span>
                   </div>
@@ -253,10 +273,11 @@ export default function MyAgendaPage() {
                 <button
                   onClick={() => handleViewDetails(session.sessionId)}
                   disabled={loadingSession === session.sessionId}
-                  className={`w-full py-2 text-sm font-medium rounded-lg transition-colors curser-pointer duration-200 shadow-sm ${loadingSession === session.sessionId
-                    ? "bg-red-900 cursor-not-allowed text-white"
-                    : "bg-[#9B2033] text-white hover:bg-red-900"
-                    }`}
+                  className={`w-full py-2 text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm ${
+                    loadingSession === session.sessionId
+                      ? "bg-red-900 cursor-not-allowed text-white"
+                      : "bg-[#9B2033] text-white hover:bg-red-900 cursor-pointer"
+                  }`}
                 >
                   {loadingSession === session.sessionId ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>

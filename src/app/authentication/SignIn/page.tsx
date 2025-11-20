@@ -24,6 +24,8 @@ export default function SignIn() {
   })
 
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
   const router = useRouter()
   const dispatch = useDispatch()
 
@@ -86,11 +88,15 @@ export default function SignIn() {
         else if (user.role === 'exhibitor') router.push('/Exhibitors/ManageSessions')
         else router.push('/authentication/SignIn')
       }
-    } catch (err) {
-      console.error('Login failed', err)
-    } finally {
-      setLoading(false)
+    } catch (err: any) {
+    if (err.response && err.response.status === 401) {
+      setError('Incorrect email or password')
+    } else {
+      setError('Something went wrong')
     }
+  } finally {
+    setLoading(false)
+  }
   }
 
   return (
@@ -143,25 +149,32 @@ export default function SignIn() {
           onChange={handleChange}
           className="text-sm text-[#616161] border-none outline-none w-full"
         />
-        <FaEyeSlash className="w-4 h-4 text-[#9C9C9C]" />
+      
       </div>
     </div>
 
-    <div className="flex flex-col sm:flex-row items-center justify-between w-full">
-      <div className="flex items-center gap-2 mb-1 sm:mb-0">
-        <input
-          type="checkbox"
-          name="rememberMe"
-          checked={formData.rememberMe}
-          onChange={handleChange}
-          className="w-3.5 h-3.5 bg-white border border-[#282828] rounded"
-        />
-        <label className="text-sm text-[#282828]">Remember me</label>
-      </div>
-      <Link href="/authentication/ForgetPassword">
-        <span className="text-sm text-[#9B2033] hover:underline">Forget Password?</span>
-      </Link>
-    </div>
+   <div className="flex items-center justify-between w-full mt-2">
+  <label className="flex items-center gap-1 text-sm text-[#282828]">
+    Remember me
+    <input
+      type="checkbox"
+      name="rememberMe"
+      checked={formData.rememberMe}
+      onChange={handleChange}
+      className="w-3 h-3 border border-[#282828] rounded cursor-pointer"
+    />
+  </label>
+
+  <Link href="/authentication/ForgetPassword">
+    <span className="text-sm text-[#9B2033] hover:underline">
+      Forget Password?
+    </span>
+  </Link>
+</div>
+
+{error && (
+  <p className="text-red-600 text-sm text-center">{error}</p>
+)}
 
     <LoadingButton text="Sign In" loading={loading} color="bg-[#9B2033]" />
   </form>
@@ -173,20 +186,26 @@ export default function SignIn() {
       <hr className="flex-1 border border-[#546056] opacity-20" />
     </div>
 
-    <div className="flex flex-col sm:flex-row gap-1 w-full mt-2">
-      <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
-        <FaGoogle className="w-4 h-4" />
-        Google
-      </button>
-      <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
-        <FaFacebookF className="w-4 h-4" />
-        Facebook
-      </button>
-      <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
-        <FaApple className="w-4 h-4" />
-        Apple
-      </button>
-    </div>
+   <div className="flex flex-col sm:flex-row gap-1 w-full mt-2">
+  <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
+    <FaGoogle className="w-4 h-4 text-red-500" />
+    Google
+  </button>
+
+  <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
+    <FaFacebookF className="w-4 h-4 text-blue-600" />
+    Facebook
+  </button>
+
+  <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
+    <FaApple className="w-4 h-4 text-black" />
+    Apple
+  </button>
+</div>
+
+ 
+ 
+ 
   </div>
 
   <p className="text-sm text-center text-[#282828] mt-3">

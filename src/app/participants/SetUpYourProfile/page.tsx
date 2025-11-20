@@ -179,8 +179,8 @@ export default function ProfileSetup() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className={`w-full h-12 text-white text-sm font-semibold rounded-lg transition ${loading
-                  ? 'bg-gray-400 cursor-not-allowed'
+              className={`w-full h-12 text-white text-sm cursor-pointer font-semibold rounded-lg transition ${loading
+                  ? 'bg-red-900 cursor-not-allowed'
                   : 'bg-[#9B2033] hover:bg-[#7c1a2a]'
                 }`}
             >

@@ -35,30 +35,60 @@ export default function SessionPage({ params }: PageProps) {
 
   const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : null;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await api.get(`/sessions/detail/${id}`)
-        setSession(res.data)
+useEffect(() => {
+  let isMounted = true
 
-        // Fetch user status only for participants
-        if (userRole === "participant" && userId) {
-          try {
-            const statusRes = await api.get(`/sessions/${id}/user-status/${userId}`)
-            setBookmarked(statusRes.data.isBookmarked)
-            setIsRegistered(statusRes.data.isRegistered)
-          } catch (err) {
-            console.error("Failed to fetch user status", err)
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch session", err)
-      } finally {
-        setLoading(false)
-      }
+  // Check if we already have session in localStorage or cache
+  const cachedSession = localStorage.getItem(`session-${id}`)
+  if (cachedSession) {
+    const data = JSON.parse(cachedSession)
+    setSession(data.session)
+    setBookmarked(data.bookmarked)
+    setIsRegistered(data.isRegistered)
+    setLoading(false)
+    return
+  }
+
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      const sessionPromise = api.get(`/sessions/detail/${id}`)
+      const userStatusPromise =
+        userRole === "participant" && userId
+          ? api.get(`/sessions/${id}/user-status/${userId}`)
+          : Promise.resolve({ data: {} })
+
+      const [sessionRes, statusRes] = await Promise.all([sessionPromise, userStatusPromise])
+
+      if (!isMounted) return
+
+      setSession(sessionRes.data)
+      setBookmarked(statusRes.data.isBookmarked || false)
+      setIsRegistered(statusRes.data.isRegistered || false)
+
+      // Save to localStorage to avoid refetch on redirect
+      localStorage.setItem(
+        `session-${id}`,
+        JSON.stringify({
+          session: sessionRes.data,
+          bookmarked: statusRes.data.isBookmarked || false,
+          isRegistered: statusRes.data.isRegistered || false,
+        })
+      )
+    } catch (err) {
+      console.error(err)
+    } finally {
+      if (isMounted) setLoading(false)
     }
-    fetchData()
-  }, [id, userId, userRole])
+  }
+
+  fetchData()
+
+  return () => {
+    isMounted = false
+  }
+}, [id, userId, userRole])
+
 
   const handleBookmark = async () => {
     if (bookmarked) {
@@ -127,33 +157,8 @@ export default function SessionPage({ params }: PageProps) {
 
   if (loading)
     return (
-      <div className="flex justify-center mt-20">
-        <button
-          disabled
-          className="flex items-center gap-2 px-6 py-2 rounded-lg font-medium text-red-6 cursor-not-allowed"
-        >
-          <svg
-            className="animate-spin h-5 w-5 text-red-600"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v8H4z"
-            ></path>
-          </svg>
-          Loading session...
-        </button>
+  <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
       </div>
     )
 
@@ -176,7 +181,7 @@ export default function SessionPage({ params }: PageProps) {
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-3">
           <FaArrowLeft
-            className="text-red-600 cursor-pointer"
+            className="text-red-900 cursor-pointer"
             size={20}
             onClick={() => router.back()}
           />

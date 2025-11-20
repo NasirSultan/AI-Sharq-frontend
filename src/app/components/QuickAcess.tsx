@@ -21,8 +21,8 @@ const quickAccessItems = [
     Link: '/participants/Speakers',
   },
   {
-    label: 'Sponsors',
-    desc: 'Partners & exhibits',
+    label: 'Partners',
+    desc: 'Sponsors & exhibits',
     img: '/images/div (3).png',
     Link: '/participants/Sponsors&Exhibitors',
   },
@@ -30,15 +30,14 @@ const quickAccessItems = [
 
 export default function QuickAccess() {
   return (
-   <section className="w-full bg-white  md:p-5 md:px-8 rounded-2xl ">
-  <div className="flex flex-col md:flex-row gap-5 w-full">
-   <div className="w-full md:w-1/2">
+   <section className="w-full bg-white p-4 md:p-6 lg:p-8 rounded-2xl">
+  <div className="flex flex-col md:flex-row gap-6 w-full">
+
+    <div className="w-full md:w-1/2">
       <EventLocationMap />
     </div>
-   
-   
+
     <div className="w-full md:w-1/2">
-     
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 w-full">
         {quickAccessItems.map((item) => (
           <Link href={item.Link} key={item.label} className="block w-full">
@@ -56,9 +55,9 @@ export default function QuickAccess() {
       </div>
     </div>
 
-    
   </div>
 </section>
+
 
   )
 }

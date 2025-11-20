@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import TodaysSchedule from "../../components/TodaysSchedule";
 import QuickAccess from "../../components/QuickAcess";
 import ToolsAndConnections from "../../components/ToolsAndConnections";
@@ -23,6 +22,16 @@ interface Banner {
   buttonColor: string;
 }
 
+// Cache object outside component to persist across renders
+const sessionCache: {
+  [key: number]: {
+    data: any;
+    timestamp: number;
+  };
+} = {};
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+
 const parseDuration = (duration: string) => {
   const parts = duration.split(" - ");
   if (parts.length === 2) {
@@ -41,21 +50,27 @@ const parseDuration = (duration: string) => {
 };
 
 const motivationalLines = [
-  "Don’t miss this session, it’s full of insights",
+  "Don't miss this session, it's full of insights",
   "Join now to learn new skills and ideas",
-  "Be part of this session, it’s highly recommended",
+  "Be part of this session, it's highly recommended",
 ];
 
 export default function Home() {
   const eventId = useSelector((state: RootState) => state.event.id);
   const [banners, setBanners] = useState<Banner[]>([]);
-  const [nextSessions, setNextSessions] = useState<any[]>([]);
-  const [eventInfo, setEventInfo] = useState<{ title: string; description: string } | null>(null);
+  const [nextSessions, setNextSessions] = useState([]);
+  const [eventInfo, setEventInfo] = useState<{
+    title: string;
+    description: string;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [emptyMessage, setEmptyMessage] = useState("");
   const [showRedirectButton, setShowRedirectButton] = useState(false);
+  
+  const hasFetched = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchSessions = async () => {
+  useEffect(() => {
     if (!eventId) {
       setEmptyMessage("Event not selected");
       setShowRedirectButton(false);
@@ -63,86 +78,149 @@ export default function Home() {
       return;
     }
 
-    try {
-      setLoading(true);
-      const res = await api.get(`/event/event-sessions/${eventId}`);
-      const data = res.data;
+    // Prevent refetch if already fetched for this eventId
+    if (hasFetched.current) {
+      return;
+    }
 
-      const event = data.allSessions?.[0]?.event || data.liveSessions?.[0]?.event;
-      if (event) {
-        setEventInfo({
-          title: event.eventTitle,
-          description: event.eventDescription,
+    // Check cache first
+    const cached = sessionCache[eventId];
+    const now = Date.now();
+    
+    if (cached && now - cached.timestamp < CACHE_DURATION) {
+      // Use cached data
+      processSessionData(cached.data);
+      setLoading(false);
+      hasFetched.current = true;
+      return;
+    }
+
+    const fetchEvent = async () => {
+      try {
+        setLoading(true);
+
+        // Cancel previous request if exists
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+
+        // Create new abort controller
+        abortControllerRef.current = new AbortController();
+
+        const res = await api.get(`/event/event-sessions/${eventId}`, {
+          signal: abortControllerRef.current.signal,
+          timeout: 5000, // 5 second timeout
         });
-      }
+        
+        const data = res.data;
 
-      const liveBanners: Banner[] = (data.liveSessions || []).map((s: any) => {
+        // Cache the response
+        sessionCache[eventId] = {
+          data: data,
+          timestamp: Date.now(),
+        };
+
+        processSessionData(data);
+        hasFetched.current = true;
+      } catch (err: any) {
+        if (err.name === 'AbortError' || err.name === 'CanceledError') {
+          console.log("Request was cancelled");
+          return;
+        }
+        console.error("Error fetching sessions:", err);
+        setEmptyMessage("Failed to load sessions");
+        setShowRedirectButton(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+
+    // Cleanup function
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [eventId]);
+
+  const processSessionData = (data: any) => {
+    // Set event info
+    const event =
+      data.allSessions?.[0]?.event || data.liveSessions?.[0]?.event;
+    if (event) {
+      setEventInfo({
+        title: event.eventTitle,
+        description: event.eventDescription,
+      });
+    }
+
+    // Live banners
+    const liveBanners: Banner[] = (data.liveSessions || []).map((s: any) => {
+      const { startTime, endTime } = parseDuration(s.duration);
+      return {
+        sessionId: s.sessionId,
+        type: "Live",
+        category: s.category || "N/A",
+        startTime,
+        endTime,
+        subtitle: s.location || "",
+        bgColor: "bg-red-800",
+        textColor: "text-white",
+        buttonColor: "text-white",
+      };
+    });
+
+    // Latest banners
+    const latestBanners: Banner[] = (data.allSessions || [])
+      .filter((s: any) => !s.isLive)
+      .slice(0, 1)
+      .map((s: any) => {
         const { startTime, endTime } = parseDuration(s.duration);
         return {
           sessionId: s.sessionId,
-          type: "Live",
+          type: "Latest Update",
           category: s.category || "N/A",
           startTime,
           endTime,
           subtitle: s.location || "",
-          bgColor: "bg-red-800",
-          textColor: "text-white",
-          buttonColor: "text-white",
+          bgColor: "bg-white",
+          textColor: "text-red-800",
+          buttonColor: "text-red-700",
         };
       });
 
-      const latestBanners: Banner[] = (data.allSessions || [])
-        .filter((s: any) => !s.isLive)
-        .slice(0, 1)
-        .map((s: any) => {
-          const { startTime, endTime } = parseDuration(s.duration);
-          return {
-            sessionId: s.sessionId,
-            type: "Latest Update",
-            category: s.category || "N/A",
-            startTime,
-            endTime,
-            subtitle: s.location || "",
-            bgColor: "bg-white",
-            textColor: "text-red-800",
-            buttonColor: "text-red-700",
-          };
-        });
+    setBanners([...liveBanners, ...latestBanners]);
 
-      setBanners([...liveBanners, ...latestBanners]);
+    // Next sessions
+    const next = (data.allSessions || []).slice(1, 2).map((s: any) => {
+      const { startTime } = parseDuration(s.duration);
+      return {
+        sessionId: s.sessionId,
+        startTime: startTime || "TBD",
+        category: s.category || "N/A",
+        speaker: s.speakerName || "Unknown",
+        location: s.location || "TBD",
+      };
+    });
 
-      const next = (data.allSessions || []).slice(1, 2).map((s: any) => {
-        const { startTime } = parseDuration(s.duration);
-        return {
-          sessionId: s.sessionId,
-          startTime: startTime || "TBD",
-          category: s.category || "N/A",
-          speaker: s.speakerName || "Unknown",
-          location: s.location || "TBD",
-        };
-      });
-      setNextSessions(next);
+    setNextSessions(next);
 
-      if (liveBanners.length + latestBanners.length === 0 && next.length === 0) {
-  setEmptyMessage("No sessions are available for this event yet.");
-
-        setShowRedirectButton(true);
-      } else {
-        setEmptyMessage("");
-        setShowRedirectButton(false);
-      }
-    } catch (err) {
-      console.error("Error fetching sessions:", err);
-      setEmptyMessage("Failed to load sessions");
+    if (liveBanners.length + latestBanners.length === 0 && next.length === 0) {
+      setEmptyMessage("No sessions are available for this event yet.");
+      setShowRedirectButton(true);
+    } else {
+      setEmptyMessage("");
       setShowRedirectButton(false);
-    } finally {
-      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchSessions();
-  }, [eventId]);
+  const sortedBanners = useMemo(() => {
+    const live = banners.find((b) => b.type === "Live");
+    const rest = banners.filter((b) => b.type !== "Live");
+    return live ? [live, ...rest] : rest;
+  }, [banners]);
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -155,24 +233,20 @@ export default function Home() {
           <div className="flex flex-col justify-center items-center h-64 space-y-4">
             <p className="text-black text-lg font-medium">{emptyMessage}</p>
             {showRedirectButton && (
-             <Link href="/participants/vanue">
-  <button className="px-4 py-2 border-2 border-red-900 text-red-900 bg-white rounded-full hover:bg-red-900 hover:text-white cursor-pointer">
-    View Venue
-  </button>
-</Link>
-
+              <Link href="/participants/vanue">
+                <button className="px-4 py-2 border-2 border-red-900 text-red-900 bg-white rounded-full hover:bg-red-900 hover:text-white cursor-pointer">
+                  View Venue
+                </button>
+              </Link>
             )}
           </div>
         ) : (
           <>
-            {/* Event Card */}
             {eventInfo && (
               <div>
                 <div className="flex items-center">
                   <div>
-                    <h2 className="text-2xl font-bold text-black">
-                      Venue: {eventInfo.title}
-                    </h2>
+                    <h2 className="text-2xl font-bold text-black">Venue: {eventInfo.title}</h2>
                     <p className="text-gray-600 text-sm mt-1">{eventInfo.description}</p>
                   </div>
                 </div>
@@ -180,12 +254,8 @@ export default function Home() {
               </div>
             )}
 
-            {/* Banners Section */}
             <div className="space-y-4">
-              {[
-                ...(banners.find((b) => b.type === "Live") ? [banners.find((b) => b.type === "Live")!] : []),
-                ...banners.filter((b) => b.type !== "Live"),
-              ].map((banner, index) => {
+              {sortedBanners.map((banner, index) => {
                 const { bgColor, textColor } = banner;
                 return (
                   <div
@@ -226,20 +296,15 @@ export default function Home() {
               })}
             </div>
 
-            {/* Schedule Header */}
             <div className="flex justify-between items-center border-b border-gray-300 pb-2">
               <h2 className="text-xl font-semibold text-black">Today's Schedule</h2>
-              <Link
-                href="/participants/ViewAllSessions"
-                className="text-red-900 text-sm font-medium hover:underline"
-              >
+              <Link href="/participants/ViewAllSessions" className="text-red-900 text-sm font-medium hover:underline">
                 View All
               </Link>
             </div>
 
-            {/* Next Sessions */}
             <div className="space-y-4">
-              {nextSessions.map((session, index) => (
+              {nextSessions.map((session: any, index) => (
                 <div
                   key={index}
                   className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 flex items-center justify-between hover:shadow-md transition w-full"
@@ -263,7 +328,6 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Other Sections */}
             <div>
               <div className="bg-white rounded-2xl shadow-md border border-gray-200">
                 <h2 className="text-lg md:text-xl font-semibold mx-10 mt-4 text-[#282828]">Quick Access</h2>
@@ -276,13 +340,7 @@ export default function Home() {
         )}
       </div>
 
-      <Image
-        src="/images/line.png"
-        alt="Line"
-        width={1450}
-        height={127}
-        className="w-full h-auto mt-12"
-      />
+      <Image src="/images/line.png" alt="Line" width={1450} height={127} className="w-full h-auto mt-12" />
     </main>
   );
 }
