@@ -1,8 +1,10 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { QRCodeCanvas as QRCode } from 'qrcode.react'
 import LoadingButton from './LoadingButton'
+import { RootState } from '@/lib/store/store'
 
 export default function UserQRModal({
   show,
@@ -15,6 +17,20 @@ export default function UserQRModal({
 }) {
   const qrRef = useRef<HTMLCanvasElement | null>(null)
   const [qrLoading, setQrLoading] = useState(false)
+  const [role, setRole] = useState('')
+
+  // Get speaker ID from Redux
+  const speakerId = useSelector((state: RootState) => state.speaker.speakerId)
+
+  useEffect(() => {
+    const savedRole = localStorage.getItem('role')
+    if (savedRole) {
+      setRole(savedRole)
+    }
+  }, [])
+
+  // Decide which ID to use
+  const finalUserId = role === 'speaker' ? speakerId : userId
 
   const handleDownloadQR = async () => {
     setQrLoading(true)
@@ -24,7 +40,7 @@ export default function UserQRModal({
         const url = canvas.toDataURL('image/png')
         const a = document.createElement('a')
         a.href = url
-        a.download = `user-${userId}-qr.png`
+        a.download = `user-${finalUserId}-qr.png`
         a.click()
       }
     } catch (err) {
@@ -46,13 +62,16 @@ export default function UserQRModal({
         className="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center"
       >
         <QRCode
-          value={`${window.location.origin}/participants/profile/${userId}`}
+          value={`https://connect.sharqforum.org/Profile/${finalUserId}?role=${encodeURIComponent(
+            role
+          )}`}
           size={180}
           bgColor="#ffffff"
           fgColor="#000000"
           includeMargin={true}
           ref={qrRef}
         />
+
         <div className="mt-4">
           <LoadingButton
             text="Download QR Code"

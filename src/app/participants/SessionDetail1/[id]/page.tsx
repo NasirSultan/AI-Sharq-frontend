@@ -33,61 +33,62 @@ export default function SessionPage({ params }: PageProps) {
   const eventId = useSelector((state: RootState) => state.event.id)
   const dispatch = useDispatch()
 
+
   const userRole = typeof window !== "undefined" ? localStorage.getItem("role") : null;
 
-useEffect(() => {
-  let isMounted = true
+  useEffect(() => {
+    let isMounted = true
 
-  // Check if we already have session in localStorage or cache
-  const cachedSession = localStorage.getItem(`session-${id}`)
-  if (cachedSession) {
-    const data = JSON.parse(cachedSession)
-    setSession(data.session)
-    setBookmarked(data.bookmarked)
-    setIsRegistered(data.isRegistered)
-    setLoading(false)
-    return
-  }
-
-  const fetchData = async () => {
-    setLoading(true)
-    try {
-      const sessionPromise = api.get(`/sessions/detail/${id}`)
-      const userStatusPromise =
-        userRole === "participant" && userId
-          ? api.get(`/sessions/${id}/user-status/${userId}`)
-          : Promise.resolve({ data: {} })
-
-      const [sessionRes, statusRes] = await Promise.all([sessionPromise, userStatusPromise])
-
-      if (!isMounted) return
-
-      setSession(sessionRes.data)
-      setBookmarked(statusRes.data.isBookmarked || false)
-      setIsRegistered(statusRes.data.isRegistered || false)
-
-      // Save to localStorage to avoid refetch on redirect
-      localStorage.setItem(
-        `session-${id}`,
-        JSON.stringify({
-          session: sessionRes.data,
-          bookmarked: statusRes.data.isBookmarked || false,
-          isRegistered: statusRes.data.isRegistered || false,
-        })
-      )
-    } catch (err) {
-      console.error(err)
-    } finally {
-      if (isMounted) setLoading(false)
+    // Check if we already have session in localStorage or cache
+    const cachedSession = localStorage.getItem(`session-${id}`)
+    if (cachedSession) {
+      const data = JSON.parse(cachedSession)
+      setSession(data.session)
+      setBookmarked(data.bookmarked)
+      setIsRegistered(data.isRegistered)
+      setLoading(false)
+      return
     }
-  }
 
-  fetchData()
+    const fetchData = async () => {
+      setLoading(true)
+      try {
+        const sessionPromise = api.get(`/sessions/detail/${id}`)
+        const userStatusPromise =
+          userRole === "participant" && userId
+            ? api.get(`/sessions/${id}/user-status/${userId}`)
+            : Promise.resolve({ data: {} })
 
-  return () => {
-    isMounted = false
-  }
-}, [id, userId, userRole])
+        const [sessionRes, statusRes] = await Promise.all([sessionPromise, userStatusPromise])
+
+        if (!isMounted) return
+
+        setSession(sessionRes.data)
+        setBookmarked(statusRes.data.isBookmarked || false)
+        setIsRegistered(statusRes.data.isRegistered || false)
+
+        // Save to localStorage to avoid refetch on redirect
+        localStorage.setItem(
+          `session-${id}`,
+          JSON.stringify({
+            session: sessionRes.data,
+            bookmarked: statusRes.data.isBookmarked || false,
+            isRegistered: statusRes.data.isRegistered || false,
+          })
+        )
+      } catch (err) {
+        console.error(err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    fetchData()
+
+    return () => {
+      isMounted = false
+    }
+  }, [id, userId, userRole])
 
 
   const handleBookmark = async () => {
@@ -132,7 +133,7 @@ useEffect(() => {
 
   const handleJoinSession = () => {
     if (joining) return
-    
+
     const now = new Date()
     const start = new Date(session.startTime)
     const end = new Date(session.endTime)
@@ -157,7 +158,7 @@ useEffect(() => {
 
   if (loading)
     return (
-  <div className="flex justify-center items-center h-64">
+      <div className="flex justify-center items-center h-64">
         <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
       </div>
     )
@@ -188,9 +189,9 @@ useEffect(() => {
           <h1 className="text-xl font-semibold text-black">Session Details</h1>
         </div>
 
-        <button 
-          onClick={handleBookmark} 
-          disabled={bookmarkLoading || bookmarked} 
+        <button
+          onClick={handleBookmark}
+          disabled={bookmarkLoading || bookmarked}
           className={`${bookmarked ? 'cursor-default' : 'cursor-pointer'}`}
         >
           <svg
@@ -247,7 +248,7 @@ useEffect(() => {
               {Math.floor(
                 (new Date(session.endTime).getTime() -
                   new Date(session.startTime).getTime()) /
-                  60000
+                60000
               )}{" "}
               mins
             </span>
@@ -263,33 +264,33 @@ useEffect(() => {
 
 
 
-<div className="bg-white border border-red-300 rounded-2xl p-4 shadow-sm flex items-center justify-between cursor-pointer transition-colors duration-200">
-  <div className="flex-1">
-    <h2 className="text-lg font-semibold">Session Forum</h2>
-    <p className="text-sm">
-      Discuss with other attendees, ask questions, and share ideas before joining.
-    </p>
-  </div>
-<button
-  onClick={() => {
-    if (session?.tags) {
-      localStorage.setItem("sessionTags", JSON.stringify(session.tags))
-    }
+      <div className="bg-white border border-red-300 rounded-2xl p-4 shadow-sm flex items-center justify-between cursor-pointer transition-colors duration-200">
+        <div className="flex-1">
+          <h2 className="text-lg font-semibold">Session Forum</h2>
+          <p className="text-sm">
+            Discuss with other attendees, ask questions, and share ideas before joining.
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            if (session?.tags) {
+              localStorage.setItem("sessionTags", JSON.stringify(session.tags))
+            }
 
-    if (id) {
-      localStorage.setItem("sessionId", String(id))
-    }
+            if (id) {
+              localStorage.setItem("sessionId", String(id))
+            }
 
-    router.push("/participants/SessionForum")
-  }}
-  className="flex items-center gap-2 font-semibold hover:text-white cursor-pointer"
->
-  <FaArrowRight className="text-[#9B2033] text-2xl ml-auto cursor-pointer hover:text-red-700" />
-</button>
+            router.push("/participants/SessionForum")
+          }}
+          className="flex items-center gap-2 font-semibold hover:text-white cursor-pointer"
+        >
+          <FaArrowRight className="text-[#9B2033] text-2xl ml-auto cursor-pointer hover:text-red-700" />
+        </button>
 
 
 
-</div>
+      </div>
 
 
 
@@ -304,76 +305,51 @@ useEffect(() => {
     className={`flex items-center gap-3 p-4 rounded-2xl shadow transition ${
       joining
         ? "bg-[#ffdada]"
-        : canJoin
-        ? "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
-        : userRole !== "participant"
-        ? "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
-        : "bg-gray-100 cursor-not-allowed"
+        : isSessionLive
+          ? "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
+          : "bg-gray-100 cursor-not-allowed"
     } ${userRole === "participant" && !canJoin ? "opacity-60" : ""}`}
   >
     <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center relative overflow-hidden">
-      {joining ? (
-        <svg
-          className="animate-spin h-5 w-5 text-[#9B2033]"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          ></circle>
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v8H4z"
-          ></path>
-        </svg>
-      ) : (
+      {isSessionLive && (
         <>
-          {canJoin || userRole !== "participant" ? (
-            <>
-              <span className="absolute w-12 h-12 rounded-full border-2 border-[#9B2033]/40 animate-wave"></span>
-              <span className="absolute w-12 h-12 rounded-full border border-[#9B2033]/30 animate-wave-delayed"></span>
-              <FaVideo className="text-[#9B2033] text-xl relative z-10 animate-pulse-smooth" />
-            </>
-          ) : (
-            <FaVideo className="text-[#9B2033] text-xl opacity-50" />
-          )}
+          <span className="absolute w-12 h-12 rounded-full border-2 border-[#9B2033]/40 animate-wave"></span>
+          <span className="absolute w-12 h-12 rounded-full border border-[#9B2033]/30 animate-wave-delayed"></span>
         </>
       )}
+      <FaVideo
+        className={`text-[#9B2033] text-xl relative z-10 ${
+          isSessionLive ? "animate-pulse-smooth" : "opacity-50"
+        }`}
+      />
     </div>
 
     <div>
       <h2 className="text-lg font-semibold text-[#9B2033]">
         {joining
           ? "Joining..."
-          : canJoin || userRole !== "participant"
-          ? "Join Live Session"
-          : session.registrationRequired && !isRegistered
-          ? "Registration Required"
-          : "Session Not Live"}
+          : isSessionLive
+            ? session.registrationRequired && !isRegistered
+              ? "Registration Required"
+              : "Join Live Session"
+            : "Session Not Live"}
       </h2>
       <p className="text-xs text-[#9B2033]">
-        {joining
-          ? "Redirecting..."
-          : canJoin || userRole !== "participant"
-          ? "Click to join the live session"
-          : session.registrationRequired && !isRegistered
-          ? "Register yourself to join"
-          : "You can join only during live time"}
+       {joining
+  ? "Please wait while we connect you to the session."
+  : isSessionLive
+    ? session.registrationRequired && !isRegistered
+      ? "You need to register to attend this session. Click the registration button to join."
+      : "The session is live now! Click to join and participate in real-time."
+    : "The session has not started yet or has already ended. Check the schedule for upcoming sessions."}
+
       </p>
     </div>
 
-    {!joining && (
-      <FaArrowRight className="text-[#9B2033] text-2xl ml-auto" />
-    )}
+    {!joining && <FaArrowRight className="text-[#9B2033] text-2xl ml-auto" />}
   </div>
 )}
+
 
 
 
@@ -450,7 +426,9 @@ useEffect(() => {
         <div className="flex items-center justify-between">
           <p className="text-xs text-gray-600">
             {session.registrationRequired
-              ? "Registration Required"
+              ? isRegistered || bookmarked
+                ? "Already Registered"
+                : "Registration Required"
               : "No Registration Required"}
           </p>
 
@@ -466,7 +444,7 @@ useEffect(() => {
               ) : (
                 <button
                   onClick={() => router.push(`/participants/SessionRegistration/${id}`)}
-                  className="bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded-lg hover:bg-red-800 cursor-pointer"
+                  className="bg-red-900 text-white text-xs font-semibold px-3 py-1 rounded-lg hover:bg-red-800 cursor-pointer"
                 >
                   Register Now
                 </button>
@@ -480,6 +458,7 @@ useEffect(() => {
               </button>
             )
           )}
+
         </div>
       </div>
 
