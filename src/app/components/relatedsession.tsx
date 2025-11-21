@@ -1,36 +1,23 @@
-'use client'
-import useSWR from 'swr'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/lib/store/store'
-import { FaCalendarAlt, FaLock, FaUnlock } from 'react-icons/fa'
-import api from '@/config/api'
+"use client"
+import useSWR from "swr"
+import { useSelector } from "react-redux"
+import { RootState } from "@/lib/store/store"
+import { FaCalendarAlt, FaLock, FaUnlock } from "react-icons/fa"
+import Link from "next/link"
+import api from "@/config/api"
 
-const fetcher = (url: string) => api.get(url).then(res => res.data || [])
+const fetcher = (url: string) => api.get(url).then(res => res.data)
 
 export default function MyAgendaPage() {
   const eventId = useSelector((state: RootState) => state.event.id)
 
-  const { data: sessionsData, error, isLoading } = useSWR(
+  const { data, error, isLoading } = useSWR(
     eventId ? `/sessions/event/${eventId}/sessions` : null,
     fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
+    { revalidateOnFocus: false } // prevents reload on window focus
   )
 
-  if (!eventId) return <p className="text-black text-lg font-medium">Event not selected</p>
-  if (error) return <p className="text-black text-lg font-medium">Failed to load sessions</p>
-  if (isLoading) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="w-12 h-12 border-4 border-gray-300 border-t-[#9B2033] rounded-full animate-spin"></div>
-    </div>
-  )
-
-  const sessions = (sessionsData || []).map((s: any) => {
+  const sessions = data?.map((s: any) => {
     const start = new Date(s.startTime)
     const end = new Date(s.endTime)
     const minutes =
@@ -41,7 +28,7 @@ export default function MyAgendaPage() {
     return {
       sessionId: s.id,
       sessionTitle: s.title,
-      eventDescription: s.description,
+      event: { eventDescription: s.description },
       startTime: isNaN(start.getTime()) ? null : start,
       endTime: isNaN(end.getTime()) ? null : end,
       minutes,
@@ -53,19 +40,39 @@ export default function MyAgendaPage() {
         pic: sp.file,
       })),
     }
-  })
+  }) || []
 
-  if (sessions.length === 0) return (
-    <div className="flex justify-center items-center h-64">
-      <p className="text-black text-lg font-medium">No sessions found</p>
-    </div>
-  )
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-[#9B2033] rounded-full animate-spin"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-black text-lg font-medium">Failed to load sessions</p>
+      </div>
+    )
+  }
+
+  if (!sessions.length) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-black text-lg font-medium">
+          {eventId ? "No sessions found" : "Event not selected"}
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
       {sessions.map((session, index) => (
         <div
-          key={session.sessionId ?? index}
+          key={session?.sessionId ?? index}
           className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex flex-col justify-between h-[380px]"
         >
           <div className="flex items-center justify-between">
@@ -78,32 +85,32 @@ export default function MyAgendaPage() {
           </div>
 
           <div className="flex items-center text-xs text-gray-600 space-x-2">
-            <div className="w-6 h-6 relative rounded-full overflow-hidden">
-              <Image
-                src={session.speakers[0]?.pic || '/images/img (9).png'}
-                alt={session.speakers[0]?.fullName || 'Unknown'}
-                fill
-                className="object-cover rounded-full"
-              />
-            </div>
-            <span>{session.speakers[0]?.fullName ?? 'Unknown'}</span>
+            <img
+              src={session.speakers[0]?.pic || "/images/img (9).png"}
+              className="w-6 h-6 rounded-full object-cover"
+            />
+            <span>{session.speakers[0]?.fullName ?? "Unknown"}</span>
           </div>
 
           <hr className="border-t border-gray-300" />
 
-          <p className="text-xs text-gray-500 mb-3">{session.eventDescription ?? 'No description'}</p>
+          <p className="text-xs text-gray-500 mb-3">
+            {session.event?.eventDescription ?? "No description"}
+          </p>
 
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2 text-xs">
-              <FaCalendarAlt className="text-blue-700" />
-              <span>
-                {session.startTime && session.endTime
-                  ? `${session.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${session.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                  : 'No time available'}
-              </span>
+              <div className="flex items-center gap-1">
+                <FaCalendarAlt className="text-blue-700" />
+                <span>
+                  {session.startTime && session.endTime
+                    ? `${session.startTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${session.endTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                    : "No time available"}
+                </span>
+              </div>
             </div>
             <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-xl text-xs font-semibold">
-              {session.category || 'No category'}
+              {session.category || "No category"}
             </span>
           </div>
 
@@ -113,11 +120,11 @@ export default function MyAgendaPage() {
           </div>
           <div className="flex text-xs text-gray-900 mb-2 items-center justify-between">
             <span>Room</span>
-            <span>{session.location || 'Hall B'}</span>
+            <span>{session.location || "Hall B"}</span>
           </div>
 
           <Link
-            href={session.sessionId ? `/participants/SessionDetail1/${session.sessionId}` : '#'}
+            href={session?.sessionId ? `/participants/SessionDetail1/${session.sessionId}` : "#"}
             className="w-full"
           >
             <button className="w-full bg-[#9B2033] text-white py-2 text-sm rounded-md hover:bg-red-700 transition cursor-pointer">
