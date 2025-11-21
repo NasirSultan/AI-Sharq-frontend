@@ -1,9 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { FaSearch, FaArrowLeft, FaArrowRight } from 'react-icons/fa'
-import { FaMessage } from 'react-icons/fa6'
-import Image from 'next/image'
+import { FaSearch, FaArrowLeft, FaArrowRight, FaComment } from 'react-icons/fa'
 import Link from 'next/link'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store/store'
@@ -15,7 +13,6 @@ interface User {
   id: number
   name: string
   email: string
-  file: string | null
 }
 
 interface Connection {
@@ -47,10 +44,12 @@ const Networking: React.FC = () => {
   useEffect(() => {
     if (data) {
       const prevData = prevDataRef.current
-      // Compare lengths or IDs to check for changes
       const hasChanged =
         prevData.length !== data.length ||
-        data.some((conn: Connection, index: number) => conn.connectionId !== prevData[index]?.connectionId)
+        data.some(
+          (conn: Connection, index: number) =>
+            conn.connectionId !== prevData[index]?.connectionId
+        )
 
       if (hasChanged) {
         setConnections(data)
@@ -61,9 +60,10 @@ const Networking: React.FC = () => {
 
   if (error) console.error(error)
 
-  const filteredConnections = connections.filter(conn =>
-    (conn.user.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (conn.user.email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+  const filteredConnections = connections.filter(
+    (conn) =>
+      (conn.user.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (conn.user.email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   )
 
   return (
@@ -72,7 +72,7 @@ const Networking: React.FC = () => {
       {/* Header */}
       <div className="flex items-center gap-3 bg-[#FFEEEE] p-4 rounded-2xl shadow mb-6">
         <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center">
-          <FaMessage className="text-[#9B2033] text-xl" />
+          <FaComment className="text-[#9B2033] text-xl" />
         </div>
         <h2 className="text-lg font-semibold text-[#9B2033]">Chats List</h2>
         <Link href="/participants/Masseges" className="ml-auto">
@@ -107,7 +107,7 @@ const Networking: React.FC = () => {
             type="text"
             placeholder="Search"
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 outline-none border-none text-sm text-[#575454]"
           />
         </div>
@@ -120,41 +120,44 @@ const Networking: React.FC = () => {
 
       {/* Connections List */}
       <div className="flex flex-col gap-3">
-        {filteredConnections.map(conn => (
+        {filteredConnections.map((conn) => (
           <div
-            key={conn.connectionId}
-            className="flex flex-row items-center gap-3 bg-white p-3 rounded-xl shadow border border-[#D4D4D4] w-full"
-          >
-            {/* Profile Picture */}
-            <div className="w-14 h-14 relative rounded-full overflow-hidden flex-shrink-0">
-              {conn.user.file ? (
-                <Image
-                  src={encodeURI(conn.user.file)}
-                  alt={conn.user.name}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <Image
-                  src="/https://thumbs.dreamstime.com/b/beautiful-woman-walking-balancing-street-curb-curbstone-sunset-copy-space-caucasian-smiling-carrying-bag-154366915.jpg"
-                  alt={conn.user.name}
-                  fill
-                  className="object-cover"
-                />
-              )}
-            </div>
+  key={conn.connectionId}
+  className="flex flex-row items-center gap-3 bg-white p-3 rounded-xl shadow border border-[#D4D4D4] w-full"
+>
+  {/* Profile Picture or Fallback Icon */}
+  <div className="w-10 h-10 relative flex-shrink-0">
+    <img
+      src={conn.user.file || ""}
+      alt={conn.user.name}
+      onError={(e) => {
+        const target = e.currentTarget as HTMLImageElement;
+        target.onerror = null; // prevent infinite loop
+        target.src = ""; // remove broken image
+        target.style.display = "none"; // hide image
+      }}
+      className="w-10 h-10 rounded-full object-cover"
+    />
+    {/* Fallback Icon */}
+    {!conn.user.file && (
+      <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-2xl text-red-700 absolute top-0 left-0">
+        {conn.user.name?.charAt(0).toUpperCase() || "?"}
+      </div>
+    )}
+  </div>
 
-            {/* Name and Email */}
-            <div className="flex-1 flex flex-col justify-center gap-0.5">
-              <h3 className="text-base font-semibold text-[#282828]">{conn.user.name}</h3>
-              <span className="text-xs text-[#282828]">{conn.user.email}</span>
-            </div>
+  {/* Name and Email */}
+  <div className="flex-1 flex flex-col justify-center gap-0.5">
+    <h3 className="text-base font-semibold text-[#282828]">{conn.user.name}</h3>
+    <span className="text-xs text-[#282828]">{conn.user.email}</span>
+  </div>
 
-            {/* Chat Icon */}
-            <div className="flex-shrink-0">
-              <Image src="/images/chat.png" alt="Chat" width={28} height={28} />
-            </div>
-          </div>
+  {/* Chat Icon */}
+  <div className="flex-shrink-0">
+    <img src="/images/chat.png" alt="Chat" width={28} height={28} />
+  </div>
+</div>
+
         ))}
       </div>
     </div>
