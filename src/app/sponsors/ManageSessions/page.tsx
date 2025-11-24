@@ -1,9 +1,8 @@
 "use client"
-import React, { useState, useEffect } from "react"
-import { FaArrowRight, FaCalendarAlt, FaClock, FaPlay, FaSearch, FaStar, FaLock, FaCopy } from "react-icons/fa"
+import React, { useState, useEffect, useMemo } from "react"
+import { FaArrowRight, FaCalendarAlt, FaClock, FaPlay, FaEdit, FaSearch, FaStar, FaLock, FaCopy } from "react-icons/fa"
 import { FaMessage, FaCalendar as FaCalendarIcon } from "react-icons/fa6"
 import Image from "next/image"
-import Link from "next/link"
 import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "@/lib/store/store"
 import api from "@/config/api"
@@ -11,6 +10,7 @@ import { useRouter } from "next/navigation"
 import { setEventId } from "@/lib/store/features/event/eventSlice"
 
 const filters = ["Daily", "Weekly", "10 Days", "90 Days", "All Time"]
+const cache: { [key: string]: any } = {}
 
 export default function SpeakerSessions() {
   const router = useRouter()
@@ -22,30 +22,45 @@ export default function SpeakerSessions() {
   const [searchText, setSearchText] = useState("")
   const [activeFilter, setActiveFilter] = useState("All Time")
   const [stats, setStats] = useState({ total: 0, ongoing: 0, scheduled: 0 })
+  const [loading, setLoading] = useState(false)
+  const [loadingCardId, setLoadingCardId] = useState<number | null>(null)
 
-  useEffect(() => {
+  const fetchEvents = async () => {
     if (!sponsorId) return
-    const fetchEvents = async () => {
-      try {
+    setLoading(true)
+    try {
+      if (cache[sponsorId]) {
+        setEvents(cache[sponsorId].sessions)
+        setFilteredEvents(cache[sponsorId].sessions)
+        setStats(cache[sponsorId].stats)
+      } else {
         const res = await api.get(`/sponsors/sponsor/${sponsorId}/sessions`)
         const data = Array.isArray(res.data.sessions) ? res.data.sessions : []
-        setEvents(data)
-        setFilteredEvents(data)
-        setStats({
+        const statsData = {
           total: res.data.total || 0,
           ongoing: res.data.ongoing || 0,
           scheduled: res.data.scheduled || 0
-        })
-      } catch (err) {
-        setEvents([])
-        setFilteredEvents([])
-        setStats({ total: 0, ongoing: 0, scheduled: 0 })
+        }
+        setEvents(data)
+        setFilteredEvents(data)
+        setStats(statsData)
+        cache[sponsorId] = { sessions: data, stats: statsData }
       }
+    } catch (err) {
+      setEvents([])
+      setFilteredEvents([])
+      setStats({ total: 0, ongoing: 0, scheduled: 0 })
     }
+    setLoading(false)
+  }
+
+  useEffect(() => {
     fetchEvents()
   }, [sponsorId])
 
-  useEffect(() => {
+  const filteredList = useMemo(() => {
+    if (!events) return []
+
     let filtered = [...events]
     const now = new Date()
 
@@ -74,8 +89,8 @@ export default function SpeakerSessions() {
       filtered = filtered.filter(ev => new Date(ev.startTime) >= ninetyDaysAgo)
     }
 
-    setFilteredEvents(filtered)
-  }, [activeFilter, searchText, events])
+    return filtered
+  }, [events, searchText, activeFilter])
 
   const formatTime = (time: string) => {
     const date = new Date(time)
@@ -92,53 +107,47 @@ export default function SpeakerSessions() {
     return Math.round((endDate.getTime() - startDate.getTime()) / 60000)
   }
 
-  const formatStat = (count: number) => {
-    if (count <= 1) return <span>{count}</span>
-    return (
-      <span className="flex items-baseline gap-1">
-        <span>{1}</span>
-        <span className="text-sm text-green-600">+{count - 1}</span>
-      </span>
-    )
-  }
-
-  const handleViewAll = (sessionId: number, eventId: number) => {
+  const handleViewAll = async (sessionId: number, eventId: number) => {
+    setLoadingCardId(sessionId)
     dispatch(setEventId(eventId))
-    router.push(`/participants/SessionDetail1/${sessionId}`)
+    setTimeout(() => {
+      setLoadingCardId(null)
+      router.push(`/participants/SessionDetail1/${sessionId}`)
+    }, 500)
   }
 
   const handleSponsorClick = () => {
-    router.push(`/sponsors/SponsorsDetailScreen?sponsorId=${sponsorId}`)
+    router.push(`/participants/SponsorsDetailsScreen/${sponsorId}`)
   }
 
   return (
-    <div className="p-6 md:p-10 min-h-screen font-sans">
-      {/* Top cards: Chats and Sponsor */}
+    <div className="p-6 md:p-10 min-h-screen font-sans max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex-1 flex items-center justify-between p-6 gap-3 h-24 bg-[#FFEEEE] border border-[#D4D4D4] shadow-sm rounded-3xl">
+        <div
+          className="flex-1 flex items-center justify-between p-4 gap-3 h-24 bg-[#FFEEEE] border border-[#D4D4D4] shadow-sm rounded-3xl cursor-pointer"
+          onClick={() => window.location.href = '/sponsors/edit'}
+        >
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center">
-              <FaMessage className="text-[#9B2033] text-xl" />
+              <FaEdit className="text-[#9B2033] text-xl" />
             </div>
-            <h2 className="text-lg font-semibold text-[#9B2033]">Chats List</h2>
+            <h2 className="text-lg font-semibold text-[#9B2033]">Edit Profile</h2>
           </div>
-          <Link href="/speakers/Messages">
-            <FaArrowRight className="text-[#9B2033] text-2xl" />
-          </Link>
         </div>
 
-        <div className="flex-1 flex items-center justify-between p-6 gap-3 h-24 bg-[#FFFAEE] border border-[#D4D4D4] shadow rounded-[20px] cursor-pointer" onClick={handleSponsorClick}>
+        <div
+          className="flex-1 flex items-center justify-between p-4 gap-3 h-24 bg-[#FFFAEE] border border-[#D4D4D4] shadow rounded-[20px] cursor-pointer"
+          onClick={handleSponsorClick}
+        >
           <div className="flex items-center gap-3">
             <div className="w-[45px] h-[45px] bg-[#FEF9C3] rounded-[7.5px] flex items-center justify-center">
               <FaStar className="text-[#CA8A04] text-lg" />
             </div>
             <h2 className="text-[18px] font-semibold text-[#9B2033]">Sponsor Detail</h2>
           </div>
-          <FaArrowRight className="text-[#9B2033] text-[30px] w-[30px] h-[26px]" />
         </div>
       </div>
 
-      {/* Filters and Search */}
       <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 mb-6">
         <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-96">
           <FaSearch className="text-red-900 mr-2" />
@@ -164,133 +173,105 @@ export default function SpeakerSessions() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="flex flex-col items-start p-6 bg-white border border-[#E6E6E6] shadow rounded-3xl">
-          <div className="flex items-center gap-4 w-full">
-            <div className="w-12 h-12 bg-[#DBEAFE] rounded-2xl flex items-center justify-center">
-              <FaCalendarIcon className="w-6 h-6 text-[#2563EB]" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold text-4xl text-gray-700">{formatStat(stats.total)}</span>
-              <span className="font-normal text-lg text-gray-600">Total Sessions</span>
-            </div>
-          </div>
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
         </div>
-
-        <div className="flex flex-col items-start p-6 bg-white border border-[#E6E6E6] shadow rounded-3xl">
-          <div className="flex items-center gap-4 w-full">
-            <div className="w-12 h-12 bg-[#DCFCE7] rounded-2xl flex items-center justify-center">
-              <FaPlay className="w-6 h-6 text-[#16A34A]" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold text-4xl text-gray-700">{formatStat(stats.ongoing)}</span>
-              <span className="font-normal text-lg text-gray-600">Ongoing</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-start p-6 bg-white border border-[#E6E6E6] shadow rounded-3xl">
-          <div className="flex items-center gap-4 w-full">
-            <div className="w-12 h-12 bg-[#FEF9C3] rounded-2xl flex items-center justify-center">
-              <FaClock className="w-6 h-6 text-[#CA8A04]" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold text-4xl text-gray-700">{formatStat(stats.scheduled)}</span>
-              <span className="font-normal text-lg text-gray-600">Scheduled</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Session Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredEvents.map((event, index) => {
-          const now = new Date()
-          const start = new Date(event.startTime)
-          const end = new Date(event.endTime)
-
-          let statusText = "Scheduled"
-          let statusColor = "text-gray-600"
-
-          if (now >= start && now <= end) {
-            statusText = "Live"
-            statusColor = "text-red-600"
-          } else if (now > end) {
-            statusText = "Completed"
-            statusColor = "text-green-600"
-          }
-
-          const formattedDate = start.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
-
-          return (
-            <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col justify-between h-[380px]">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-sm font-semibold text-black">{event.title}</h2>
-                {event.registrationRequired ? (
-                  <FaLock className="text-gray-400" />
-                ) : (
-                  <FaCopy
-                    className="text-blue-500 cursor-pointer"
-                    onClick={() => navigator.clipboard.writeText(event.joinToken)}
-                  />
-                )}
-              </div>
-
-              <div className={`text-xs font-semibold mb-2 ${statusColor}`}>
-                {statusText === "Scheduled" ? `Scheduled for ${formattedDate}` : statusText}
-              </div>
-
-              <div className="flex items-center space-x-2 mb-2">
-                {event.speakers && event.speakers.length > 0 ? (
-                  <div className="flex items-center space-x-2">
-                    {event.speakers[0].file && (
-                      <Image
-                        src={event.speakers[0].file.startsWith("http") ? event.speakers[0].file : `/uploads/${event.speakers[0].file}.png`}
-                        alt=""
-                        width={24}
-                        height={24}
-                        className="rounded-full object-cover"
-                      />
-                    )}
-                    <span className="text-xs text-gray-600">{event.speakers[0].name}</span>
-                    {event.speakers.length > 1 && <span className="text-xs text-gray-500">+{event.speakers.length - 1}</span>}
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredList.map(event => {
+            const now = new Date()
+            const start = new Date(event.startTime)
+            const end = new Date(event.endTime)
+            let statusText = "Scheduled"
+            let statusColor = "text-gray-600"
+            if (now >= start && now <= end) {
+              statusText = "Live"
+              statusColor = "text-red-600"
+            } else if (now > end) {
+              statusText = "Completed"
+              statusColor = "text-green-600"
+            }
+            const formattedDate = start.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+            return (
+              <div key={event.id} className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex flex-col justify-between h-[360px] relative">
+                {loadingCardId === event.id && (
+                  <div className="absolute inset-0 bg-white bg-opacity-70 flex justify-center items-center rounded-xl">
+                    <div className="w-10 h-10 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
                   </div>
-                ) : (
-                  <span className="text-xs text-gray-500">No speakers</span>
                 )}
-              </div>
+                <div className={loadingCardId === event.id ? "opacity-30 flex flex-col h-full" : "opacity-100 flex flex-col h-full"}>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h2 className="text-sm font-semibold text-black">{event.title}</h2>
+                    </div>
 
-              <p className="text-xs text-gray-500 mb-3">{event.description}</p>
+                    <div className="flex items-center space-x-2 mb-2">
+                     {event.speakers && event.speakers.length > 0 ? (
+  <div className="flex items-center space-x-2">
+    {event.speakers[0].file && (
+     <Image
+  src={event.speakers[0].file}
+  alt={event.speakers[0].name}
+  width={24}
+  height={24}
+  style={{ width: "24px", height: "auto" }}
+  className="rounded-full object-cover"
+/>
 
-              <div className="flex items-center justify-between mb-2 text-xs text-gray-600">
-                <div className="flex items-center text-xs text-gray-600">
-                  <FaClock className="mr-1" />
-                  <span>{formatTime(event.startTime)} - {formatTime(event.endTime)}</span>
+    )}
+    <span className="text-xs text-gray-600">{event.speakers[0].name}</span>
+    {event.speakers.length > 1 && <span className="text-xs text-gray-500">+{event.speakers.length - 1}</span>}
+  </div>
+) : (
+  <span className="text-xs text-gray-500">No speakers</span>
+)}
+
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-gray-500 mb-3 flex-1 overflow-auto">{event.description}</p>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2 text-xs text-gray-600">
+                      <div className="flex items-center text-xs text-gray-600">
+                        <FaClock className="mr-1" />
+                        <span>{formatTime(event.startTime)} - {formatTime(event.endTime)}</span>
+                      </div>
+                      <span className="px-2 py-1 rounded-xl text-xs font-semibold bg-blue-100 text-blue-700">{event.category}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-gray-900 mb-2">
+                      <span>Duration</span>
+                      <span>{getDurationMinutes(event.startTime, event.endTime)} minutes</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-gray-900 mb-2">
+                      <span>Location</span>
+                      <span>{event.location || "N/A"}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-gray-900 mb-3">
+                      <span>Status</span>
+                      <div className={`text-xs font-semibold ${statusColor}`}>
+                        {statusText === "Scheduled" ? `Scheduled for ${formattedDate}` : statusText}
+                      </div>
+                    </div>
+
+                    <button
+                      className="w-full bg-[#9B2033] text-white py-1.5 text-xs rounded-md hover:bg-red-900 transition cursor-pointer"
+                      onClick={() => handleViewAll(event.id, event.eventId)}
+                      disabled={loadingCardId === event.id}
+                    >
+                      View Details
+                    </button>
+                  </div>
                 </div>
-                <span className="px-2 py-1 rounded-xl text-xs font-semibold bg-blue-100 text-blue-700">{event.category}</span>
               </div>
-
-              <div className="flex items-center justify-between text-xs text-gray-900 mb-2">
-                <span>Duration</span>
-                <span>{getDurationMinutes(event.startTime, event.endTime)} minutes</span>
-              </div>
-
-              <div className="flex items-center justify-between text-xs text-gray-900 mb-2">
-                <span>Location</span>
-                <span>{event.location || "N/A"}</span>
-              </div>
-
-              <button
-                className="w-full bg-[#9B2033] text-white py-2 text-sm rounded-md hover:bg-red-700 transition"
-                onClick={() => handleViewAll(event.id, event.eventId)}
-              >
-                View Details
-              </button>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import api from '@/config/api';
-import { FaRobot, FaLaptop, FaMobileAlt, FaHeadphones, FaCamera, FaBox, FaTrash, FaSpinner, FaArrowRight } from 'react-icons/fa';
+import { FaRobot, FaLaptop, FaMobileAlt, FaHeadphones,FaEdit, FaCamera, FaBox, FaTrash, FaSpinner, FaArrowRight } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/store/store';
 import Link from 'next/link';
@@ -30,12 +30,12 @@ const AddSponsorProduct: React.FC = () => {
 
   const getIconByTitle = (title: string) => {
     const lower = title.toLowerCase();
-    if (lower.includes('ai')) return <FaRobot className="text-red-600 text-2xl" />;
-    if (lower.includes('electronic')) return <FaLaptop className="text-red-600 text-2xl" />;
-    if (lower.includes('mobile')) return <FaMobileAlt className="text-red-600 text-2xl" />;
-    if (lower.includes('headphone')) return <FaHeadphones className="text-red-600 text-2xl" />;
-    if (lower.includes('camera')) return <FaCamera className="text-red-600 text-2xl" />;
-    return <FaBox className="text-red-600 text-2xl" />;
+    if (lower.includes('ai')) return <FaRobot className="text-red-900 text-2xl" />;
+    if (lower.includes('electronic')) return <FaLaptop className="text-blue-600 text-2xl" />;
+    if (lower.includes('mobile')) return <FaMobileAlt className="text-green-600 text-2xl" />;
+    if (lower.includes('headphone')) return <FaHeadphones className="text-purple-600 text-2xl" />;
+    if (lower.includes('camera')) return <FaCamera className="text-gray-800 text-2xl" />;
+    return <FaBox className="text-red-900 text-2xl" />;
   };
 
   const fetchProducts = async () => {
@@ -100,12 +100,14 @@ const AddSponsorProduct: React.FC = () => {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50 p-4 gap-8 relative">
       {notification && (
-        <div className={`fixed top-5 right-5 px-6 py-4 rounded-lg text-white shadow-lg ${notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+        <div className={`fixed top-5 right-5 p-2 mt-16 rounded-lg text-white shadow-lg ${notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
           {notification.message}
         </div>
       )}
 
       <div className="bg-white border border-gray-300 rounded-2xl shadow-lg p-10 w-full max-w-lg flex flex-col gap-4">
+     
+     
         <h1 className="text-2xl font-medium text-gray-900">Add Sponsor Product</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
@@ -135,15 +137,16 @@ const AddSponsorProduct: React.FC = () => {
           </div>
           <button
             type="submit"
-            className={`py-4 rounded-xl mt-4 text-white flex justify-center items-center ${loadingAdd ? 'bg-red-400' : 'bg-red-600 hover:bg-red-700'}`}
+            className={`py-2 rounded-xl mt-2 text-white flex justify-center items-center ${loadingAdd ? 'bg-red-900' : 'bg-red-900 hover:bg-red-800'}`}
             disabled={loadingAdd}
           >
             {loadingAdd && <FaSpinner className="animate-spin mr-2" />}
             {loadingAdd ? 'Adding...' : 'Add Product'}
           </button>
         </form>
-        <Link href="/sponsors/ManageSessions" className="mt-4 py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center justify-center gap-2">
-          Manage Sessions <FaArrowRight />
+        <Link href="/sponsors/ManageSessions" className="py-2 px-6 bg-white text-red-900 border-2 border-red-900 rounded-xl flex items-center justify-center gap-2 hover:bg-red-900 hover:text-white cursor-pointer"
+>
+          Back to Home <FaArrowRight />
         </Link>
       </div>
 
@@ -161,11 +164,15 @@ const AddSponsorProduct: React.FC = () => {
               </div>
               <button
                 onClick={() => handleDelete(product.id)}
-                className="text-red-600 hover:text-red-800 flex items-center justify-center"
+                className="text-red-600 hover:text-red-600 flex items-center justify-center cursor-pointer"
                 disabled={loadingDeleteId === product.id}
               >
                 {loadingDeleteId === product.id ? <FaSpinner className="animate-spin" /> : <FaTrash />}
               </button>
+             {/* <button className="text-blue-600 hover:text-blue-700 flex items-center justify-center cursor-pointer">
+  <FaEdit />
+</button> */}
+
             </div>
           ))}
         </div>

@@ -3,6 +3,7 @@
 import React from 'react'
 import ProfileCard from '../ProfileCard'
 import SpeakerProfileCard from '../SpeakerProfileCard'
+import SponsorProfileCard from '../SponsorProfileCard'
 
 interface ProfilePageProps {
   params: Promise<{ id: string }>
@@ -20,6 +21,9 @@ export default function ProfilePage({ params, searchParams }: ProfilePageProps) 
     return <SpeakerProfileCard speakerId={id} />
   }
 
+    if (role === 'sponsor') {
+    return <SponsorProfileCard sponsorId={id} />
+  }
   if (role === 'participant' || role === 'organizer') {
     return <ProfileCard profileId={id} role={role} />
   }

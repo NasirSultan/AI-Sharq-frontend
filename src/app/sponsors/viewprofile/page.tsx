@@ -2,43 +2,55 @@
 
 import React, { useEffect, useState, useRef } from 'react'
 import api from '@/config/api'
-import { FaUser } from 'react-icons/fa'
+import { FaUser, FaLinkedin, FaTwitter, FaYoutube } from 'react-icons/fa'
 import Image from 'next/image'
-import { FaLinkedin, FaTwitter, FaYoutube } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store/store'
-import { useRouter } from 'next/navigation'
 import { QRCodeCanvas as QRCode } from 'qrcode.react'
 import LogoutButton from './../../components/LogoutButton'
+import Link from 'next/link'
 
 const SponsorProfileView: React.FC = () => {
   const [sponsor, setSponsor] = useState<any | null>(null)
   const [loading, setLoading] = useState(false)
   const [showQR, setShowQR] = useState(false)
-  const router = useRouter()
+  const sponsorCache = useRef<any>(null)
   const sponsorId = useSelector((state: RootState) => state.sponsor.sponsorId)
   const qrRef = useRef<HTMLCanvasElement | null>(null)
 
-  useEffect(() => {
-    const fetchSponsor = async () => {
-      if (!sponsorId) return
-      setLoading(true)
-      try {
-        const res = await api.get(`/sponsors/${sponsorId}`)
+  const fetchSponsor = async () => {
+    if (!sponsorId) return
+
+    try {
+      const res = await api.get(`/sponsors/${sponsorId}`)
+      if (!res.data) return
+
+      // Compare with cached data
+      const cachedStr = sponsorCache.current ? JSON.stringify(sponsorCache.current) : ''
+      const fetchedStr = JSON.stringify(res.data)
+
+      if (cachedStr !== fetchedStr) {
+        sponsorCache.current = res.data
         setSponsor(res.data)
-      } catch (err) {
-        console.log('Error fetching sponsor', err)
-      } finally {
-        setLoading(false)
       }
+    } catch (err) {
+      console.log('Error fetching sponsor', err)
     }
-    fetchSponsor()
+  }
+
+  // Load cached sponsor first without triggering loader
+  useEffect(() => {
+    if (sponsorCache.current && sponsorCache.current.id === sponsorId) {
+      setSponsor(sponsorCache.current)
+    } else {
+      setLoading(true)
+      fetchSponsor().finally(() => setLoading(false))
+    }
   }, [sponsorId])
 
   const handleDownloadQR = () => {
     if (qrRef.current) {
-      const canvas = qrRef.current
-      const url = canvas.toDataURL('image/png')
+      const url = qrRef.current.toDataURL('image/png')
       const a = document.createElement('a')
       a.href = url
       a.download = `sponsor-${sponsorId}-qr.png`
@@ -47,7 +59,11 @@ const SponsorProfileView: React.FC = () => {
   }
 
   if (loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+      </div>
+    )
   }
 
   if (!sponsor) {
@@ -57,7 +73,6 @@ const SponsorProfileView: React.FC = () => {
   return (
     <>
       <div className="relative flex flex-col items-center min-h-screen bg-gray-50 p-4">
-        {/* Cover image */}
         <div className="relative w-full max-w-5xl h-64 rounded-2xl overflow-hidden shadow-md mb-8">
           {sponsor.Pic_url ? (
             <img src={sponsor.Pic_url} alt="Cover" className="w-full h-full object-cover" />
@@ -67,42 +82,24 @@ const SponsorProfileView: React.FC = () => {
             </div>
           )}
 
-          {/* Edit and QR buttons at top-right */}
-         <div className="absolute top-4 right-4 flex gap-2">
-  <button
-    type="button"
-    onClick={() => window.location.href = '/sponsors/edit'}
-    className="p-2 bg-red-600 text-white rounded-full shadow hover:bg-red-700"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="w-4 h-4"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-9.193 9.193a4.5 4.5 0 01-1.897 1.13l-3.323.94.94-3.323a4.5 4.5 0 011.13-1.897l9.193-9.193z"
-      />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 7.125L16.875 4.5" />
-    </svg>
+          <div className="absolute top-4 right-4 flex gap-2">
+           <Link href="/sponsors/edit">
+  <button className="w-12 h-12 flex items-center justify-center bg-red-600 text-white rounded-full shadow hover:bg-red-700">
+    Edit
   </button>
+</Link>
 
-  <button
-    onClick={() => setShowQR(true)}
-    className="p-2 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900"
-  >
-    QR
-  </button>
+            <button
+              onClick={() => setShowQR(true)}
+              className="w-12 h-12 flex items-center justify-center bg-gray-800 text-white rounded-full shadow hover:bg-gray-900"
+            >
+              QR
+            </button>
 
-  <LogoutButton />
-</div>
+            <LogoutButton />
+          </div>
         </div>
 
-        {/* Main Card */}
         <div className="bg-white border border-gray-300 rounded-2xl shadow-lg p-10 w-full max-w-5xl mb-16">
           <div className="flex flex-col items-center gap-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
@@ -164,12 +161,10 @@ const SponsorProfileView: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottom decorative line */}
       <div className="w-full flex justify-center fix bottom-0">
         <Image src="/images/line.png" alt="Line" width={1450} height={127} className="w-full max-w-screen-xl" />
       </div>
 
-      {/* QR Popup */}
       {showQR && (
         <div
           onClick={() => setShowQR(false)}

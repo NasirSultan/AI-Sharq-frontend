@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { FaUser, FaEye, FaEyeSlash, FaPlus } from 'react-icons/fa'
+import { FaUser, FaEye, FaEyeSlash, FaSpinner, FaPlus } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store/store'
@@ -96,8 +96,8 @@ const EditSponsorProfile: React.FC = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center min-h-screen bg-gray-50 pt-4">
-        <div className="bg-white border border-gray-300 rounded-2xl shadow-lg p-10 w-full max-w-7xl">
+ <div className="w-full max-w-6xl mx-auto flex justify-center items-center min-h-screen bg-gray-50 pt-4 mx-2">
+        <div className="bg-white border mx-2 border-gray-300 rounded-2xl shadow-lg p-10 w-full max-w-6xl">
           <div className="flex flex-col items-center gap-8">
             <h1 className="text-2xl font-medium text-gray-900 text-center">
               Edit Sponsor Profile
@@ -238,23 +238,15 @@ const EditSponsorProfile: React.FC = () => {
                 <div className="flex flex-col gap-1 relative md:col-span-2">
                   <label>New Password</label>
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type="password"
                     name="password"
                     value={formData.password}
-                    onChange={handleInputChange}
-                    placeholder="Enter new password if you want to change it"
-                    className="w-full px-5 py-4 border border-gray-300 rounded-xl pr-12"
+                    placeholder="Password cannot be changed"
+                    disabled
+                    className="w-full px-5 py-4 border border-gray-300 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed"
                   />
-                  {formData.password && formData.password.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(prev => !prev)}
-                      className="absolute right-2 top-1/2 mt-3 mr-3 transform -translate-y-1/2 flex items-center justify-center text-gray-500"
-                    >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                  )}
                 </div>
+
               </div>
 
               <div className="flex flex-col gap-1">
@@ -269,23 +261,34 @@ const EditSponsorProfile: React.FC = () => {
                 />
               </div>
 
-              <div className="flex flex-col gap-4 pt-4">
+              <div className="flex flex-col gap-4 pt-4 w-full">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="py-4 bg-red-700 text-white rounded-xl disabled:opacity-50"
+                  className="py-3 px-6 bg-red-900 text-white rounded-xl cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 text-base sm:text-sm"
                 >
-                  {loading ? 'Loading...' : 'Update & Save'}
+                  {loading ? <FaSpinner className="animate-spin text-xl  bg-red-900" /> : 'Update & Save'}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => router.push('/sponsors/sponsorsproducts')}
-                  className="py-4 bg-gray-100 text-red-700 border border-red-600 rounded-xl hover:bg-red-600 hover:text-white transition"
-                >
-                  Add New Service
-                </button>
+
+                <div className="flex flex-row gap-4 w-full flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/sponsors/sponsorsproducts')}
+                    className="flex-1 py-3 text-red-900 border border-red-900 rounded-full hover:bg-red-900 hover:text-white transition cursor-pointer text-sm sm:text-xs text-center"
+                  >
+                    Add New Service
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => router.push('/sponsors/representatives')}
+                    className="flex-1 py-3 text-red-900 border border-red-900 rounded-full hover:bg-red-900 hover:text-white transition cursor-pointer text-sm sm:text-xs text-center"
+                  >
+                    Add New Representative
+                  </button>
+                </div>
               </div>
+
             </form>
           </div>
         </div>

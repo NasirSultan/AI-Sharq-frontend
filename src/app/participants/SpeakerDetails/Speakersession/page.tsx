@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store/store'
-import { FaCalendarAlt } from 'react-icons/fa'
+import { FaCalendarAlt, FaUser } from 'react-icons/fa'
 import api from '@/config/api'
 
 const parseDuration = (start: string, end: string) => {
@@ -45,8 +45,8 @@ export default function SpeakerSessions() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-[300px]">
-        <div className="w-12 h-12 border-4 border-gray-300 border-t-[#9B2033] rounded-full animate-spin"></div>
+       <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
       </div>
     )
   }
@@ -87,13 +87,21 @@ export default function SpeakerSessions() {
 
               {session.speakers && session.speakers.length > 0 && (
                 <div className="flex items-center gap-2 mb-3">
-                  <Image
-                    src={session.speakers[0].file || '/images/default-avatar.png'}
-                    alt="Speaker"
-                    width={32}
-                    height={32}
-                    className="rounded-full object-cover w-8 h-8"
-                  />
+                  {session.speakers[0].file ? (
+                    <div className="w-8 h-8 relative rounded-full overflow-hidden">
+                      <Image
+                        src={session.speakers[0].file ||         <FaUser />} 
+                        alt={session.speakers[0].name || 'Speaker'}
+                        width={32}
+                        height={32}
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full text-gray-700">
+                      <FaUser />
+                    </div>
+                  )}
                   <div className="flex flex-col leading-tight">
                     <span className="text-sm font-medium text-gray-900">
                       {session.speakers[0].name || 'Unknown Speaker'}

@@ -21,7 +21,7 @@ export default function UserQRModal({
 
   // Get speaker ID from Redux
   const speakerId = useSelector((state: RootState) => state.speaker.speakerId)
-
+const sponsorId = useSelector((state: RootState) => state.sponsor.sponsorId)
   useEffect(() => {
     const savedRole = localStorage.getItem('role')
     if (savedRole) {
@@ -30,7 +30,12 @@ export default function UserQRModal({
   }, [])
 
   // Decide which ID to use
-  const finalUserId = role === 'speaker' ? speakerId : userId
+const finalUserId =
+  role === 'speaker'
+    ? speakerId
+    : role === 'sponsor'
+    ? sponsorId
+    : userId
 
   const handleDownloadQR = async () => {
     setQrLoading(true)
@@ -63,6 +68,8 @@ export default function UserQRModal({
       >
         <QRCode
           value={`https://connect.sharqforum.org/Profile/${finalUserId}?role=${encodeURIComponent(
+            //  value={`http://192.168.100.10:3000/Profile/${finalUserId}?role=${encodeURIComponent(
+
             role
           )}`}
           size={180}
