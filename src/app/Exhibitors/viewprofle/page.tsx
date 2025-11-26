@@ -8,6 +8,7 @@ import api from '@/config/api'
 import Image from 'next/image'
 import { FaUser, FaLinkedin, FaTwitter, FaYoutube } from 'react-icons/fa'
 import { QRCodeCanvas as QRCode } from 'qrcode.react'
+import LogoutButton from './../../components/LogoutButton'
 
 const ExhibitorProfileView: React.FC = () => {
   const router = useRouter()
@@ -95,9 +96,10 @@ const ExhibitorProfileView: React.FC = () => {
             >
               QR
             </button>
+                  <LogoutButton />
           </div>
         </div>
-
+  
         {/* Profile Card */}
         <div className="bg-white border border-gray-300 rounded-2xl shadow-lg p-10 w-full max-w-5xl mb-16">
           <div className="flex flex-col items-center gap-8">

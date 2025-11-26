@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useSelector } from 'react-redux'
+import useSWR from 'swr'
 import { RootState } from '@/lib/store/store'
 import api from '@/config/api'
 import {
@@ -15,6 +16,7 @@ import {
   FaLinkedin,
   FaTwitter,
   FaYoutube,
+  FaMapMarkerAlt
 } from 'react-icons/fa'
 import { FaShop } from 'react-icons/fa6'
 
@@ -26,170 +28,183 @@ const socialMap: Record<string, { icon: any; color: string }> = {
   youtube: { icon: FaYoutube, color: '#FF0000' },
 }
 
+const fetcher = (url: string) => api.get(url).then(res => res.data)
+
+const DynamicMapCard: React.FC<{ booth: any }> = ({ booth }) => {
+  const handleViewFullMap = () => {
+    if (!booth) return
+    const query = encodeURIComponent(booth.boothLocation || booth.boothNumber)
+    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
+  }
+
+  return (
+    <div className="mb-8 sm:mb-10">
+      <h2 className="text-xl sm:text-2xl font-medium text-[#282828] mb-6">Booth Location</h2>
+      <div className="w-full flex flex-col sm:flex-row gap-6">
+        <div className="flex-1 bg-white border border-gray-300 shadow-sm rounded-2xl p-6 flex flex-col justify-center text-center">
+          <div className="flex items-center gap-2 mb-2 justify-center">
+            <FaMapMarkerAlt className="text-[#9B2033] text-lg" />
+            <h3 className="text-lg font-semibold text-[#282828]">Booth {booth.boothNumber}</h3>
+          </div>
+          <p className="text-[#424242] mb-1">{booth.boothLocation}</p>
+          {booth.openTime && (
+            <p className="text-sm text-gray-600 mb-1">
+              <span className="font-medium">Open:</span> {booth.openTime}
+            </p>
+          )}
+          <p className="text-sm text-gray-600 mb-1">
+            <span className="font-medium">Distance:</span> {booth.distance || 10}m
+          </p>
+        </div>
+        <div
+          className="flex-1 bg-white border border-gray-300 shadow-sm rounded-2xl overflow-hidden relative h-64 sm:h-auto cursor-pointer"
+          onClick={handleViewFullMap}
+        >
+          <img
+            src="https://static0.anpoimages.com/wordpress/wp-content/uploads/2022/07/googleMapsTricksHero.jpg"
+            alt={`Booth ${booth.boothNumber} Location`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const ExhibitorDetailsScreen: React.FC = () => {
   const exhibitorId = useSelector((state: RootState) => state.exhibitor.exhibitorId)
-  const [exhibitor, setExhibitor] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
 
-  useEffect(() => {
-    const fetchExhibitor = async () => {
-      if (!exhibitorId) {
-        setLoading(false)
-        return
-      }
-      try {
-        const res = await api.get(`/exhibiteros/${exhibitorId}/details`)
-        setExhibitor(res.data)
-      } catch {
-        setExhibitor(null)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchExhibitor()
-  }, [exhibitorId])
+  const swrKey = exhibitorId ? `/exhibiteros/${exhibitorId}/details` : null
 
-  if (loading) return <div className="text-center mt-10">Loading...</div>
-  if (!exhibitor) return <div className="text-center mt-10">No exhibitor found</div>
+  const { data: exhibitor, error, isLoading, mutate } = useSWR(
+    swrKey,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 3000
+    }
+  )
+
+  if (isLoading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+    </div>
+  )
+
+  if (error || !exhibitor) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-lg">No exhibitor found</p>
+    </div>
+  )
 
   const firstBooth = exhibitor.booths?.[0]
 
   return (
-    <div className="relative w-full min-h-screen bg-gray-50">
-      {/* Header Section */}
+    <div className="min-h-screen bg-white">
       <div
-        className="w-full h-60 sm:h-52 bg-cover bg-center relative"
+        className="relative w-full h-48 sm:h-56 md:h-64 lg:h-72 bg-cover bg-center"
         style={{ backgroundImage: `url(${exhibitor.picUrl || '/images/building.jpg'})` }}
       >
-        {/* Back Button */}
-        <div className="absolute top-4 left-4 w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md cursor-pointer">
-          <Link href="/participants/Sponsors&Exhibitors">
+        <div className="absolute w-10 h-10 left-4 sm:left-6 top-4 sm:top-6 rounded-full flex items-center justify-center cursor-pointer bg-white/80 hover:bg-white transition-colors">
+          <Link href="/Exhibitors/ManageSessions">
             <FaArrowLeft className="text-red-800 w-5 h-5" />
           </Link>
         </div>
-
-        {/* Exhibitor Badge */}
-        <div className="absolute top-4 right-4 flex items-center gap-2 bg-[#FFFEEF] rounded-full px-3 py-1 shadow-sm">
-          <FaShop className="text-green-500 w-5 h-5" />
-          <span className="text-[#282828] font-medium text-lg sm:text-base">Exhibitors</span>
+        <div className="absolute flex flex-row justify-center items-center gap-2 right-4 sm:right-6 top-4 sm:top-6 w-auto px-4 py-2 h-9 bg-[#FFFEEF] rounded-full">
+          <FaShop className="text-green-400 w-5 h-4" />
+          <span className="text-[#282828] font-medium text-sm sm:text-base lg:text-lg">Exhibitors</span>
         </div>
       </div>
 
-      {/* Gradient Circle for Name */}
-      <div className="absolute top-[140px] left-4 w-44 h-44 flex items-center justify-center">
-        <div
-          className="w-full h-full rounded-full flex items-center justify-center text-center p-4"
-          style={{ background: 'linear-gradient(90deg, #FB923C 0%, #EA580C 100%)' }}
-        >
-          <span className="text-white text-lg font-semibold">{exhibitor.name}</span>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-28 flex flex-col gap-10">
-
-        {/* About and Contact */}
-        <div className="flex flex-col lg:flex-row gap-5">
-          {/* About Section */}
-          <div className="flex-1 bg-white border border-gray-300 shadow-sm rounded-2xl p-6 flex flex-col gap-4">
-            <h2 className="text-lg font-semibold text-[#282828]">{exhibitor.name}</h2>
-            <p className="text-sm text-[#424242] leading-5">{exhibitor.description}</p>
+      <div className="relative flex ml-10 justify-left -mt-20 sm:-mt-24 md:-mt-28">
+        <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 lg:w-48 lg:h-48 rounded-full bg-gradient-to-r from-[#FB923C] to-[#EA580C] flex items-center justify-center">
+          <div className="text-center px-2">
+            <span className="font-medium text-white text-sm sm:text-base md:text-lg lg:text-xl whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] sm:max-w-[140px] md:max-w-[160px]">
+              {exhibitor.name}
+            </span>
           </div>
+        </div>
+      </div>
 
-          {/* Contact Info */}
-          <div className="w-full lg:w-80 bg-white border border-gray-300 shadow-sm rounded-2xl p-6 flex flex-col gap-4">
-            <h2 className="text-lg font-semibold text-[#282828]">Contact Information</h2>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center">
-                  <FaGlobe className="text-blue-600" />
+      <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+        <div className="flex flex-col lg:flex-row gap-6 mb-8 sm:mb-10">
+          <div className="flex-1 p-6 sm:p-8 bg-white border border-gray-300 shadow-sm rounded-2xl">
+            <h2 className="text-lg sm:text-xl font-semibold text-[#282828] mb-4">{exhibitor.name}</h2>
+            <p className="text-sm sm:text-base text-[#424242] leading-6 sm:leading-7">{exhibitor.description}</p>
+          </div>
+          <div className="w-full lg:w-80 xl:w-96 p-6 sm:p-8 bg-white border border-gray-300 shadow-sm rounded-2xl">
+            <h2 className="text-lg sm:text-xl font-semibold text-[#282828] mb-4 sm:mb-6">Contact Information</h2>
+            <div className="space-y-4 sm:space-y-6">
+              <a href={exhibitor.website} target="_blank"
+                className="flex flex-row items-center gap-3 sm:gap-4 cursor-pointer hover:bg-blue-50 p-2 rounded-lg transition-all">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <FaGlobe className="text-blue-600 text-sm sm:text-base" />
                 </div>
-                <a
-                  href={exhibitor.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 hover:underline"
-                >
-                  {exhibitor.website || 'Website'}
-                </a>
-              </div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1">
+                  <span className="text-sm font-medium text-gray-700">Website</span>
+                  <span className="text-sm text-blue-600 truncate">{exhibitor.website}</span>
+                </div>
+              </a>
 
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center">
-                  <FaEnvelope className="text-green-600" />
+              <a href={`mailto:${exhibitor.email}`}
+                className="flex flex-row items-center gap-3 sm:gap-4 cursor-pointer hover:bg-green-50 p-2 rounded-lg transition-all">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-green-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <FaEnvelope className="text-green-600 text-sm sm:text-base" />
                 </div>
-                <a
-                  href={`mailto:${exhibitor.email}`}
-                  className="text-sm text-black hover:underline"
-                >
-                  {exhibitor.email || 'Email'}
-                </a>
-              </div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1">
+                  <span className="text-sm font-medium text-gray-700">Email</span>
+                  <span className="text-sm text-black truncate">{exhibitor.email}</span>
+                </div>
+              </a>
 
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-purple-100 rounded-full flex items-center justify-center">
-                  <FaPhone className="text-purple-600" />
+              <a href={`tel:${exhibitor.phone}`}
+                className="flex flex-row items-center gap-3 sm:gap-4 cursor-pointer hover:bg-purple-50 p-2 rounded-lg transition-all">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-purple-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <FaPhone className="text-purple-600 text-sm sm:text-base" />
                 </div>
-                <a
-                  href={`tel:${exhibitor.phone}`}
-                  className="text-sm text-black hover:underline"
-                >
-                  {exhibitor.phone || 'Phone'}
-                </a>
-              </div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1">
+                  <span className="text-sm font-medium text-gray-700">Phone</span>
+                  <span className="text-sm text-black">{exhibitor.phone}</span>
+                </div>
+              </a>
             </div>
           </div>
         </div>
 
-        {/* Representatives and Products */}
-        <div className="flex flex-col lg:flex-row gap-5">
-          {/* Representatives */}
-          <div className="flex-1 bg-white border border-gray-300 shadow-sm rounded-2xl p-6 flex flex-col gap-6">
-            <h2 className="text-2xl font-medium text-[#282828]">Representatives</h2>
-            <div className="flex flex-col gap-3">
-              {exhibitor.representatives?.map((rep: any, index: number) => (
-                <div
-                  key={index}
-                  className="w-full p-3 bg-white border border-gray-200 shadow-sm rounded-lg flex items-center gap-4"
-                >
-                  <div className="flex-shrink-0 w-12 h-12 relative">
-                    <Image
-                      src={rep.user.photo || '/images/default-profile.png'}
-                      alt={rep.user.name}
-                      fill
-                      className="rounded-full object-cover"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-base font-medium text-[#282828]">{rep.user.name}</span>
-                    <span className="text-sm text-gray-600">{rep.user.organization}</span>
-                  </div>
-                  <div className="ml-auto">
-                    <span className="text-base font-medium text-red-700 cursor-pointer">Connect</span>
+        <div className="flex flex-col xl:flex-row gap-6 mb-8 sm:mb-10">
+          <div className="flex-1 p-6 sm:p-8 lg:p-10 bg-white border border-gray-300 shadow-sm rounded-2xl">
+            <h2 className="text-xl sm:text-2xl font-medium text-[#282828] mb-6 sm:mb-8">Representatives</h2>
+            <div className="space-y-4">
+              {exhibitor.representatives.length > 0 ? exhibitor.representatives.map((rep: any) => (
+                <div key={rep.id} className="w-full p-4 bg-white border border-gray-200 shadow-sm rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 cursor-pointer transform transition-all duration-200 hover:scale-105 hover:border-red-900">
+                  <div className="flex flex-row items-center gap-3">
+                    <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
+                      <Image src={rep.user.file || '/images/img (13).png'} alt={rep.user.name} fill className="rounded-full object-cover"/>
+                    </div>
+                    <div className="flex flex-col gap-1 min-w-0">
+                      <span className="text-base font-medium text-[#282828] truncate">{rep.user.name}</span>
+                      <span className="text-sm text-gray-600 truncate">{rep.user.organization}</span>
+                    </div>
                   </div>
                 </div>
-              ))}
+              )) : <p className="text-gray-500 text-center py-4">No representatives available</p>}
             </div>
           </div>
 
-          {/* Products */}
-          <div className="flex-1 bg-white border border-gray-300 shadow-sm rounded-2xl p-6 flex flex-col gap-6">
-            <h2 className="text-2xl font-medium text-[#282828]">Products & Services</h2>
-            <div className="flex flex-col gap-3">
-              {exhibitor.products?.map((product: any, index: number) => (
-                <div
-                  key={index}
-                  className="w-full p-3 bg-white border border-gray-200 shadow-sm rounded-lg flex items-center gap-3"
-                >
-                  <div className="w-9 h-9 bg-blue-100 rounded-2xl flex items-center justify-center">
-                    <FaGlobe className="text-blue-600" />
+          <div className="flex-1 p-6 sm:p-8 lg:p-10 bg-white border border-gray-300 shadow-sm rounded-2xl">
+            <h2 className="text-xl sm:text-2xl font-medium text-[#282828] mb-6 sm:mb-8">Products And Services</h2>
+            <div className="space-y-4">
+              {exhibitor.products.map((prod: any) => (
+                <div key={prod.id} className="w-full p-4 bg-white border border-gray-200 shadow-sm rounded-lg flex flex-row items-center gap-3 sm:gap-4 cursor-pointer transform transition-all duration-200 hover:scale-105 hover:border-red-900">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <FaGlobe className="text-blue-600 text-sm sm:text-base" />
                   </div>
-                  <div className="flex flex-col gap-1 flex-1">
-                    <span className="text-base font-medium text-[#282828]">{product.title}</span>
-                    <span className="text-sm text-gray-600">{product.description}</span>
+                  <div className="flex flex-col gap-1 flex-1 min-w-0">
+                    <span className="text-base font-medium text-[#282828] truncate">{prod.title}</span>
+                    <span className="text-sm text-gray-600 line-clamp-2">{prod.description}</span>
                   </div>
                 </div>
               ))}
@@ -197,54 +212,27 @@ const ExhibitorDetailsScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Live Location */}
-        {mounted && firstBooth && (
-          <div
-            className="cursor-pointer"
-            onClick={() => {
-              const query = encodeURIComponent(firstBooth.boothLocation || firstBooth.boothNumber)
-              window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
-            }}
-          >
-            <LiveLocation booth={firstBooth} />
-          </div>
-        )}
+        {mounted && firstBooth && <DynamicMapCard booth={firstBooth}/>}
 
-        {/* Social Media */}
-        <div className="flex flex-col w-full gap-4 mt-10">
-          <h2 className="text-2xl font-medium text-[#282828] mb-2">Follow Us</h2>
-          <div className="flex flex-row gap-3 w-full">
-            {exhibitor.socialMedia?.map((sm: any) => {
-              const key = sm.name.toLowerCase()
-              const social = socialMap[key]
-              if (!social) return null
-              const Icon = social.icon
-              return (
-                <a
-                  key={sm.name}
-                  href={sm.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 h-12 rounded-lg flex items-center justify-center gap-2"
-                  style={{ backgroundColor: social.color }}
-                >
-                  <Icon className="text-white" />
-                  <span className="text-white text-base">{sm.name}</span>
-                </a>
-              )
-            })}
-          </div>
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-8">
+          {exhibitor.socialMedia.map((sm: any) => {
+            const key = sm.name.toLowerCase()
+            const social = socialMap[key]
+            if (!social) return null
+            const Icon = social.icon
+            return (
+              <a key={sm.name} href={sm.website} target="_blank"
+                 className="flex-1 h-12 rounded-lg flex items-center justify-center gap-3 hover:opacity-90 transition-opacity"
+                 style={{ backgroundColor: social.color }}>
+                <Icon className="text-white text-lg"/>
+                <span className="text-base font-normal text-white">{sm.name}</span>
+              </a>
+            )
+          })}
         </div>
 
-        {/* Divider Line */}
-        <div className="w-full flex justify-center mt-8">
-          <Image
-            src="/images/line.png"
-            alt="Line"
-            width={1850}
-            height={127}
-            className="object-contain"
-          />
+        <div className="w-full overflow-hidden mt-10">
+          <Image src="/images/line.png" alt="Decoration" width={1729} height={127} className="w-full h-auto"/>
         </div>
       </div>
     </div>

@@ -121,40 +121,41 @@ const Networking: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-6 w-full">
-              {filteredRequests.map(req => (
-                <div
-                  key={req.requestId}
-                  className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 rounded-2xl shadow border border-[#D4D4D4] w-full"
-                >
-                  <div className="w-24 h-24 relative rounded-full overflow-hidden flex-shrink-0">
-                    {req.sender.file ? (
-                      <Image src={req.sender.file} alt={req.sender.name} fill className="object-cover" />
-                    ) : (
-                      <Image src="/images/default.png" alt={req.sender.name} fill className="object-cover" />
-                    )}
-                  </div>
-                  <div className="flex-1 flex flex-col justify-center gap-1">
-                    <h3 className="text-lg font-semibold text-[#282828]">{req.sender.name}</h3>
-                    <span className="text-sm text-[#282828]">{req.sender.role}</span>
-                  </div>
-                  <div className="flex gap-2 mt-2 md:mt-0">
-                    <button
-                      disabled={loadingIds.includes(req.requestId)}
-                      onClick={() => handleAction(req.requestId, 'ACCEPTED')}
-                      className="px-4 py-2 rounded-full bg-[#F7FCDC] text-[#849122] font-bold"
-                    >
-                      {loadingIds.includes(req.requestId) ? '...' : 'Accept'}
-                    </button>
-                    <button
-                      disabled={loadingIds.includes(req.requestId)}
-                      onClick={() => handleAction(req.requestId, 'REJECTED')}
-                      className="px-4 py-2 rounded-full bg-[#FCDCDC] text-[#9B2033] font-bold"
-                    >
-                      {loadingIds.includes(req.requestId) ? '...' : 'Reject'}
-                    </button>
-                  </div>
-                </div>
-              ))}
+           {filteredRequests.map(req => (
+  <div
+    key={req.requestId}
+    className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 rounded-2xl shadow border border-[#D4D4D4] w-full"
+  >
+    <div className="w-16 h-16 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0">
+      <img
+        src={req.sender.file || "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png"}
+        alt={req.sender.name || "User"}
+        className="rounded-full object-cover w-12 h-12"
+      />
+    </div>
+    <div className="flex-1 flex flex-col justify-center gap-1 text-center md:text-left">
+      <h3 className="text-lg font-semibold text-[#282828]">{req.sender.name}</h3>
+      <span className="text-sm text-[#282828]">{req.sender.role}</span>
+    </div>
+    <div className="flex gap-2 mt-2 md:mt-0">
+      <button
+        disabled={loadingIds.includes(req.requestId)}
+        onClick={() => handleAction(req.requestId, 'ACCEPTED')}
+        className="px-4 py-2 rounded-full bg-[#F7FCDC] text-[#849122] font-bold"
+      >
+        {loadingIds.includes(req.requestId) ? '...' : 'Accept'}
+      </button>
+      <button
+        disabled={loadingIds.includes(req.requestId)}
+        onClick={() => handleAction(req.requestId, 'REJECTED')}
+        className="px-4 py-2 rounded-full bg-[#FCDCDC] text-[#9B2033] font-bold"
+      >
+        {loadingIds.includes(req.requestId) ? '...' : 'Reject'}
+      </button>
+    </div>
+  </div>
+))}
+
             </div>
           </>
         )}

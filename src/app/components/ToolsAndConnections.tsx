@@ -52,6 +52,7 @@ export default function DashboardPage() {
         `/participant-directory-opt-in-out/opted-in-in-event/${eventId}?userId=${userId}`
       )
       .then((res) => {
+            console.log(res.data)
         const uniqueParticipants = Array.from(
           new Map(res.data.map((p: any) => [p.id, p])).values()
         )
@@ -182,17 +183,18 @@ export default function DashboardPage() {
                     className="flex items-center justify-between bg-[#F9FAFB] border border-gray-200 rounded-xl px-5 py-4 hover:bg-white hover:border-[#9B2033] transition-all duration-200 shadow-sm hover:shadow-md"
                   >
                     <div className="flex items-center gap-4">
-                      {p.file ? (
-                        <img
-                          src={`/files/${p.file}`}
-                          alt={p.name}
-                          className="w-12 h-12 rounded-full border border-gray-300 shadow-sm object-cover"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700 shadow-sm">
-                          {p.name[0]?.toUpperCase()}
-                        </div>
-                      )}
+                     {p.file ? (
+  <img
+    src={p.file.startsWith("http") ? p.file : `/files/${p.file}`}
+    alt={p.name}
+    className="w-12 h-12 rounded-full border border-gray-300 shadow-sm object-cover"
+  />
+) : (
+  <div className="w-12 h-12 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700 shadow-sm">
+    {p.name[0]?.toUpperCase()}
+  </div>
+)}
+
                       <div>
                         <p className="text-sm font-semibold text-[#111827]">
                           {p.name}

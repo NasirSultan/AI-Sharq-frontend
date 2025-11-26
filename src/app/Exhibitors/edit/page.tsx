@@ -97,7 +97,7 @@ interface LoadingButtonProps {
   color?: string
 }
     const goToBooth = () => {
-    router.push('/Exhibitors/booth')
+    router.push('/Exhibitors/add-representative')
   }
 
 
@@ -203,7 +203,7 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
                 onClick={goToBooth}
                 className="py-4 px-6 bg-gray-800 text-white rounded-xl w-full"
               >
-                Go to Booth
+                Add Representatives
               </button>
               <button
                 type="button"

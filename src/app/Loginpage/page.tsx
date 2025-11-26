@@ -19,12 +19,12 @@ export default function Page() {
         {/* Buttons */}
         <div className="mt-12 flex flex-row gap-4 md:gap-6">
           <Link href="/authentication/SignUp">
-            <button className="bg-white text-[#9B2033] px-6 py-2 hover:bg-red-800 hover:text-white rounded transition">
+            <button className="bg-white text-[#9B2033]  border border-white cursor-pointer px-6 py-2 hover:bg-[#9B2033]  hover:border-white hover:text-white rounded transition">
               Sign Up
             </button>
           </Link>
           <Link href="/authentication/SignIn">
-            <button className="bg-transparent border border-white text-white px-6 py-2 rounded hover:bg-white hover:text-[#9B2033] transition">
+            <button className="bg-transparent border border-white text-white cursor-pointer px-6 py-2 rounded hover:bg-white hover:text-[#9B2033] transition">
               Sign In
             </button>
           </Link>

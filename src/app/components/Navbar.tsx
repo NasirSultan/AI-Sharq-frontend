@@ -59,7 +59,7 @@ export default function Navbar() {
   const handleLogoClick = () => {
     if (role === 'speaker') router.push('/speakers/ManageSessions')
     else if (role === 'participant') router.push('/participants/Home')
-    else if (role === 'exhibitor') router.push('/Exhibitors/dashboard')
+    else if (role === 'exhibitor') router.push('/Exhibitors/ManageSessions')
     else if (role === 'sponsor') router.push('/sponsors/ManageSessions')
     else if (role === 'organizer') router.push('/Organizer/Dashboard')
     else router.push('/')
@@ -71,11 +71,12 @@ export default function Navbar() {
     router.push('/participants/Masseges')
   }
 
-  const handleNotificationsClick = () => {
-    setUnreadNotifications(false)
-    localStorage.setItem('unreadNotifications', 'false')
-    router.push('/participants/Masseges')
-  }
+const handleNotificationsClick = () => {
+  setUnreadNotifications(false)
+
+  localStorage.setItem('unreadNotifications', 'false')
+}
+
 
   const handleVenuesClick = () => {
     if (role === 'participant') router.push('/participants/vanue')
@@ -163,7 +164,7 @@ export default function Navbar() {
             }}
           >
             <img
-  src={user?.file || '/images/public/images/liveman.png'}
+  src={user?.file || '/images/img (13).png'}
   alt="User"
   className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
 />

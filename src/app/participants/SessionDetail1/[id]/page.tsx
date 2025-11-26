@@ -264,91 +264,88 @@ export default function SessionPage({ params }: PageProps) {
 
 
 
-      <div className="bg-white border border-red-300 rounded-2xl p-4 shadow-sm flex items-center justify-between cursor-pointer transition-colors duration-200">
-        <div className="flex-1">
-          <h2 className="text-lg font-semibold">Session Forum</h2>
-          <p className="text-sm">
-            Discuss with other attendees, ask questions, and share ideas before joining.
-          </p>
-        </div>
-        <button
-          onClick={() => {
-            if (session?.tags) {
-              localStorage.setItem("sessionTags", JSON.stringify(session.tags))
-            }
-
-            if (id) {
-              localStorage.setItem("sessionId", String(id))
-            }
-
-            router.push("/participants/SessionForum")
-          }}
-          className="flex items-center gap-2 font-semibold hover:text-white cursor-pointer"
-        >
-          <FaArrowRight className="text-[#9B2033] text-2xl ml-auto cursor-pointer hover:text-red-700" />
-        </button>
-
-
-
-      </div>
-
-
-
-
-
-{session.location?.toLowerCase() === "online" && (
-  <div
-    onClick={() => {
-      if (userRole === "participant" && !canJoin) return;
-      handleJoinSession();
-    }}
-    className={`flex items-center gap-3 p-4 rounded-2xl shadow transition ${
-      joining
-        ? "bg-[#ffdada]"
-        : isSessionLive
-          ? "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
-          : "bg-gray-100 cursor-not-allowed"
-    } ${userRole === "participant" && !canJoin ? "opacity-60" : ""}`}
-  >
-    <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center relative overflow-hidden">
-      {isSessionLive && (
-        <>
-          <span className="absolute w-12 h-12 rounded-full border-2 border-[#9B2033]/40 animate-wave"></span>
-          <span className="absolute w-12 h-12 rounded-full border border-[#9B2033]/30 animate-wave-delayed"></span>
-        </>
-      )}
-      <FaVideo
-        className={`text-[#9B2033] text-xl relative z-10 ${
-          isSessionLive ? "animate-pulse-smooth" : "opacity-50"
-        }`}
-      />
-    </div>
-
-    <div>
-      <h2 className="text-lg font-semibold text-[#9B2033]">
-        {joining
-          ? "Joining..."
-          : isSessionLive
-            ? session.registrationRequired && !isRegistered
-              ? "Registration Required"
-              : "Join Live Session"
-            : "Session Not Live"}
-      </h2>
-      <p className="text-xs text-[#9B2033]">
-       {joining
-  ? "Please wait while we connect you to the session."
-  : isSessionLive
-    ? session.registrationRequired && !isRegistered
-      ? "You need to register to attend this session. Click the registration button to join."
-      : "The session is live now! Click to join and participate in real-time."
-    : "The session has not started yet or has already ended. Check the schedule for upcoming sessions."}
-
+    {userRole !== "sponsor" && userRole !== "exhibitor" && (
+  <div className="bg-white border border-red-300 rounded-2xl p-4 shadow-sm flex items-center justify-between cursor-pointer transition-colors duration-200">
+    <div className="flex-1">
+      <h2 className="text-lg font-semibold">Session Forum</h2>
+      <p className="text-sm">
+        Discuss with other attendees, ask questions, and share ideas before joining.
       </p>
     </div>
+    <button
+      onClick={() => {
+        if (session?.tags) {
+          localStorage.setItem("sessionTags", JSON.stringify(session.tags))
+        }
 
-    {!joining && <FaArrowRight className="text-[#9B2033] text-2xl ml-auto" />}
+        if (id) {
+          localStorage.setItem("sessionId", String(id))
+        }
+
+        router.push("/participants/SessionForum")
+      }}
+      className="flex items-center gap-2 font-semibold hover:text-white cursor-pointer"
+    >
+      <FaArrowRight className="text-[#9B2033] text-2xl ml-auto cursor-pointer hover:text-red-700" />
+    </button>
   </div>
 )}
+
+
+
+
+
+      {session.location?.toLowerCase() === "online" && (
+        <div
+          onClick={() => {
+            if (userRole === "participant" && !canJoin) return;
+            handleJoinSession();
+          }}
+          className={`flex items-center gap-3 p-4 rounded-2xl shadow transition ${joining
+              ? "bg-[#ffdada]"
+              : isSessionLive
+                ? "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
+                : "bg-gray-100 cursor-not-allowed"
+            } ${userRole === "participant" && !canJoin ? "opacity-60" : ""}`}
+        >
+          <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center relative overflow-hidden">
+            {isSessionLive && (
+              <>
+                <span className="absolute w-12 h-12 rounded-full border-2 border-[#9B2033]/40 animate-wave"></span>
+                <span className="absolute w-12 h-12 rounded-full border border-[#9B2033]/30 animate-wave-delayed"></span>
+              </>
+            )}
+            <FaVideo
+              className={`text-[#9B2033] text-xl relative z-10 ${isSessionLive ? "animate-pulse-smooth" : "opacity-50"
+                }`}
+            />
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold text-[#9B2033]">
+              {joining
+                ? "Joining..."
+                : isSessionLive
+                  ? session.registrationRequired && !isRegistered
+                    ? "Registration Required"
+                    : "Join Live Session"
+                  : "Session Not Live"}
+            </h2>
+            <p className="text-xs text-[#9B2033]">
+              {joining
+                ? "Please wait while we connect you to the session."
+                : isSessionLive
+                  ? session.registrationRequired && !isRegistered
+                    ? "You need to register to attend this session. Click the registration button to join."
+                    : "The session is live now! Click to join and participate in real-time."
+                  : "The session has not started yet or has already ended. Check the schedule for upcoming sessions."}
+
+            </p>
+          </div>
+
+          {!joining && <FaArrowRight className="text-[#9B2033] text-2xl ml-auto" />}
+        </div>
+      )}
 
 
 

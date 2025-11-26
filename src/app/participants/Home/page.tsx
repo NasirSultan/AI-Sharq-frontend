@@ -109,7 +109,7 @@ export default function Home() {
 
         const res = await api.get(`/event/event-sessions/${eventId}`, {
           signal: abortControllerRef.current.signal,
-          timeout: 5000, // 5 second timeout
+          timeout: 10000, // 5 second timeout
         });
         
         const data = res.data;

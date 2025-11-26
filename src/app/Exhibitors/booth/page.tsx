@@ -172,10 +172,6 @@ const AddBooth: React.FC = () => {
             {loading ? (isEditing ? 'Updating Booth...' : 'Adding Booth...') : (isEditing ? 'Update Booth' : 'Add Booth')}
           </button>
         </form>
-
-        {distance !== null && (
-          <p className="mt-4 text-gray-700">Distance assigned by backend: {distance} meters</p>
-        )}
       </div>
     </div>
   )

@@ -9,8 +9,9 @@ const filters = ["Daily", "Weekly", "10 Days", "90 Days", "All Time"]
 
 export default function Page() {
   const router = useRouter()
-  const [activeFilter, setActiveFilter] = useState("Daily")
+  const [activeFilter, setActiveFilter] = useState("All Time")
   const [participants, setParticipants] = useState<any[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
   const [stats, setStats] = useState({
     totalParticipants: 0,
     totalBookmarks: 0,
@@ -80,22 +81,47 @@ export default function Page() {
     { label: "Sessions Registration ", value: stats.totalSessionRegistrations, icon: <FaPlay className="text-green-600" />, iconBg: "bg-green-100" }
   ]
 
+const filteredParticipants = participants.filter(user => {
+  const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        user.organization?.toLowerCase().includes(searchTerm.toLowerCase())
+
+  const matchesFilter = (() => {
+    if (activeFilter === "Daily") return user.joinedToday
+    if (activeFilter === "Weekly") return user.joinedThisWeek
+    if (activeFilter === "10 Days") return user.joinedLast10Days
+    if (activeFilter === "90 Days") return user.joinedLast90Days
+    return true
+  })()
+
+  return matchesSearch && matchesFilter
+})
+
+
+
   return (
 <div className="min-h-screen bg-[#FAFAFA] px-4 md:px-8 lg:px-10 py-6 space-y-8 max-w-6xl mx-auto">
 
   {/* Header */}
-  <div className="flex items-center gap-3">
-    <Link href="/Organizer/Dashboard">
-      <FaArrowLeft className="text-red-800 w-5 h-5 cursor-pointer" />
-    </Link>
-    <h1 className="text-xl font-bold text-gray-900 ml-2 sm:ml-5">Manage Participants</h1>
-  </div>
+<div className="flex items-center gap-3">
+  <Link href="/Organizer/Dashboard">
+    <FaArrowLeft className="text-red-800 w-5 h-5 cursor-pointer" />
+  </Link>
+  <h1 className="text-xl font-bold text-gray-900">Manage Participants</h1>
+</div>
 
   {/* Filters/Search */}
   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
       <FaSearch className="text-red-900 mr-2 mt-1" />
-      <input type="text" placeholder="Search sessions or speakers" className="outline-none text-sm w-full" />
+     <input
+  type="text"
+  placeholder="Search sessions or participants"
+  className="outline-none text-sm w-full"
+  value={searchTerm}
+  onChange={e => setSearchTerm(e.target.value)}
+/>
+
     </div>
 
     <div className="flex gap-2 flex-wrap md:flex-nowrap">
@@ -138,14 +164,16 @@ export default function Page() {
     ) : participants.length === 0 ? (
       <p className="text-center text-gray-500">No participants found</p>
     ) : (
-      participants.map(user => (
+    filteredParticipants.map(user => (
+
         <div key={user.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 rounded-md p-4 mb-4 shadow-sm gap-4 sm:gap-2">
           <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
-            <img
-              src={user.file ? user.file : "/Images/default-user.png"}
-              alt={user.name}
-              className="rounded-full object-cover w-10 h-10"
-            />
+           <img
+  src={user.file ? user.file : "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png"}
+  alt={user.name}
+  className="rounded-full object-cover w-10 h-10"
+/>
+
             <div className="flex flex-col">
               <div className="flex items-baseline space-x-2">
                 <h2 className="font-semibold text-gray-900">{user.name}</h2>
