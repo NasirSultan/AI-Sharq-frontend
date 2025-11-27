@@ -22,42 +22,68 @@ export default function RegisterSession({ params }: PageProps) {
   const userId = useSelector((state: RootState) => state.user.userId)
   const router = useRouter()
 
-  const handleRegister = async () => {
-    if (!userId || !id) return
+const handleRegister = async () => {
+  if (!userId || !id) return
 
-    // Stop API call if fields are empty
-    if (!whyWantToJoin.trim() || !relevantExperience.trim()) {
-      setShowPopup({ message: "Please fill all fields", success: false })
-      return
-    }
-
-    try {
-      setLoading(true)
-      const payload = {
-        userId: Number(userId),
-        sessionId: Number(id),
-        whyWantToJoin,
-        relevantExperience,
-      }
-
-      const res = await api.post(`/participants-session/registration`, payload)
-
-      if (res.status === 201) {
-        setShowPopup({ message: "Successfully Registered!", success: true })
-        setTimeout(() => router.push("/participants/Schedule"), 1000)
-      }
-    } catch (err: any) {
-      if (err.response && err.response.status === 400) {
-        setShowPopup({ message: "Already Registered", success: false })
-        setTimeout(() => router.push("/participants/Schedule"), 1000)
-      } else {
-        console.error("Registration error:", err)
-        setShowPopup({ message: "Something went wrong. Try again.", success: false })
-      }
-    } finally {
-      setLoading(false)
-    }
+  if (!whyWantToJoin.trim() || !relevantExperience.trim()) {
+    setShowPopup({ message: "Please fill all fields", success: false })
+    return
   }
+
+  try {
+    setLoading(true)
+
+    const payload = {
+      userId: Number(userId),
+      sessionId: Number(id),
+      whyWantToJoin,
+      relevantExperience
+    }
+
+    const res = await api.post(`/participants-session/registration`, payload)
+
+    if (res.status === 201) {
+      setShowPopup({ message: "Successfully Registered!", success: true })
+
+      const cached = localStorage.getItem(`session-${id}`)
+      if (cached) {
+        const data = JSON.parse(cached)
+        localStorage.setItem(
+          `session-${id}`,
+          JSON.stringify({
+            ...data,
+            isRegistered: true
+          })
+        )
+      }
+
+      setTimeout(() => router.push("/participants/Schedule"), 1000)
+    }
+  } catch (err) {
+    if (err.response && err.response.status === 400) {
+      setShowPopup({ message: "Already Registered", success: false })
+
+      const cached = localStorage.getItem(`session-${id}`)
+      if (cached) {
+        const data = JSON.parse(cached)
+        localStorage.setItem(
+          `session-${id}`,
+          JSON.stringify({
+            ...data,
+            isRegistered: true
+          })
+        )
+      }
+
+      setTimeout(() => router.push("/participants/Schedule"), 1000)
+    } else {
+      setShowPopup({ message: "Something went wrong. Try again.", success: false })
+    }
+  } finally {
+    setLoading(false)
+  }
+}
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50 p-4">
