@@ -113,24 +113,14 @@ export default function ProfileCard({
             {user.name}
           </p>
         </div>
-       
-       
-        <div className="flex flex-col">
-          <p className="text-sm text-gray-500">Bio</p>
-          <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm">
-            {user.bio}
-          </p>
-        </div>
+
         <div className="flex flex-col">
           <p className="text-sm text-gray-500">Organization</p>
           <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm">
             {user.organization || 'No organization exists yet'}
           </p>
         </div>
-        <div className="flex flex-col sm:col-span-2">
-          <p className="text-sm text-gray-500">Phone</p>
-          <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm break-all">{displayValue(user.phone)}</p>
-        </div>
+
         <div className="flex flex-col sm:col-span-2">
           <p className="text-sm text-gray-500">Email</p>
           <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm break-all">

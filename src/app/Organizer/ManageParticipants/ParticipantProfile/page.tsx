@@ -63,23 +63,23 @@ export default function ProfileCard({ role }: { role: string }) {
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col">
             <p className="text-sm text-gray-500">Full Name</p>
-            <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm">{displayValue(user.name)}</p>
+            <p className="px-4 py-2  rounded-lg bg-gray-50 text-black text-sm">{displayValue(user.name)}</p>
           </div>
           <div className="flex flex-col">
             <p className="text-sm text-gray-500">Bio</p>
-            <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm">{displayValue(user.bio)}</p>
+            <p className="px-4 py-2  rounded-lg bg-gray-50 text-black text-sm">{displayValue(user.bio)}</p>
           </div>
           <div className="flex flex-col">
             <p className="text-sm text-gray-500">Organization</p>
-            <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm">{displayValue(user.organization)}</p>
+            <p className="px-4 py-2  rounded-lg bg-gray-50 text-black text-sm">{displayValue(user.organization)}</p>
           </div>
           <div className="flex flex-col sm:col-span-2">
             <p className="text-sm text-gray-500">Email</p>
-            <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm break-all">{displayValue(user.email)}</p>
+            <p className="px-4 py-2  rounded-lg bg-gray-50 text-black text-sm break-all">{displayValue(user.email)}</p>
           </div>
          <div className="flex flex-col sm:col-span-2">
             <p className="text-sm text-gray-500">Phone</p>
-            <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm break-all">{displayValue(user.phone)}</p>
+            <p className="px-4 py-2  rounded-lg bg-gray-50 text-black text-sm break-all">{displayValue(user.phone)}</p>
           </div>
         
         </div>
