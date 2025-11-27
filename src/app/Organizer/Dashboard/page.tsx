@@ -11,7 +11,7 @@ import {
   FaBullhorn,
   FaUserPlus,
   FaCheckCircle,
-  FaArrowRight,
+  FaArrowRight,FaFileAlt,FaQuestionCircle
 } from "react-icons/fa";
 import OptIn from "./../../components/opt-in"
 
@@ -162,36 +162,36 @@ export default function Dashboard() {
 
 
       {/* Tools & Support */}
-      <section className="bg-white p-6 rounded-xl shadow">
-        <h2 className="text-xl font-semibold mb-6 text-black">Tools & Support</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {loading ? (
-            Array.from({ length: 2 }).map((_, idx) => (
-              <div key={idx} className="flex items-center justify-between border border-gray-300 rounded-xl p-4 animate-pulse h-20" />
-            ))
-          ) : (
-            [
-              { title: "Reports", desc: "Analytics & exports", img: "/Images/reports.png", link: "/Organizer/Report", bg: "bg-[#E3FFF7]" },
-              { title: "Manage FAQ", desc: "Help & guidance", img: "/Images/Faqs.png", link: "/Organizer/Dashboard", bg: "bg-[#FFF3F3]" },
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md hover:border-red-900 transition cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className={`${item.bg} p-2 rounded-md`}>
-                    <Image src={item.img} alt={item.title} width={24} height={24} />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-black text-sm">{item.title}</p>
-                    <p className="text-xs text-gray-500">{item.desc}</p>
-                  </div>
-                </div>
-                <Link href={item.link} className="text-[#9B2033] text-lg font-bold">
-                  <FaArrowRight />
-                </Link>
-              </div>
-            ))
-          )}
+<section className="bg-white p-6 rounded-xl shadow">
+  <h2 className="text-xl font-semibold mb-6 text-black">Tools & Support</h2>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {loading ? (
+      Array.from({ length: 2 }).map((_, idx) => (
+        <div key={idx} className="flex items-center justify-between border border-gray-300 rounded-xl p-4 animate-pulse h-20" />
+      ))
+    ) : (
+      [
+        { title: "Reports", desc: "Analytics & exports", icon: <FaFileAlt size={24} color="#0B3D91" />, bg: "bg-[#E3FFF7]", href: "/Organizer/Report" },
+        { title: "Manage FAQ", desc: "Help & guidance", icon: <FaQuestionCircle size={24} color="#9B2033" />, bg: "bg-[#FFF3F3]", href: "/Organizer/ManageFAQS" },
+      ].map((item, idx) => (
+        <div key={idx} className="flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md hover:border-red-900 transition cursor-pointer">
+          <div className="flex items-center gap-3">
+            <div className={`${item.bg} p-2 rounded-md`}>
+              {item.icon}
+            </div>
+            <div>
+              <p className="font-semibold text-black text-sm">{item.title}</p>
+              <p className="text-xs text-gray-500">{item.desc}</p>
+            </div>
+          </div>
+          <Link href={item.href} className="text-[#9B2033] text-lg font-bold">
+            <FaArrowRight color="#000" />
+          </Link>
         </div>
-      </section>
+      ))
+    )}
+  </div>
+</section>
 
       {/* Recent Participants */}
       <div className="flex justify-between items-center">

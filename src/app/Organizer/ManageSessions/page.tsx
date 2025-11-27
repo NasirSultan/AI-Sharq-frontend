@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { FaArrowLeft, FaSearch, FaPlay, FaRegListAlt, FaLock, FaUnlock, FaQrcode, FaCalendarAlt } from 'react-icons/fa'
+import { FaArrowLeft, FaSearch,FaUser, FaPlay, FaRegListAlt, FaLock, FaUnlock, FaQrcode, FaCalendarAlt } from 'react-icons/fa'
 import api from '@/config/api'
 import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
@@ -396,7 +396,7 @@ export default function SessionsSchedule() {
                       rel="noopener noreferrer"
                       className="text-green-600 hover:text-green-700 flex-shrink-0 ml-2"
                     >
-                      <FaQrcode size={18} />
+                      <FaQrcode size={16} />
                     </a>
                   )}
                 </div>
@@ -407,13 +407,22 @@ export default function SessionsSchedule() {
                 {/* Speaker Info */}
                 {speaker && (
                   <div className="flex items-center text-xs text-gray-600 mb-1 space-x-2">
-                    {speaker.file && (
-                      <img 
-                        src={speaker.file} 
-                        alt={speaker.name} 
-                        className="w-6 h-6 rounded-full object-cover flex-shrink-0" 
-                      />
-                    )}
+{speaker.file ? (
+  <img
+    src={speaker.file}
+    alt={speaker.name || "Default Avatar"}
+    className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+    onError={(e) => {
+      e.currentTarget.style.display = "none"
+    }}
+  />
+) : (
+<div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+  <FaUser className="w-4 h-4 text-blue-500" />
+</div>
+
+)}
+
                     <span className="truncate">{speaker.name}</span>
                   </div>
                 )}
