@@ -54,7 +54,7 @@ export default function SignUp() {
         setUserIdInput(userId)
       }
 
-      router.push('/authentication/SignIn')
+      router.push('/authentication/verificationcode')
     } catch (err: any) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {
@@ -174,8 +174,8 @@ export default function SignUp() {
             type="submit"
             disabled={loading}
             className={`w-full h-9 text-white text-sm font-medium rounded-md transition ${loading
-                ? 'bg-red-400 cursor-not-allowed'
-                : 'bg-red-700 hover:bg-red-800'
+                ? 'bg-red-900 cursor-not-allowed'
+                : 'bg-red-800 hover:bg-red-900'
               }`}
           >
             {loading ? 'Creating...' : 'Create Account'}

@@ -89,11 +89,14 @@ export default function SignIn() {
         else router.push('/authentication/SignIn')
       }
     } catch (err: any) {
-      if (err.response && err.response.status === 401) {
-        setError('Incorrect email or password')
-      } else {
-        setError('Something went wrong')
-      }
+     if (err.response && err.response.status === 403) {
+  setError('You have been blocked')
+} else if (err.response && err.response.status === 401) {
+  setError('Incorrect email or password')
+} else {
+  setError('Something went wrong')
+}
+
     } finally {
       setLoading(false)
     }

@@ -81,137 +81,147 @@ export default function Page() {
     { label: "Sessions Registration ", value: stats.totalSessionRegistrations, icon: <FaPlay className="text-green-600" />, iconBg: "bg-green-100" }
   ]
 
-const filteredParticipants = participants.filter(user => {
-  const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        user.organization?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredParticipants = participants.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.organization?.toLowerCase().includes(searchTerm.toLowerCase())
 
-  const matchesFilter = (() => {
-    if (activeFilter === "Daily") return user.joinedToday
-    if (activeFilter === "Weekly") return user.joinedThisWeek
-    if (activeFilter === "10 Days") return user.joinedLast10Days
-    if (activeFilter === "90 Days") return user.joinedLast90Days
-    return true
-  })()
+    const matchesFilter = (() => {
+      if (activeFilter === "Daily") return user.joinedToday
+      if (activeFilter === "Weekly") return user.joinedThisWeek
+      if (activeFilter === "10 Days") return user.joinedLast10Days
+      if (activeFilter === "90 Days") return user.joinedLast90Days
+      return true
+    })()
 
-  return matchesSearch && matchesFilter
-})
+    return matchesSearch && matchesFilter
+  })
 
 
 
   return (
-<div className="min-h-screen bg-[#FAFAFA] px-4 md:px-8 lg:px-10 py-6 space-y-8 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#FAFAFA] px-4 md:px-8 lg:px-10 py-6 space-y-8 max-w-6xl mx-auto">
 
-  {/* Header */}
-<div className="flex items-center gap-3">
-  <Link href="/Organizer/Dashboard">
-    <FaArrowLeft className="text-red-800 w-5 h-5 cursor-pointer" />
-  </Link>
-  <h1 className="text-xl font-bold text-gray-900">Manage Participants</h1>
-</div>
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <Link href="/Organizer/Dashboard">
+          <FaArrowLeft className="text-red-800 w-5 h-5 cursor-pointer" />
+        </Link>
+        <h1 className="text-xl font-bold text-gray-900">Manage Participants</h1>
+      </div>
 
-  {/* Filters/Search */}
-  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
-      <FaSearch className="text-red-900 mr-2 mt-1" />
-     <input
-  type="text"
-  placeholder="Search sessions or participants"
-  className="outline-none text-sm w-full"
-  value={searchTerm}
-  onChange={e => setSearchTerm(e.target.value)}
-/>
+      {/* Filters/Search */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
+          <FaSearch className="text-red-900 mr-2 mt-1" />
+          <input
+            type="text"
+            placeholder="Search sessions or participants"
+            className="outline-none text-sm w-full"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
 
-    </div>
-
-    <div className="flex gap-2 flex-wrap md:flex-nowrap">
-      {filters.map(filter => (
-        <button
-          key={filter}
-          onClick={() => setActiveFilter(filter)}
-          className={`px-4 py-1 rounded-full text-sm font-medium ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-gray-800"}`}
-        >
-          {filter}
-        </button>
-      ))}
-    </div>
-
-    <div className="flex items-center border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700 mt-2 md:mt-0">
-      <FaCalendarAlt className="mr-2 text-gray-500" />
-      Jan 2024 - Dec 2024
-    </div>
-  </div>
-
-  {/* Stats */}
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    {statsItems.map((item, idx) => (
-      <div key={idx} className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition">
-        <div className={`w-10 h-10 rounded-md ${item.iconBg} flex items-center justify-center mr-3 sm:mr-4`}>
-          {item.icon}
         </div>
-        <div className="flex-1">
-          <p className="text-lg sm:text-[22px] font-bold text-black leading-none">{item.value}</p>
-          <p className="text-sm text-gray-600">{item.label}</p>
+
+        <div className="flex gap-2 flex-wrap md:flex-nowrap">
+          {filters.map(filter => (
+            <button
+              key={filter}
+              onClick={() => setActiveFilter(filter)}
+              className={`px-4 py-1 rounded-full text-sm font-medium ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-gray-800"}`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700 mt-2 md:mt-0">
+          <FaCalendarAlt className="mr-2 text-gray-500" />
+          Jan 2024 - Dec 2024
         </div>
       </div>
-    ))}
-  </div>
 
-  {/* Participants List */}
-  <div className="w-full max-w-full mx-auto bg-white rounded-lg shadow-md p-4 sm:p-6">
-    {loading ? (
-      <p className="text-center text-gray-500">Loading participants...</p>
-    ) : participants.length === 0 ? (
-      <p className="text-center text-gray-500">No participants found</p>
-    ) : (
-    filteredParticipants.map(user => (
-
-        <div key={user.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 rounded-md p-4 mb-4 shadow-sm gap-4 sm:gap-2">
-          <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
-           <img
-  src={user.file ? user.file : "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png"}
-  alt={user.name}
-  className="rounded-full object-cover w-10 h-10"
-/>
-
-            <div className="flex flex-col">
-              <div className="flex items-baseline space-x-2">
-                <h2 className="font-semibold text-gray-900">{user.name}</h2>
-                <h3 className="text-gray-600 text-sm">{user.organization}</h3>
-              </div>
-              <p className="text-sm text-gray-500">{user.email}</p>
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {statsItems.map((item, idx) => (
+          <div key={idx} className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition">
+            <div className={`w-10 h-10 rounded-md ${item.iconBg} flex items-center justify-center mr-3 sm:mr-4`}>
+              {item.icon}
+            </div>
+            <div className="flex-1">
+              <p className="text-lg sm:text-[22px] font-bold text-black leading-none">{item.value}</p>
+              <p className="text-sm text-gray-600">{item.label}</p>
             </div>
           </div>
+        ))}
+      </div>
 
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-            <button
-              onClick={() => handleDelete(user)}
-              className="bg-red-800 text-white px-4 py-1 rounded-md hover:bg-red-900 transition cursor-pointer flex-1 sm:flex-none"
-            >
-              Delete Account
-            </button>
-            <button
-              onClick={() => handleBlock(user)}
-              className={`px-4 py-1 rounded-md border cursor-pointer flex-1 sm:flex-none transition ${
-                user.isBlocked
-                  ? 'bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200'
-                  : 'bg-green-100 text-green-800 border-green-300 hover:bg-green-200'
-              }`}
-            >
-              {user.isBlocked ? 'Suspended' : 'Active'}
-            </button>
-            <button
-              onClick={() => router.push(`/Organizer/ManageParticipants/bookmark?userId=${user.id}`)}
-              className="border border-gray-300 px-4 py-1 rounded-md cursor-pointer text-black hover:bg-gray-100 transition flex-1 sm:flex-none"
-            >
-              View Bookmarks
-            </button>
-          </div>
-        </div>
-      ))
-    )}
-  </div>
-</div>
+      {/* Participants List */}
+      <div className="w-full max-w-full mx-auto bg-white rounded-lg shadow-md p-4 sm:p-6">
+        {loading ? (
+          <p className="text-center text-gray-500">Loading participants...</p>
+        ) : participants.length === 0 ? (
+          <p className="text-center text-gray-500">No participants found</p>
+        ) : (
+          filteredParticipants.map(user => (
+
+            <div key={user.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 rounded-md p-4 mb-4 shadow-sm gap-4 sm:gap-2">
+              <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
+                <img
+                  src={user.file ? user.file : "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png"}
+                  alt={user.name}
+                  className="rounded-full object-cover w-10 h-10"
+                />
+
+                <div className="flex flex-col">
+                  <div className="flex items-baseline space-x-2">
+                    <h2 className="font-semibold text-gray-900">{user.name}</h2>
+                    <h3 className="text-gray-600 text-sm">{user.organization}</h3>
+                  </div>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                <button
+                  onClick={() => handleDelete(user)}
+                  className="bg-red-800 text-white px-4 py-1 rounded-md hover:bg-red-900 transition cursor-pointer flex-1 sm:flex-none"
+                >
+                  Delete Account
+                </button>
+                <button
+                  onClick={() => handleBlock(user)}
+                  className={`px-4 py-1 rounded-md border cursor-pointer flex-1 sm:flex-none transition ${user.isBlocked
+                      ? 'bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200'
+                      : 'bg-green-100 text-green-800 border-green-300 hover:bg-green-200'
+                    }`}
+                >
+                  {user.isBlocked ? 'Suspended' : 'Active'}
+                </button>
+                <button
+                  onClick={() => {
+                    localStorage.setItem('participantId', user.id.toString())
+                    router.push('/Organizer/ManageParticipants/ParticipantProfile')
+                  }}
+                  className="border border-blue-600 text-blue-600 px-4 py-1 rounded-md cursor-pointer hover:bg-blue-50 transition flex-1 sm:flex-none"
+                >
+                  View Profile
+                </button>
+
+
+                <button
+                  onClick={() => router.push(`/Organizer/ManageParticipants/bookmark?userId=${user.id}`)}
+                  className="border border-gray-300 px-4 py-1 rounded-md cursor-pointer text-black hover:bg-gray-100 transition flex-1 sm:flex-none"
+                >
+                  View Bookmarks
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
 
   )
 }

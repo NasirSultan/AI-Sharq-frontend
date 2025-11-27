@@ -9,7 +9,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const pathname = usePathname()?.toLowerCase()
   const [isChecking, setIsChecking] = useState(true)
 
-  const publicPaths = ["/", "/authentication/signin", "/authentication/signup"]
+  const publicPaths = ["/", "/authentication/signin", "/authentication/signup", "/authentication/verificationcode"]
   const isPublic = publicPaths.includes(pathname)
   const hideNavbar = pathname === "/" || pathname.startsWith("/authentication/")
 
