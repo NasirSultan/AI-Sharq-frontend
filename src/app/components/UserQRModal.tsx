@@ -67,8 +67,8 @@ const finalUserId =
         className="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center"
       >
         <QRCode
-          // value={`https://connect.sharqforum.org/Profile/${finalUserId}?role=${encodeURIComponent(
-             value={`http://192.168.100.10:3000/Profile/${finalUserId}?role=${encodeURIComponent(
+          value={`https://connect.sharqforum.org/Profile/${finalUserId}?role=${encodeURIComponent(
+            //  value={`http://192.168.100.10:3000/Profile/${finalUserId}?role=${encodeURIComponent(
 
             role
           )}`}

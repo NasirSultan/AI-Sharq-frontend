@@ -112,17 +112,17 @@ export default function Page() {
 
       {/* Filters/Search */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
-          <FaSearch className="text-red-900 mr-2 mt-1" />
-          <input
-            type="text"
-            placeholder="Search sessions or participants"
-            className="outline-none text-sm w-full"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
+       <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
+  <FaSearch className="text-red-900 mr-2 mt-1" />
+  <input
+    type="text"
+    placeholder="Search sessions or participants"
+    className="outline-none text-sm w-full text-black"
+    value={searchTerm}
+    onChange={e => setSearchTerm(e.target.value)}
+  />
+</div>
 
-        </div>
 
         <div className="flex gap-2 flex-wrap md:flex-nowrap">
           {filters.map(filter => (

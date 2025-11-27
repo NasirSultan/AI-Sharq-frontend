@@ -25,7 +25,7 @@ export default function Page() {
           </Link>
           <Link href="/authentication/SignIn">
             <button className="bg-transparent border border-white text-white cursor-pointer px-6 py-2 rounded hover:bg-white hover:text-[#9B2033] transition">
-              Sign In
+      Login
             </button>
           </Link>
         </div>
