@@ -105,7 +105,7 @@ export default function MyAgendaPage() {
 
   const getSessionStatus = (session: any) => {
     if (session.location?.toLowerCase() === "online") {
-      return session.isLive ? "Live Now" : "Offline"
+      return session.isLive ? "Live Now" : "Finished"
     } else {
       return `Onsite at ${session.location || "TBD"}`
     }

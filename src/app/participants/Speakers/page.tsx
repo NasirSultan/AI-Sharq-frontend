@@ -1,13 +1,12 @@
 "use client"
 import Link from "next/link"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import { FaArrowLeft, FaFilter, FaSearch } from "react-icons/fa"
 import Image from "next/image"
 import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "@/lib/store/store"
 import { setSpeakerId } from "@/lib/store/features/speaker/speakerSlice"
 import api from "@/config/api"
-import { useMemo } from "react"
 
 const tagColors: Record<string, string> = {
   Expert: "bg-blue-200 text-blue-800",
@@ -27,54 +26,64 @@ export default function SpeakersPage() {
   const [speakers, setSpeakers] = useState<any[]>([])
   const [activeFilter, setActiveFilter] = useState("All")
   const [searchQuery, setSearchQuery] = useState("")
+  const [loading, setLoading] = useState(false)
   const dispatch = useDispatch()
 
+  useEffect(() => {
+    if (!eventId) return
 
+    let isMounted = true
 
-useEffect(() => {
-  if (!eventId) return
-
-  let isMounted = true
-
-  // Check cache first
-  const cachedSpeakers = localStorage.getItem(`speakers-${eventId}`)
-  if (cachedSpeakers) {
-    const data = JSON.parse(cachedSpeakers)
-    setSpeakers(data)
-    return
-  }
-
-  const fetchSpeakers = async () => {
-    try {
-      const res = await api.get(`/speakers/event/${eventId}/short-info`)
-      if (!isMounted) return
-      setSpeakers(res.data)
-      // Save to localStorage for quick navigation next time
-      localStorage.setItem(`speakers-${eventId}`, JSON.stringify(res.data))
-    } catch (error) {
-      console.error("Error fetching speakers:", error)
+    const cachedSpeakers = localStorage.getItem(`speakers-${eventId}`)
+    if (cachedSpeakers) {
+      const data = JSON.parse(cachedSpeakers)
+      setSpeakers(data)
+      return
     }
+
+    const fetchSpeakers = async () => {
+      try {
+        setLoading(true)
+        const res = await api.get(`/speakers/event/${eventId}/short-info`)
+        if (!isMounted) return
+        setSpeakers(res.data)
+        localStorage.setItem(`speakers-${eventId}`, JSON.stringify(res.data))
+      } catch (error) {
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSpeakers()
+
+    return () => {
+      isMounted = false
+    }
+  }, [eventId])
+
+  type SpeakerItem = {
+    user: {
+      name: string
+    }
+    bio: string
+    expertise: string[]
+    tags: string[]
   }
 
-  fetchSpeakers()
+  const filteredSpeakers = useMemo(() => {
+    return speakers.filter((item: SpeakerItem) => {
+      const filterMatch =
+        activeFilter === "All" ||
+        item.tags.some(tag => tag.toLowerCase() === activeFilter.toLowerCase())
 
-  return () => {
-    isMounted = false
-  }
-}, [eventId])
+      const searchMatch =
+        item.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.bio.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.expertise.some(exp => exp.toLowerCase().includes(searchQuery.toLowerCase()))
 
-
-const filteredSpeakers = useMemo(() => {
-  return speakers.filter(speaker => {
-    const matchesFilter = activeFilter === "All" || speaker.tags.includes(activeFilter)
-    const matchesSearch =
-      speaker.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      speaker.bio.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      speaker.expertise.some(exp => exp.toLowerCase().includes(searchQuery.toLowerCase()))
-    return matchesFilter && matchesSearch
-  })
-}, [speakers, activeFilter, searchQuery])
-
+      return filterMatch && searchMatch
+    })
+  }, [speakers, activeFilter, searchQuery])
 
   return (
     <>
@@ -93,18 +102,19 @@ const filteredSpeakers = useMemo(() => {
               type="text"
               placeholder="Search"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="flex-1 outline-none text-gray-400 text-sm"
             />
           </div>
-          {["All", "Expert", "Keynote", "Technology", "Workshop"].map((tag) => (
+          {["All", "Expert", "Keynote", "Technology", "Workshop"].map(tag => (
             <button
               key={tag}
               onClick={() => setActiveFilter(tag)}
-              className={`px-4 py-2 rounded-lg text-sm ${activeFilter === tag
-                ? "bg-red-700 text-white font-bold"
-                : "border border-gray-300 text-gray-900"
-                }`}
+              className={`px-4 py-2 rounded-lg text-sm ${
+                activeFilter === tag
+                  ? "bg-red-700 text-white font-bold"
+                  : "border border-gray-300 text-gray-900"
+              }`}
             >
               {tag}
             </button>
@@ -114,69 +124,81 @@ const filteredSpeakers = useMemo(() => {
           </div>
         </div>
 
-        <p className="text-md font-medium text-gray-900">
-          {filteredSpeakers.length} Speakers Showing
-        </p>
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <>
+            <p className="text-md font-medium text-gray-900">
+              {filteredSpeakers.length} Speakers Showing
+            </p>
 
-        <div className="flex flex-col gap-4">
-          {filteredSpeakers.map((speaker, index) => (
-            <Link
-              key={index}
-              href={`/participants/SpeakerDetails/${speaker.id}`}
-              onClick={() => dispatch(setSpeakerId(speaker.id))}
-              className="block"
-            >
-              <div className="bg-white border border-gray-300 rounded-xl p-4 shadow-sm hover:shadow-md transition">
-                <div className="flex gap-4 flex-wrap">
-                  {speaker.user.file ? (
-                    <img
-                      src={speaker.user.file}
-                      alt={speaker.user.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-medium">
-                      No Image
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-[150px]">
-                    <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <h2 className="text-lg font-semibold text-gray-900">
-                        {speaker.user.name}
-                      </h2>
-                      {speaker.designations.map((d: string, i: number) => (
-                        <div key={i} className="flex items-center gap-1">
-                          <div className="w-1 h-1 bg-red-700 rounded-full" />
-                          <p className="text-sm text-gray-900">{d}</p>
+            <div className="flex flex-col gap-4">
+              {filteredSpeakers.map((speaker, index) => (
+                <Link
+                  key={index}
+                  href={`/participants/SpeakerDetails/${speaker.id}`}
+                  onClick={() => dispatch(setSpeakerId(speaker.id))}
+                  className="block"
+                >
+                  <div className="bg-white border border-gray-300 rounded-xl p-4 shadow-sm hover:shadow-md transition">
+                    <div className="flex gap-4 flex-wrap">
+                      {speaker.user.file ? (
+                        <img
+                          src={speaker.user.file}
+                          alt={speaker.user.name}
+                          className="w-16 h-16 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-medium">
+                          No Image
                         </div>
-                      ))}
-                      <div className="ml-auto flex gap-1 flex-wrap">
-                        {speaker.tags[0] && (
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-xs font-medium ${tagColors[speaker.tags[0]] ?? "bg-gray-200 text-gray-800"
-                              }`}
-                          >
-                            {speaker.tags[0]}
-                          </span>
-                        )}
-                      </div>
+                      )}
+                      <div className="flex-1 min-w-[150px]">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <h2 className="text-lg font-semibold text-gray-900">
+                            {speaker.user.name}
+                          </h2>
 
-                      <div className="bg-red-200 p-1 rounded-full">
-                        <p className="text-xs text-red-700">
-                          {speaker.sessionCount} Sessions
+                          {speaker.designations.map((d: string, i: number) => (
+                            <div key={i} className="flex items-center gap-1">
+                              <div className="w-1 h-1 bg-red-700 rounded-full" />
+                              <p className="text-sm text-gray-900">{d}</p>
+                            </div>
+                          ))}
+
+                          <div className="ml-auto flex gap-1 flex-wrap">
+                            {speaker.tags[0] && (
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                  tagColors[speaker.tags[0]] ??
+                                  "bg-gray-200 text-gray-800"
+                                }`}
+                              >
+                                {speaker.tags[0]}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="bg-red-200 p-1 rounded-full">
+                            <p className="text-xs text-red-700">
+                              {speaker.sessionCount} Sessions
+                            </p>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-gray-600 leading-relaxed">
+                          {speaker.bio}
                         </p>
                       </div>
                     </div>
-
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      {speaker.bio}
-                    </p>
                   </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <Image
@@ -184,7 +206,7 @@ const filteredSpeakers = useMemo(() => {
         alt="Line"
         width={2200}
         height={100}
-        className="absolute"
+        className="absolute bottom-0"
       />
     </>
   )

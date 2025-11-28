@@ -100,22 +100,24 @@ const VenueMaps: React.FC = () => {
 
       <LiveLoaction3 />
 
-      <div className="w-full flex justify-center">
-        <div className="flex items-center w-full max-w-[1280px] p-3 sm:p-4 gap-3 border border-[#E8E8E8] rounded-2xl">
-          <FiSearch className="w-5 h-5 text-red-500" />
-          <span className="text-sm sm:text-base text-[#706f6f]">Search Venue</span>
-        </div>
-      </div>
 
       <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-[1280px] gap-4">
-        <div
-          className="flex items-center gap-2 px-4 py-2 bg-[#9B2033] rounded-2xl cursor-pointer hover:bg-[#7e0505] transition"
-          onClick={() => setIsPopupOpen(true)}
-        >
-          <FaPlus className="w-3 h-3 text-white" />
-          <span className="text-white text-sm">Add New Venue</span>
-        </div>
-        <span className="text-base font-medium text-[#282828]">View All</span>
+      <div className="flex flex-col items-start space-y-2">
+
+  <div
+    className="flex items-center gap-2 px-4 py-2 bg-[#9B2033] rounded-2xl cursor-pointer hover:bg-[#7e0505] transition"
+    onClick={() => setIsPopupOpen(true)}
+  >
+    <FaPlus className="w-3 h-3 text-white" />
+    <span className="text-white text-sm">Add New Venue</span>
+  </div>
+
+  <p className="text-sm text-gray-600">
+    Please make sure the current event record is complete. Only one event can exist at a time and a new event will replace the previous one.
+  </p>
+
+</div>
+
       </div>
 
       <div className="flex flex-col gap-6 w-full">

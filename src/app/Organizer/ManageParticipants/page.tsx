@@ -86,16 +86,46 @@ export default function Page() {
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.organization?.toLowerCase().includes(searchTerm.toLowerCase())
 
+    const createdDate = new Date(user.createdAt)
+    const updatedDate = new Date(user.updatedAt)
+    const now = new Date()
+
     const matchesFilter = (() => {
-      if (activeFilter === "Daily") return user.joinedToday
-      if (activeFilter === "Weekly") return user.joinedThisWeek
-      if (activeFilter === "10 Days") return user.joinedLast10Days
-      if (activeFilter === "90 Days") return user.joinedLast90Days
-      return true
+      if (activeFilter === "Daily") {
+        const startOfToday = new Date(now)
+        startOfToday.setHours(0, 0, 0, 0)
+        const endOfToday = new Date(now)
+        endOfToday.setHours(23, 59, 59, 999)
+        return (createdDate >= startOfToday && createdDate <= endOfToday) ||
+          (updatedDate >= startOfToday && updatedDate <= endOfToday)
+      }
+      if (activeFilter === "Weekly" || activeFilter === "Last 7 Days") {
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(now.getDate() - 7)
+        return (createdDate >= sevenDaysAgo && createdDate <= now) ||
+          (updatedDate >= sevenDaysAgo && updatedDate <= now)
+      }
+      if (activeFilter === "10 Days") {
+        const tenDaysAgo = new Date()
+        tenDaysAgo.setDate(now.getDate() - 10)
+        return (createdDate >= tenDaysAgo && createdDate <= now) ||
+          (updatedDate >= tenDaysAgo && updatedDate <= now)
+      }
+      if (activeFilter === "90 Days") {
+        const ninetyDaysAgo = new Date()
+        ninetyDaysAgo.setDate(now.getDate() - 90)
+        return (createdDate >= ninetyDaysAgo && createdDate <= now) ||
+          (updatedDate >= ninetyDaysAgo && updatedDate <= now)
+      }
+      if (activeFilter === "All Time") {
+        return true
+      }
     })()
 
     return matchesSearch && matchesFilter
   })
+
+
 
 
 
@@ -111,36 +141,32 @@ export default function Page() {
       </div>
 
       {/* Filters/Search */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-       <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-[300px]">
-  <FaSearch className="text-red-900 mr-2 mt-1" />
-  <input
-    type="text"
-    placeholder="Search sessions or participants"
-    className="outline-none text-sm w-full text-black"
-    value={searchTerm}
-    onChange={e => setSearchTerm(e.target.value)}
-  />
-</div>
+      <div className="flex w-full gap-4">
+        <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 flex-grow">
+          <FaSearch className="text-red-900 mr-2 mt-1" />
+          <input
+            type="text"
+            placeholder="Search sessions or participants"
+            className="outline-none text-sm w-full text-black"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+        </div>
 
-
-        <div className="flex gap-2 flex-wrap md:flex-nowrap">
+        <div className="flex gap-2 flex-wrap flex-grow">
           {filters.map(filter => (
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-4 py-1 rounded-full text-sm font-medium ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-gray-800"}`}
+              className={`flex-1 px-4 py-1 rounded-full text-sm font-medium text-center ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-gray-800"}`}
             >
               {filter}
             </button>
           ))}
         </div>
-
-        <div className="flex items-center border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700 mt-2 md:mt-0">
-          <FaCalendarAlt className="mr-2 text-gray-500" />
-          Jan 2024 - Dec 2024
-        </div>
       </div>
+
+
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -159,68 +185,67 @@ export default function Page() {
 
       {/* Participants List */}
       <div className="w-full max-w-full mx-auto bg-white rounded-lg shadow-md p-4 sm:p-6">
-        {loading ? (
-          <p className="text-center text-gray-500">Loading participants...</p>
-        ) : participants.length === 0 ? (
-          <p className="text-center text-gray-500">No participants found</p>
-        ) : (
-          filteredParticipants.map(user => (
-
-            <div key={user.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 rounded-md p-4 mb-4 shadow-sm gap-4 sm:gap-2">
-              <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
-                <img
-                  src={user.file ? user.file : "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png"}
-                  alt={user.name}
-                  className="rounded-full object-cover w-10 h-10"
-                />
-
-                <div className="flex flex-col">
-                  <div className="flex items-baseline space-x-2">
-                    <h2 className="font-semibold text-gray-900">{user.name}</h2>
-                    <h3 className="text-gray-600 text-sm">{user.organization}</h3>
-                  </div>
-                  <p className="text-sm text-gray-500">{user.email}</p>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                <button
-                  onClick={() => handleDelete(user)}
-                  className="bg-red-800 text-white px-4 py-1 rounded-md hover:bg-red-900 transition cursor-pointer flex-1 sm:flex-none"
-                >
-                  Delete Account
-                </button>
-                <button
-                  onClick={() => handleBlock(user)}
-                  className={`px-4 py-1 rounded-md border cursor-pointer flex-1 sm:flex-none transition ${user.isBlocked
-                      ? 'bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200'
-                      : 'bg-green-100 text-green-800 border-green-300 hover:bg-green-200'
-                    }`}
-                >
-                  {user.isBlocked ? 'Suspended' : 'Active'}
-                </button>
-                <button
-                  onClick={() => {
-                    localStorage.setItem('participantId', user.id.toString())
-                    router.push('/Organizer/ManageParticipants/ParticipantProfile')
-                  }}
-                  className="border border-blue-600 text-blue-600 px-4 py-1 rounded-md cursor-pointer hover:bg-blue-50 transition flex-1 sm:flex-none"
-                >
-                  View Profile
-                </button>
-
-
-                <button
-                  onClick={() => router.push(`/Organizer/ManageParticipants/bookmark?userId=${user.id}`)}
-                  className="border border-gray-300 px-4 py-1 rounded-md cursor-pointer text-black hover:bg-gray-100 transition flex-1 sm:flex-none"
-                >
-                  View Bookmarks
-                </button>
-              </div>
+  {loading ? (
+    <p className="text-center text-gray-500">Loading participants...</p>
+  ) : participants.length === 0 ? (
+    <p className="text-center text-black">No participants found</p>
+  ) : filteredParticipants.length === 0 ? (
+    <p className="text-center text-black">No participants match your filter</p>
+  ) : (
+    filteredParticipants.map(user => (
+      <div key={user.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 rounded-md p-4 mb-4 shadow-sm gap-4 sm:gap-2">
+        <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
+          <img
+            src={user.file ? user.file : "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png"}
+            alt={user.name}
+            className="rounded-full object-cover w-10 h-10"
+          />
+          <div className="flex flex-col">
+            <div className="flex items-baseline space-x-2">
+              <h2 className="font-semibold text-gray-900">{user.name}</h2>
+              <h3 className="text-gray-600 text-sm">{user.organization}</h3>
             </div>
-          ))
-        )}
+            <p className="text-sm text-gray-500">{user.email}</p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+          <button
+            onClick={() => handleDelete(user)}
+            className="bg-red-800 text-white px-4 py-1 rounded-md hover:bg-red-900 transition cursor-pointer flex-1 sm:flex-none"
+          >
+            Delete Account
+          </button>
+          <button
+            onClick={() => handleBlock(user)}
+            className={`px-4 py-1 rounded-md border cursor-pointer flex-1 sm:flex-none transition ${user.isBlocked
+              ? 'bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200'
+              : 'bg-green-100 text-green-800 border-green-300 hover:bg-green-200'
+            }`}
+          >
+            {user.isBlocked ? 'Suspended' : 'Active'}
+          </button>
+          <button
+            onClick={() => {
+              localStorage.setItem('participantId', user.id.toString())
+              router.push('/Organizer/ManageParticipants/ParticipantProfile')
+            }}
+            className="border border-blue-600 text-blue-600 px-4 py-1 rounded-md cursor-pointer hover:bg-blue-50 transition flex-1 sm:flex-none"
+          >
+            View Profile
+          </button>
+          <button
+            onClick={() => router.push(`/Organizer/ManageParticipants/bookmark?userId=${user.id}`)}
+            className="border border-gray-300 px-4 py-1 rounded-md cursor-pointer text-black hover:bg-gray-100 transition flex-1 sm:flex-none"
+          >
+            View Bookmarks
+          </button>
+        </div>
       </div>
+    ))
+  )}
+</div>
+
     </div>
 
   )

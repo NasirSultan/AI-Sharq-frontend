@@ -4,7 +4,7 @@ import TodaysSchedule from "../../components/TodaysSchedule";
 import QuickAccess from "../../components/QuickAcess";
 import ToolsAndConnections from "../../components/ToolsAndConnections";
 import Image from "next/image";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight ,FaRegClock } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import api from "@/config/api";
@@ -224,123 +224,112 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-10">
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="w-12 h-12 border-4 border-gray-300 border-t-red-900 rounded-full animate-spin"></div>
-          </div>
-        ) : emptyMessage ? (
-          <div className="flex flex-col justify-center items-center h-64 space-y-4">
-            <p className="text-black text-lg font-medium">{emptyMessage}</p>
-            {showRedirectButton && (
-              <Link href="/participants/vanue">
-                <button className="px-4 py-2 border-2 border-red-900 text-red-900 bg-white rounded-full hover:bg-red-900 hover:text-white cursor-pointer">
-                  View Venue
-                </button>
-              </Link>
-            )}
-          </div>
-        ) : (
-          <>
-            {eventInfo && (
-              <div>
-                <div className="flex items-center">
-                  <div>
-                    <h2 className="text-2xl font-bold text-black">Venue: {eventInfo.title}</h2>
-                    <p className="text-gray-600 text-sm mt-1">{eventInfo.description}</p>
-                  </div>
-                </div>
-                <div className="border-b border-gray-300 mt-2"></div>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              {sortedBanners.map((banner, index) => {
-                const { bgColor, textColor } = banner;
-                return (
-                  <div
-                    key={index}
-                    className={`${bgColor} rounded-2xl shadow-md p-6 flex flex-col md:flex-row justify-between items-start md:items-center transition-all duration-200 hover:shadow-lg`}
-                  >
-                    <div className="space-y-2">
-                      <span
-                        className={`inline-flex px-4 py-1 rounded-full text-xs font-semibold items-center space-x-2 ${
-                          banner.type === "Live" ? "bg-red-800 text-white" : "bg-[#9E9E5C] text-white"
-                        }`}
-                      >
-                        {banner.type === "Live" && (
-                          <div className="relative flex items-center">
-                            <span className="absolute inline-flex h-4 w-4 bg-white rounded-full opacity-75 animate-ping"></span>
-                            <span className="relative inline-flex ml-1 h-2 w-2 bg-white rounded-full"></span>
-                          </div>
-                        )}
-                        <span>{banner.type}</span>
-                      </span>
-
-                      <h3 className={`text-xl font-bold ${textColor}`}>
-                        {banner.category} start at {banner.startTime && banner.endTime ? banner.startTime : ""}
-                      </h3>
-
-                      <p className={`text-sm ${textColor}`}>
-                        {banner.subtitle} - {motivationalLines[index % motivationalLines.length]}
-                      </p>
-                    </div>
-
-                    <Link href={`/participants/SessionDetail1/${banner.sessionId}`}>
-                      <button className="cursor-pointer transition">
-                        <FaArrowRight className={`text-xl ${index === 1 ? "text-red-900" : "text-white"}`} />
-                      </button>
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex justify-between items-center border-b border-gray-300 pb-2">
-              <h2 className="text-xl font-semibold text-black">Today's Schedule</h2>
-              <Link href="/participants/ViewAllSessions" className="text-red-900 text-sm font-medium hover:underline">
-                View All
-              </Link>
-            </div>
-
-            <div className="space-y-4">
-              {nextSessions.map((session: any, index) => (
-                <div
-                  key={index}
-                  className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 flex items-center justify-between hover:shadow-md transition w-full"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <p className="text-gray-500 text-xs font-semibold">Next</p>
-                      <p className="text-red-900 text-lg font-bold">{session.startTime}</p>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-black">{session.category}</p>
-                      <p className="text-sm text-gray-600">{session.location}</p>
-                    </div>
-                  </div>
-                  <Link href={`/participants/SessionDetail1/${session.sessionId}`}>
-                    <button className="text-red-900 hover:text-red-900">
-                      <FaArrowRight className="text-xl cursor-pointer" />
-                    </button>
-                  </Link>
-                </div>
-              ))}
-            </div>
-
-            <div>
-              <div className="bg-white rounded-2xl shadow-md border border-gray-200">
-                <h2 className="text-lg md:text-xl font-semibold mx-10 mt-4 text-[#282828]">Quick Access</h2>
-                <QuickAccess />
-              </div>
-
-              <ToolsAndConnections />
-            </div>
-          </>
+  <div className="max-w-6xl mx-auto px-4 py-8 space-y-10">
+    {loading ? (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-900 rounded-full animate-spin"></div>
+      </div>
+    ) : emptyMessage ? (
+      <div className="flex flex-col justify-center items-center h-64 space-y-4">
+        <p className="text-black text-lg font-medium">{emptyMessage}</p>
+        {showRedirectButton && (
+          <Link href="/participants/vanue">
+            <button className="px-4 py-2 border-2 border-red-900 text-red-900 bg-white rounded-full hover:bg-red-900 hover:text-white cursor-pointer">
+              View Venue
+            </button>
+          </Link>
         )}
       </div>
+    ) : (
+      <>
+        {eventInfo && (
+          <div>
+            <div className="flex items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-black">Venue: {eventInfo.title}</h2>
+                <p className="text-gray-600 text-sm mt-1">{eventInfo.description}</p>
+              </div>
+            </div>
+            <div className="border-b border-gray-300 mt-2"></div>
+          </div>
+        )}
 
-      <Image src="/images/line.png" alt="Line" width={1450} height={127} className="w-full h-auto mt-12" />
-    </main>
+        <div className="space-y-4">
+          {sortedBanners.map((banner, index) => {
+            const { bgColor, textColor } = banner
+            return (
+              <Link key={index} href={`/participants/SessionDetail1/${banner.sessionId}`}>
+                <div
+                  className={`${bgColor} rounded-2xl shadow-md p-6 my-2 flex flex-col md:flex-row justify-between items-start md:items-center transition-all duration-200 hover:shadow-lg cursor-pointer`}
+                >
+                  <div className="space-y-2">
+                    <span
+                      className={`inline-flex px-4 py-1 rounded-full text-xs font-semibold items-center space-x-2 ${
+                        banner.type === "Live" ? "bg-red-800 text-white" : "bg-[#9E9E5C] text-white"
+                      }`}
+                    >
+                      {banner.type === "Live" && (
+                        <div className="relative flex items-center">
+                          <span className="absolute inline-flex h-4 w-4 bg-white rounded-full opacity-75 animate-ping"></span>
+                          <span className="relative inline-flex ml-1 h-2 w-2 bg-white rounded-full"></span>
+                        </div>
+                      )}
+                      <span>{banner.type}</span>
+                    </span>
+
+                    <h3 className={`text-xl font-bold ${textColor}`}>
+                      {banner.category} start at {banner.startTime && banner.endTime ? banner.startTime : ""}
+                    </h3>
+
+                    <p className={`text-sm ${textColor}`}>
+                      {banner.subtitle} - {motivationalLines[index % motivationalLines.length]}
+                    </p>
+                  </div>
+
+                  <button className="cursor-pointer transition">
+                    <FaArrowRight className={`text-xl ${index === 1 ? "text-red-900" : "text-white"}`} />
+                  </button>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+
+        <div className="flex justify-between items-center border-b border-gray-300 pb-2">
+          <h2 className="text-xl font-semibold text-black">Today's Schedule</h2>
+          <Link href="/participants/RegisterSession" className="text-red-900 text-sm font-medium hover:underline">
+            View All  
+          </Link>
+        </div>
+
+ <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 flex flex-col gap-2">
+  <div className="flex items-center gap-4">
+    <FaRegClock className="text-red-900 text-2xl" />
+    <p className="text-Black text-sm font-semibold flex items-baseline gap-2">
+      Today Live Sessions 
+      <span className="text-red-900 text-lg font-bold">
+        {typeof window !== "undefined" ? localStorage.getItem("todayLiveSession") || 0 : 0}
+      </span>
+    </p>
+  </div>
+  <p className="text-gray-600 text-sm">
+ Here is a list of all sessions scheduled for today. Some sessions do not require registration to join.
+  </p>
+</div>
+        <div>
+          <div className="bg-white rounded-2xl shadow-md border border-gray-200">
+            <h2 className="text-lg md:text-xl font-semibold mx-10 mt-4 text-[#282828]">Quick Access</h2>
+            <QuickAccess />
+          </div>
+
+          <ToolsAndConnections />
+        </div>
+      </>
+    )}
+  </div>
+
+  <Image src="/images/line.png" alt="Line" width={1450} height={127} className="w-full h-auto mt-12" />
+</main>
+
   );
 }

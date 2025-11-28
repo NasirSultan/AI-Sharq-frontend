@@ -16,12 +16,12 @@ import {
 } from "react-icons/fa"
 
 const toolsSupport = [
-{
-  title: "Register for Session",
-  desc: "View and join sessions using your registration",
-  icon: <FaClipboardCheck className="text-xl text-gray-500" />,
-  Link: "/participants/RegisterSession",
-},
+  {
+    title: "Event Sessions",
+    desc: "View all sessions available for this event and check details",
+    icon: <FaClipboardCheck className="text-xl text-gray-500" />,
+    Link: "/participants/ViewAllSessions",
+  },
   {
     title: "FAQ & Support",
     desc: "Help & guidance",
@@ -42,6 +42,8 @@ export default function DashboardPage() {
   const [toast, setToast] = useState<Toast | null>(null)
   const [loadingParticipants, setLoadingParticipants] = useState(false)
   const [connectingId, setConnectingId] = useState<number | null>(null)
+  const [searchTerm, setSearchTerm] = useState("")
+const [showAll, setShowAll] = useState(false)
 
   useEffect(() => {
     if (!eventId || !userId) return
@@ -52,7 +54,7 @@ export default function DashboardPage() {
         `/participant-directory-opt-in-out/opted-in-in-event/${eventId}?userId=${userId}`
       )
       .then((res) => {
-            console.log(res.data)
+        console.log(res.data)
         const uniqueParticipants = Array.from(
           new Map(res.data.map((p: any) => [p.id, p])).values()
         )
@@ -66,6 +68,12 @@ export default function DashboardPage() {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
   }
+
+
+  const filteredParticipants = participants.filter((p) =>
+  p.name.toLowerCase().includes(searchTerm.toLowerCase())
+)
+const displayedParticipants = showAll ? filteredParticipants : filteredParticipants.slice(0, 3)
 
   const handleConnect = (participantId: number) => {
     if (connectingId) return
@@ -163,70 +171,78 @@ export default function DashboardPage() {
         </section>
 
         {/* Opted-in Participants */}
-        <section className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 md:p-8 w-full">
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-lg font-semibold text-[#1F2937]">
-              Opted-in Participants
-            </h2>
-          </div>
-
-          {loadingParticipants ? (
-            <div className="flex justify-center py-10">
-              <FaSpinner className="animate-spin text-[#9B2033] text-2xl" />
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {participants.length > 0 ? (
-                participants.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between bg-[#F9FAFB] border border-gray-200 rounded-xl px-5 py-4 hover:bg-white hover:border-[#9B2033] transition-all duration-200 shadow-sm hover:shadow-md"
-                  >
-                    <div className="flex items-center gap-4">
-                     {p.file ? (
-  <img
-    src={p.file.startsWith("http") ? p.file : `/files/${p.file}`}
-    alt={p.name}
-    className="w-12 h-12 rounded-full border border-gray-300 shadow-sm object-cover"
-  />
-) : (
-  <div className="w-12 h-12 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700 shadow-sm">
-    {p.name[0]?.toUpperCase()}
+       <section className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 md:p-8 w-full">
+  <div className="flex justify-between items-center mb-5">
+    <h2 className="text-lg font-semibold text-black">Opted-in Participants</h2>
+  <input
+  type="text"
+  placeholder="Search participants"
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+  className="border border-gray-300 rounded-full px-3 py-1 text-sm transition-all duration-300 hover:border-red-900"
+/>
   </div>
-)}
 
-                      <div>
-                        <p className="text-sm font-semibold text-[#111827]">
-                          {p.name}
-                        </p>
-                        <p className="text-xs text-gray-500">{p.role}</p>
-                      </div>
-                    </div>
+  {loadingParticipants ? (
+    <div className="flex justify-center py-10">
+      <FaSpinner className="animate-spin text-[#9B2033] text-2xl" />
+    </div>
+  ) : (
 
-                    <button
-                      onClick={() => handleConnect(p.id)}
-                      disabled={connectingId === p.id}
-                      className={`text-sm font-semibold ${
-                        connectingId === p.id
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-[#9B2033] hover:underline cursor-pointer"
-                      }`}
-                    >
-                      {connectingId === p.id ? (
-                        <FaSpinner className="animate-spin inline-block mr-2" />
-                      ) : null}
-                      {connectingId === p.id ? "Connecting..." : "Connect"}
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">
-                  No participants found yet
-                </p>
-              )}
-            </div>
-          )}
-        </section>
+<div className="flex flex-col gap-4">
+  {(showAll ? filteredParticipants : filteredParticipants.slice(0, 3)).map((p) => (
+    <div
+      key={p.id}
+      className="flex items-center justify-between bg-[#F9FAFB] border border-gray-200 rounded-xl px-5 py-4 hover:bg-white hover:border-[#9B2033] transition-all duration-200 shadow-sm hover:shadow-md"
+    >
+      <div className="flex items-center gap-4">
+        {p.file ? (
+          <img
+            src={p.file.startsWith("http") ? p.file : `/files/${p.file}`}
+            alt={p.name}
+            className="w-12 h-12 rounded-full border border-gray-300 shadow-sm object-cover"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700 shadow-sm">
+            {p.name[0]?.toUpperCase()}
+          </div>
+        )}
+
+        <div>
+          <p className="text-sm font-semibold text-[#111827]">{p.name}</p>
+          <p className="text-xs text-gray-500">{p.role}</p>
+        </div>
+      </div>
+
+      <button
+        onClick={() => handleConnect(p.id)}
+        disabled={connectingId === p.id}
+        className={`text-sm font-semibold ${
+          connectingId === p.id
+            ? "text-gray-400 cursor-not-allowed"
+            : "text-[#9B2033] hover:underline cursor-pointer"
+        }`}
+      >
+        {connectingId === p.id ? (
+          <FaSpinner className="animate-spin inline-block mr-2" />
+        ) : null}
+        {connectingId === p.id ? "Connecting..." : "Connect"}
+      </button>
+    </div>
+  ))}
+
+  {filteredParticipants.length > 3 && !showAll && (
+    <Link href="/participants/Directory">
+      <div className="text-sm text-[#9B2033] font-semibold text-center mt-2 hover:underline cursor-pointer">
+        Show All
+      </div>
+    </Link>
+  )}
+</div>
+
+  )}
+</section>
+
       </div>
     </div>
   )
