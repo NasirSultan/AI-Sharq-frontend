@@ -67,47 +67,61 @@ export default function QrScannerPage() {
     }
 
 const renderParticipantCard = () => {
-    if (!result) return null
-    const lines = result.split(/\r?\n/)
-    const data: any = {}
-    lines.forEach(line => {
-        if (line.startsWith("FN:")) data.name = line.replace("FN:", "")
-        else if (line.startsWith("EMAIL:")) data.email = line.replace("EMAIL:", "")
-        else if (line.startsWith("NOTE:")) {
-            const note = line.replace("NOTE:", "")
-            note.split("|").forEach(item => {
-                const [key, value] = item.split(":").map(s => s.trim())
-                if (key.toLowerCase() === "role") data.role = value
-                if (key.toLowerCase() === "bio") data.bio = value !== "null" ? value : "-"
-            })
-        }
-    })
-
-    return (
-        <div className="w-full max-w-lg bg-gray-50 shadow-lg rounded-lg p-4 flex items-center gap-4">
-            {data.photo ? (
-                <img src={data.photo} alt={data.name} className="w-20 h-20 rounded-full object-cover border-2 border-red-900" />
-            ) : (
-                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center border-2 border-red-900">
-                    <FaUser className="w-10 h-10 text-blue-500" />
-                </div>
-            )}
-            <div className="flex-1 flex flex-col gap-1 bg-gray-100 rounded-lg p-3">
-                <h2 className="text-lg font-bold text-gray-900">{data.name}</h2>
-                <p className="text-gray-700"><span className="font-semibold text-red-900">Email</span> {data.email}</p>
-                <p className="text-gray-700"><span className="font-semibold text-red-900">Role</span> {data.role}</p>
-                <p className="text-gray-700"><span className="font-semibold text-red-900">Bio</span> {data.bio}</p>
-            </div>
-        </div>
-    )
-}
-
+        if (!result) return null
+        const lines = result.split(/\r?\n/)
+        const data: any = {}
+        lines.forEach(line => {
+            if (line.startsWith("FN:")) data.name = line.replace("FN:", "")
+            else if (line.startsWith("EMAIL:")) data.email = line.replace("EMAIL:", "")
+            else if (line.startsWith("NOTE:")) {
+                const note = line.replace("NOTE:", "")
+                note.split("|").forEach(item => {
+                    const [key, value] = item.split(":").map(s => s.trim())
+                    if (key.toLowerCase() === "role") data.role = value
+                    if (key.toLowerCase() === "bio") data.bio = value !== "null" ? value : "-"
+                })
+            } else if (line.startsWith("PHOTO")) {
+                const parts = line.split(":")
+                if (parts.length > 1) data.photo = parts.slice(1).join(":").trim()
+            }
+        })
 
         return (
-    <div className="min-h-screen flex flex-col items-center justify-start p-6 bg-gray-50 w-full">
+            <div className="w-full max-w-lg bg-gray-50 shadow-lg rounded-lg p-3 sm:p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4">
+                    {data.photo ? (
+                        <img src={data.photo} alt={data.name} className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-red-900 flex-shrink-0" />
+                    ) : (
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gray-200 flex items-center justify-center border-2 border-red-900 flex-shrink-0">
+                            <FaUser className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-red-900" />
+                        </div>
+                    )}
+                    <div className="flex-1 flex flex-col gap-2 bg-gray-100 rounded-lg p-3 sm:p-4 w-full">
+                        <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 text-center sm:text-left">{data.name || "N/A"}</h2>
+                        <div className="space-y-1">
+                            <p className="text-xs sm:text-sm md:text-base text-gray-700 break-words">
+                                <span className="font-semibold text-red-900">Email: </span>
+                                {data.email || "N/A"}
+                            </p>
+                            <p className="text-xs sm:text-sm md:text-base text-gray-700">
+                                <span className="font-semibold text-red-900">Role: </span>
+                                {data.role || "N/A"}
+                            </p>
+                            <p className="text-xs sm:text-sm md:text-base text-gray-700 break-words">
+                                <span className="font-semibold text-red-900">Bio: </span>
+                                {data.bio || "-"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
-        <div className="w-full max-w-2xl mb-6">
-            <div className="w-full h-24 relative">
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-start p-6 bg-gray-50">
+
+            <div className="w-60 h-22 relative">
                 <Image
                     src="/images/logo1.png"
                     alt="Al Sharq Logo"
@@ -115,46 +129,42 @@ const renderParticipantCard = () => {
                     className="object-contain"
                 />
             </div>
-        </div>
 
-        <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center w-full max-w-2xl">QR Code Scanner</h1>
+            <h1 className="text-2xl font-bold mb-6">QR Code Scanner</h1>
 
-        <div className="flex flex-col sm:flex-row gap-3 mb-6 w-full max-w-2xl">
-            <button
-                onClick={startCameraScan}
-                className="flex-1 bg-red-900 hover:bg-red-800 text-white px-4 py-3 rounded-full cursor-pointer flex items-center justify-center gap-2"
-                disabled={scanning}
-            >
-                <Camera className="w-4 h-4" />
-                {scanning ? "Scanning..." : "Camera"}
-            </button>
-
-            <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="flex-1 border border-red-900 cursor-pointer px-4 py-3 rounded-full hover:bg-red-900 hover:text-white text-center"
-            />
-
-            {(scanning || result) && (
+            <div className="flex gap-3 mb-6 w-full max-w-md">
                 <button
-                    onClick={removeAllData}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-3 rounded-full cursor-pointer flex items-center justify-center"
+                    onClick={startCameraScan}
+                    className="flex-1 bg-red-900 hover:bg-red-800 text-white px-4 py-2 rounded-full cursor-pointer flex items-center justify-center gap-2"
+                    disabled={scanning}
                 >
-                    <X className="w-4 h-4" />
+                    <Camera className="w-4 h-4" />
+                    {scanning ? "Scanning..." : "Camera"}
                 </button>
-            )}
-        </div>
 
-        <div className="w-full max-w-2xl mb-6">
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="flex-1 border border-red-900 cursor-pointer p-2 rounded-full  hover:bg-red-900 hover:text-white"
+
+                />
+
+                {(scanning || result) && (
+                    <button
+                        onClick={removeAllData}
+                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-2 rounded-full cursor-pointer flex items-center"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                )}
+            </div>
+
             {renderParticipantCard()}
+
+            <div id="qr-reader" className="mb-6 w-full max-w-md"></div>
+            <div id="qr-reader-file"></div>
         </div>
-
-        <div id="qr-reader" className="w-full max-w-2xl mb-6"></div>
-        <div id="qr-reader-file" className="w-full max-w-2xl"></div>
-    </div>
-)
-
-
+    )
 }
