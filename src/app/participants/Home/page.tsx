@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import TodaysSchedule from "../../components/TodaysSchedule";
 import QuickAccess from "../../components/QuickAcess";
 import ToolsAndConnections from "../../components/ToolsAndConnections";
+import TotalLiveSession from "../../components/totaltodaysession";
 import Image from "next/image";
 import { FaArrowRight ,FaRegClock } from "react-icons/fa";
 import { useSelector } from "react-redux";
@@ -305,12 +306,10 @@ export default function Home() {
  <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 flex flex-col gap-2">
   <div className="flex items-center gap-4">
     <FaRegClock className="text-red-900 text-2xl" />
-    <p className="text-Black text-sm font-semibold flex items-baseline gap-2">
-      Today Live Sessions 
-      <span className="text-red-900 text-lg font-bold">
-        {typeof window !== "undefined" ? localStorage.getItem("todayLiveSession") || 0 : 0}
-      </span>
-    </p>
+  <p className="text-black text-sm font-semibold flex items-baseline gap-2">
+  Today Live Sessions <TotalLiveSession />
+</p>
+
   </div>
   <p className="text-gray-600 text-sm">
  Here is a list of all sessions scheduled for today. Some sessions do not require registration to join.

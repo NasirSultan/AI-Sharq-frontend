@@ -25,7 +25,7 @@ export default function SignIn() {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
+const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const dispatch = useDispatch()
 
@@ -86,6 +86,7 @@ export default function SignIn() {
         else if (user.role === 'organizer') router.push('/Organizer/Dashboard')
         else if (user.role === 'sponsor') router.push('/sponsors/ManageSessions')
         else if (user.role === 'exhibitor') router.push('/Exhibitors/ManageSessions')
+      else if (user.role === 'registrationteam') router.push('/registrationteam')
         else router.push('/authentication/SignIn')
       }
     } catch (err: any) {
@@ -120,7 +121,7 @@ export default function SignIn() {
             className="object-contain mb-4"
           />
           <h1 className="text-lg sm:text-xl font-medium text-gray-800 text-center leading-snug">
-            Sign In to <br />
+          Login to <br />
             <strong className="text-[#9B2033]">AL SHARQ CONFERENCE</strong>
           </h1>
         </div>
@@ -142,30 +143,37 @@ export default function SignIn() {
           </div>
 
           <div className="flex flex-col gap-1 w-full">
-            <label className="text-sm text-[#262626]">Password*</label>
-            <div className="flex items-center gap-2 w-full border border-[#DEDEDE] rounded-lg px-2 py-1.5">
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter Your Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="text-sm text-[#616161] border-none outline-none w-full"
-              />
+  <label className="text-sm text-[#262626]">Password*</label>
+  <div className="flex items-center gap-2 w-full border border-[#DEDEDE] rounded-lg px-2 py-1.5">
+    <input
+      type={showPassword ? 'text' : 'password'}
+      name="password"
+      placeholder="Enter Your Password"
+      value={formData.password}
+      onChange={handleChange}
+      className="text-sm text-[#616161] border-none outline-none w-full"
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="text-gray-500 w-5 h-5"
+    >
+      {showPassword ? <FaEyeSlash /> : <FaEyeSlash />}
+    </button>
+  </div>
+</div>
 
-            </div>
-          </div>
 
           <div className="flex items-center justify-between w-full mt-2">
             <label className="flex items-center gap-1 text-sm text-[#282828]">
-              Remember me
-              <input
+             <input
                 type="checkbox"
                 name="rememberMe"
                 checked={formData.rememberMe}
                 onChange={handleChange}
-                className="w-3 h-3 border border-[#282828] rounded cursor-pointer"
-              />
+                className="w-3 h-3 mb-1 border border-[#282828] rounded cursor-pointer"
+              />  Remember me
+             
             </label>
 
             <Link href="/authentication/ForgetPassword">
@@ -179,10 +187,10 @@ export default function SignIn() {
             <p className="text-red-600 text-sm text-center">{error}</p>
           )}
 
-          <LoadingButton text="Sign In" loading={loading} color="bg-[#9B2033]" />
+          <LoadingButton text="Login" loading={loading} color="bg-[#9B2033]" />
         </form>
 
-        <div className="flex flex-col items-center gap-3 w-full mt-3">
+        {/* <div className="flex flex-col items-center gap-3 w-full mt-3">
           <div className="flex items-center gap-2 w-full">
             <hr className="flex-1 border border-[#546056] opacity-20" />
             <span className="text-xs text-[#6C7278]">Or</span>
@@ -209,7 +217,7 @@ export default function SignIn() {
 
 
 
-        </div>
+        </div> */}
 
         <p className="text-sm text-center text-[#282828] mt-3">
           New to website?{' '}

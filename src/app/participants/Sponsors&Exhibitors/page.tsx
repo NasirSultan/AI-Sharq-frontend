@@ -89,6 +89,7 @@ const SponsorsExhibitorsPage: React.FC = () => {
   }
 
   return (
+    <>
     <div className="p-4 md:p-6 max-w-6xl mx-auto relative">
       {/* Header */}
       <div className="flex flex-col mb-6 gap-3">
@@ -239,11 +240,13 @@ const SponsorsExhibitorsPage: React.FC = () => {
         </div>
       )}
 
-      <div className="mt-6">
-        <Image src="/images/line.png" alt="Line" width={1360} height={127} className="w-full" />
-      </div>
+      
     </div>
-  )
+ <div className="mt-6">
+        <Image src="/images/line.png" alt="Line" width={1760} height={127} className="w-full" />
+      </div>
+</>
+)
 }
 
 export default SponsorsExhibitorsPage

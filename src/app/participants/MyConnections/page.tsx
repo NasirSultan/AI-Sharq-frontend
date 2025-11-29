@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { FaSearch, FaArrowLeft, FaArrowRight, FaComment } from 'react-icons/fa'
+import { FaSearch, FaArrowLeft, FaUser, FaArrowRight, FaComment } from 'react-icons/fa'
 import Link from 'next/link'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store/store'
@@ -13,6 +13,7 @@ interface User {
   id: number
   name: string
   email: string
+  file?: string
 }
 
 interface Connection {
@@ -93,7 +94,7 @@ const Networking: React.FC = () => {
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <Link href="/participants/Networking">
           <button className="border border-[#E8E8E8] rounded-xl px-6 py-2 text-black">
-            Directory
+     Requests
           </button>
         </Link>
         <Link href="/participants/MyConnections">
@@ -122,41 +123,41 @@ const Networking: React.FC = () => {
       <div className="flex flex-col gap-3">
         {filteredConnections.map((conn) => (
           <div
-  key={conn.connectionId}
-  className="flex flex-row items-center gap-3 bg-white p-3 rounded-xl shadow border border-[#D4D4D4] w-full"
->
-  {/* Profile Picture or Fallback Icon */}
-  <div className="w-10 h-10 relative flex-shrink-0">
+            key={conn.connectionId}
+            className="flex flex-row items-center gap-3 bg-white p-3 rounded-xl shadow border border-[#D4D4D4] w-full"
+          >
+            {/* Profile Picture or Fallback Icon */}
+           <div className="w-10 h-10 relative flex-shrink-0">
+  {conn.user.file ? (
     <img
-      src={conn.user.file || ""}
+      src={conn.user.file}
       alt={conn.user.name}
       onError={(e) => {
-        const target = e.currentTarget as HTMLImageElement;
-        target.onerror = null; // prevent infinite loop
-        target.src = ""; // remove broken image
-        target.style.display = "none"; // hide image
+        const target = e.currentTarget as HTMLImageElement
+        target.onerror = null
+        target.style.display = "none"
       }}
-      className="w-10 h-10 rounded-full object-cover"
+      className="w-8 h-8 rounded-full object-cover mx-auto my-auto"
     />
-    {/* Fallback Icon */}
-    {!conn.user.file && (
-      <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-2xl text-red-700 absolute top-0 left-0">
-        {conn.user.name?.charAt(0).toUpperCase() || "?"}
-      </div>
-    )}
-  </div>
-
-  {/* Name and Email */}
-  <div className="flex-1 flex flex-col justify-center gap-0.5">
-    <h3 className="text-base font-semibold text-[#282828]">{conn.user.name}</h3>
-    <span className="text-xs text-[#282828]">{conn.user.email}</span>
-  </div>
-
-  {/* Chat Icon */}
-  <div className="flex-shrink-0">
-    <img src="/images/chat.png" alt="Chat" width={28} height={28} />
-  </div>
+  ) : (
+    <div className="absolute top-1 left-1 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+      <FaUser className="w-4 h-4 text-blue-500" />
+    </div>
+  )}
 </div>
+
+
+            {/* Name and Email */}
+            <div className="flex-1 flex flex-col justify-center gap-0.5">
+              <h3 className="text-base font-semibold text-[#282828]">{conn.user.name}</h3>
+              <span className="text-xs text-[#282828]">{conn.user.email}</span>
+            </div>
+
+            {/* Chat Icon */}
+            <div className="flex-shrink-0">
+              <img src="/images/chat.png" alt="Chat" width={28} height={28} />
+            </div>
+          </div>
 
         ))}
       </div>

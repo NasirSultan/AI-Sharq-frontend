@@ -148,45 +148,36 @@ export default function MyAgendaPage() {
         <h1 className="text-2xl font-bold text-gray-900">My Agenda</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8">
-        <div className="lg:col-span-5">
-          <div className="flex items-center bg-white border border-gray-300 rounded-lg px-4 py-3 hover:border-red-700 transition shadow-sm">
-            <FaSearch className="text-red-900 mr-3 flex-shrink-0" />
-            <input
-              type="text"
-              placeholder="Search sessions..."
-              className="outline-none text-base w-full text-gray-900 placeholder-gray-500"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-            />
-          </div>
-        </div>
+<div className="w-full mb-8 flex items-center gap-2">
+  <div className="flex items-center bg-white border border-gray-300 rounded-md px-2 py-2 flex-grow">
+    <FaSearch className="text-red-900 mr-3" />
+    <input
+      type="text"
+      placeholder="Search sessions or participants"
+      className="outline-none text-base w-full text-gray-900 placeholder-gray-500"
+      value={searchText}
+      onChange={e => setSearchText(e.target.value)}
+    />
+  </div>
 
-        <div className="lg:col-span-5">
-          <div className="flex flex-wrap gap-2">
-            {filtersList.map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  activeFilter === filter
-                    ? "bg-[#86002B] text-white shadow-md"
-                    : "bg-white border border-gray-300 text-gray-700 hover:border-red-700 hover:text-red-800 shadow-sm cursor-pointer"
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
-        </div>
+  <div className="flex flex-wrap gap-2">
+    {filtersList.map(filter => (
+      <button
+        key={filter}
+        onClick={() => setActiveFilter(filter)}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+          activeFilter === filter
+            ? "bg-[#86002B] text-white shadow-md"
+            : "bg-white border border-gray-300 text-gray-700 hover:border-red-700 hover:text-red-800 shadow-sm"
+        }`}
+      >
+        {filter}
+      </button>
+    ))}
+  </div>
+</div>
 
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-center border border-gray-300 bg-white px-4 py-3 rounded-lg text-sm text-gray-700 hover:border-red-700 transition shadow-sm h-full">
-            <FaCalendarAlt className="mr-2 text-gray-500 flex-shrink-0" />
-            <span className="truncate">Jan 2024 - Dec 2024</span>
-          </div>
-        </div>
-      </div>
+
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
@@ -273,11 +264,10 @@ export default function MyAgendaPage() {
                 <button
                   onClick={() => handleViewDetails(session.sessionId)}
                   disabled={loadingSession === session.sessionId}
-                  className={`w-full py-2 text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm ${
-                    loadingSession === session.sessionId
+                  className={`w-full py-2 text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm ${loadingSession === session.sessionId
                       ? "bg-red-900 cursor-not-allowed text-white"
                       : "bg-[#9B2033] text-white hover:bg-red-900 cursor-pointer"
-                  }`}
+                    }`}
                 >
                   {loadingSession === session.sessionId ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>

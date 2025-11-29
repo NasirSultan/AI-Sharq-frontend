@@ -2,7 +2,7 @@
 
 import React from "react"
 import Image from "next/image"
-import { FaArrowLeft } from "react-icons/fa"
+import { FaArrowLeft ,FaUser } from "react-icons/fa"
 import { useParams, useRouter } from "next/navigation"
 import useSWR from "swr"
 import SpeakerSession from "../Speakersession/page"
@@ -21,7 +21,10 @@ const SpeakerDetails = () => {
     { revalidateOnFocus: false, dedupingInterval: 60000 } // cache for 1 minute
   )
 
-  if (isLoading) return <p className="text-center mt-20">Loading...</p>
+  if (isLoading) return   <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+      </div>
+
   if (error) return <p className="text-center mt-20 text-red-600">Failed to load speaker.</p>
   if (!speaker) return null
 
@@ -40,19 +43,22 @@ const SpeakerDetails = () => {
 
   {/* Speaker Info */}
   <div className="flex flex-col items-center gap-6 mt-5 w-full">
-    <div className="relative w-36 h-36 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100">
-      <img
-        src={
-          speaker.user.file
-            ? speaker.user.file.startsWith("http")
-              ? speaker.user.file
-              : `/files/${speaker.user.file}`
-            : "/images/default-avatar.png"
-        }
-        alt={speaker.user.name || "Speaker"}
-        className="w-full h-full object-cover"
-      />
-    </div>
+    <div className="relative w-36 h-36 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+  {speaker.user.file ? (
+    <img
+      src={
+        speaker.user.file.startsWith("http")
+          ? speaker.user.file
+          : `/files/${speaker.user.file}`
+      }
+      alt={speaker.user.name || "Speaker"}
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <FaUser className="w-16 h-16 text-blue-500" />
+  )}
+</div>
+
 
     <h2 className="text-2xl font-semibold text-gray-900 text-center">{speaker.user.name}</h2>
     <p className="text-sm text-gray-700 text-center">

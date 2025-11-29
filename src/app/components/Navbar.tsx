@@ -62,6 +62,7 @@ export default function Navbar() {
     else if (role === 'exhibitor') router.push('/Exhibitors/ManageSessions')
     else if (role === 'sponsor') router.push('/sponsors/ManageSessions')
     else if (role === 'organizer') router.push('/Organizer/Dashboard')
+    else if (role === 'registrationteam') router.push('/registrationteam')
     else router.push('/')
   }
 
@@ -160,6 +161,7 @@ const handleNotificationsClick = () => {
               else if (role === 'exhibitor') router.push('/Exhibitors/viewprofle')
               else if (role === 'sponsor') router.push('/sponsors/viewprofile')
               else if (role === 'organizer') router.push('/participants/view')
+             else if (role === 'registrationteam') router.push('/participants/view')
               else router.push('/')
             }}
           >

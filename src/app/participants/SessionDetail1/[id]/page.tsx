@@ -148,26 +148,27 @@ export default function SessionPage({ params }: PageProps) {
 
 
 
-const handleJoinSession = () => {
-  if (joining) return
+  const handleJoinSession = () => {
+    if (joining) return
 
-  const now = new Date()
-  const start = new Date(session.startTime)
-  const end = new Date(session.endTime)
-  const isLive = now >= start && now <= end
+    const now = new Date()
+    const start = new Date(session.startTime)
+    const end = new Date(session.endTime)
+    const isLive = now >= start && now <= end
 
-  if (!isLive) return
+    if (!isLive) return
 
-  if (session.registrationRequired) {
-    if (userRole === "participant" && !isRegistered) return
+    if (session.registrationRequired) {
+      if (userRole === "participant" && !isRegistered) return
+    }
+
+    setJoining(true)
+    localStorage.setItem("sessionName", session.title)
+    setTimeout(() => {
+      sessionStorage.setItem("previousPage", window.location.pathname)
+      router.push(`/agora/joinsession`)
+    }, 1000)
   }
-
-  setJoining(true)
-  localStorage.setItem("sessionName", session.title)
-  setTimeout(() => {
-    router.push(`/agora/joinsession`)
-  }, 1000)
-}
 
 
   if (loading)
@@ -186,6 +187,7 @@ const handleJoinSession = () => {
   const canJoin = isSessionLive && (!session.registrationRequired || isRegistered)
 
   return (
+    <>
     <div className="p-6 max-w-6xl mx-auto space-y-8 relative">
       {showPopup && (
         <div className="fixed top-5 right-5 bg-green-600 text-white px-4 py-2 rounded-xl shadow-md z-50">
@@ -228,25 +230,28 @@ const handleJoinSession = () => {
           <span className="bg-purple-100 text-purple-700 px-2 mt-3 py-1 rounded-xl">
             {session.category}
           </span>
-          <div className="text-right text-red-700">
+          <div className="text-right text-red-900">
             <div>
               {new Date(session.startTime).toLocaleTimeString([], {
                 hour: "2-digit",
-                minute: "2-digit",
-              })}{" "}
-              -{" "}
+                minute: "2-digit"
+              })}
+              -
               {new Date(session.endTime).toLocaleTimeString([], {
                 hour: "2-digit",
-                minute: "2-digit",
+                minute: "2-digit"
               })}
             </div>
+
             <div className="text-gray-500">
               {new Date(session.startTime).toLocaleDateString(undefined, {
+                day: "2-digit",
                 month: "long",
-                year: "numeric",
+                year: "numeric"
               })}
             </div>
           </div>
+
         </div>
 
         <h2 className="text-lg font-bold text-black">{session.title}</h2>
@@ -309,56 +314,56 @@ const handleJoinSession = () => {
 
 
 
-{session.location?.toLowerCase() === "online" && (
-  <div
-    onClick={() => {
-      if (userRole === "participant" && !canJoin) return
-      handleJoinSession()
-    }}
-    className={`flex items-center gap-3 p-4 rounded-2xl shadow transition ${joining
-      ? "bg-[#ffdada]"
-      : isSessionLive
-        ? "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
-        : "bg-gray-100 cursor-not-allowed"
-      } ${userRole === "participant" && !canJoin ? "opacity-60" : ""}`}
-  >
-    <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center relative overflow-hidden">
-      {isSessionLive && (
-        <>
-          <span className="absolute w-12 h-12 rounded-full border-2 border-[#9B2033]/40 animate-wave"></span>
-          <span className="absolute w-12 h-12 rounded-full border border-[#9B2033]/30 animate-wave-delayed"></span>
-        </>
+      {session.location?.toLowerCase() === "online" && (
+        <div
+          onClick={() => {
+            if (userRole === "participant" && !canJoin) return
+            handleJoinSession()
+          }}
+          className={`flex items-center gap-3 p-4 rounded-2xl shadow transition ${joining
+            ? "bg-[#ffdada]"
+            : isSessionLive
+              ? "bg-[#FFEEEE] hover:bg-[#ffdada] cursor-pointer"
+              : "bg-gray-100 cursor-not-allowed"
+            } ${userRole === "participant" && !canJoin ? "opacity-60" : ""}`}
+        >
+          <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center relative overflow-hidden">
+            {isSessionLive && (
+              <>
+                <span className="absolute w-12 h-12 rounded-full border-2 border-[#9B2033]/40 animate-wave"></span>
+                <span className="absolute w-12 h-12 rounded-full border border-[#9B2033]/30 animate-wave-delayed"></span>
+              </>
+            )}
+            <FaVideo
+              className={`text-[#9B2033] text-xl relative z-10 ${isSessionLive ? "animate-pulse-smooth" : "opacity-50"}`}
+            />
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold text-[#9B2033]">
+              {joining
+                ? "Joining..."
+                : isSessionLive
+                  ? userRole === "participant" && !isRegistered
+                    ? "Registration Required"
+                    : "Join Live Session"
+                  : "Session Not Live"}
+            </h2>
+
+            <p className="text-xs text-[#9B2033]">
+              {joining
+                ? "Please wait while we connect you to the session."
+                : isSessionLive
+                  ? userRole === "participant" && !isRegistered
+                    ? "You need to register to attend this session."
+                    : "The session is live now. Click to join."
+                  : "The session is not live right now."}
+            </p>
+          </div>
+
+          {!joining && <FaArrowRight className="text-[#9B2033] text-2xl ml-auto" />}
+        </div>
       )}
-      <FaVideo
-        className={`text-[#9B2033] text-xl relative z-10 ${isSessionLive ? "animate-pulse-smooth" : "opacity-50"}`}
-      />
-    </div>
-
-    <div>
-      <h2 className="text-lg font-semibold text-[#9B2033]">
-        {joining
-          ? "Joining..."
-          : isSessionLive
-            ? userRole === "participant" && !isRegistered
-              ? "Registration Required"
-              : "Join Live Session"
-            : "Session Not Live"}
-      </h2>
-
-      <p className="text-xs text-[#9B2033]">
-        {joining
-          ? "Please wait while we connect you to the session."
-          : isSessionLive
-            ? userRole === "participant" && !isRegistered
-              ? "You need to register to attend this session."
-              : "The session is live now. Click to join."
-            : "The session is not live right now."}
-      </p>
-    </div>
-
-    {!joining && <FaArrowRight className="text-[#9B2033] text-2xl ml-auto" />}
-  </div>
-)}
 
 
 
@@ -483,10 +488,11 @@ const handleJoinSession = () => {
               {session.registeredUsers?.slice(0, 5).map((user: any, idx: number) => (
                 <img
                   key={idx}
-                  src={user.photo ? `/uploads/${user.photo}` : "/images/img (13).png"}
+                  src={user.file ? user.file : "/images/img (13).png"}
                   alt={user.name}
                   className="w-10 h-10 rounded-full border-2 border-white object-cover"
                 />
+
               ))}
             </div>
             <span className="text-xs text-gray-600">
@@ -496,13 +502,16 @@ const handleJoinSession = () => {
         </div>
       </section>
 
-      <Image
+
+    </div>
+ 
+ <Image
         src="/images/line.png"
         alt="Line"
         width={1729}
         height={127}
         className="w-full mt-6"
       />
-    </div>
-  )
+    </>
+)
 }

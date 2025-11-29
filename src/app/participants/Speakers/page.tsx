@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 import React, { useEffect, useState, useMemo } from "react"
-import { FaArrowLeft, FaFilter, FaSearch } from "react-icons/fa"
+import { FaArrowLeft,FaUser, FaFilter, FaSearch } from "react-icons/fa"
 import Image from "next/image"
 import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "@/lib/store/store"
@@ -142,58 +142,52 @@ export default function SpeakersPage() {
                   onClick={() => dispatch(setSpeakerId(speaker.id))}
                   className="block"
                 >
-                  <div className="bg-white border border-gray-300 rounded-xl p-4 shadow-sm hover:shadow-md transition">
-                    <div className="flex gap-4 flex-wrap">
-                      {speaker.user.file ? (
-                        <img
-                          src={speaker.user.file}
-                          alt={speaker.user.name}
-                          className="w-16 h-16 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-medium">
-                          No Image
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-[150px]">
-                        <div className="flex items-center gap-2 mb-2 flex-wrap">
-                          <h2 className="text-lg font-semibold text-gray-900">
-                            {speaker.user.name}
-                          </h2>
+                 <div className="bg-white border border-gray-300 rounded-xl p-4 shadow-sm hover:shadow-md transition">
+  <div className="flex gap-4 flex-wrap">
+    {speaker.user.file ? (
+      <img
+        src={speaker.user.file}
+        alt={speaker.user.name}
+        className="w-16 h-16 rounded-full object-cover"
+      />
+    ) : (
+      <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
+        <FaUser className="w-6 h-6 text-blue-500" />
+      </div>
+    )}
+    <div className="flex-1 min-w-[150px]">
+      <div className="flex items-center gap-2 mb-2 flex-wrap">
+        <h2 className="text-lg font-semibold text-gray-900">{speaker.user.name}</h2>
 
-                          {speaker.designations.map((d: string, i: number) => (
-                            <div key={i} className="flex items-center gap-1">
-                              <div className="w-1 h-1 bg-red-700 rounded-full" />
-                              <p className="text-sm text-gray-900">{d}</p>
-                            </div>
-                          ))}
+        {speaker.designations.map((d, i) => (
+          <div key={i} className="flex items-center gap-1">
+            <div className="w-1 h-1 bg-red-700 rounded-full" />
+            <p className="text-sm text-gray-900">{d}</p>
+          </div>
+        ))}
 
-                          <div className="ml-auto flex gap-1 flex-wrap">
-                            {speaker.tags[0] && (
-                              <span
-                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                  tagColors[speaker.tags[0]] ??
-                                  "bg-gray-200 text-gray-800"
-                                }`}
-                              >
-                                {speaker.tags[0]}
-                              </span>
-                            )}
-                          </div>
+        <div className="ml-auto flex gap-1 flex-wrap">
+          {speaker.tags[0] && (
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                tagColors[speaker.tags[0]] ?? "bg-gray-200 text-gray-800"
+              }`}
+            >
+              {speaker.tags[0]}
+            </span>
+          )}
+        </div>
 
-                          <div className="bg-red-200 p-1 rounded-full">
-                            <p className="text-xs text-red-700">
-                              {speaker.sessionCount} Sessions
-                            </p>
-                          </div>
-                        </div>
+        <div className="bg-red-200 p-1 rounded-full">
+          <p className="text-xs text-red-700">{speaker.sessionCount} Sessions</p>
+        </div>
+      </div>
 
-                        <p className="text-xs text-gray-600 leading-relaxed">
-                          {speaker.bio}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+      <p className="text-xs text-gray-600 leading-relaxed">{speaker.bio}</p>
+    </div>
+  </div>
+</div>
+
                 </Link>
               ))}
             </div>

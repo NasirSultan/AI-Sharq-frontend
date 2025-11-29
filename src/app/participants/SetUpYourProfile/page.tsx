@@ -99,8 +99,9 @@ export default function ProfileSetup() {
       })
 
       if (role === 'speaker') router.push('/speakers/SetUpYourProfile')
-      else if (role === 'organizer') router.push('/Organizer/Dashboard')
+      else if (role === 'registrationteam') router.push('/registrationteam')
       else router.push('/participants/Home')
+
     } catch (err) {
       console.error('Error updating profile', err)
     } finally {
@@ -115,13 +116,11 @@ export default function ProfileSetup() {
   }
 
   const inputClass = (hasError: boolean) =>
-    `w-full h-12 px-4 border rounded-lg text-sm text-gray-800 ${
-      hasError ? 'border-red-600 bg-red-50' : 'border-gray-300 bg-white'
+    `w-full h-12 px-4 border rounded-lg text-sm text-gray-800 ${hasError ? 'border-red-600 bg-red-50' : 'border-gray-300 bg-white'
     }`
 
   const textareaClass = (hasError: boolean) =>
-    `w-full h-24 px-4 py-2 border rounded-lg text-sm text-gray-800 resize-none ${
-      hasError ? 'border-red-600 bg-red-50' : 'border-gray-300 bg-white'
+    `w-full h-24 px-4 py-2 border rounded-lg text-sm text-gray-800 resize-none ${hasError ? 'border-red-600 bg-red-50' : 'border-gray-300 bg-white'
     }`
 
   return (
@@ -192,9 +191,8 @@ export default function ProfileSetup() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className={`w-full h-12 text-white text-sm font-semibold rounded-lg transition ${
-              loading ? 'bg-red-900 cursor-not-allowed' : 'bg-[#9B2033] hover:bg-[#7c1a2a]'
-            }`}
+            className={`w-full h-12 text-white text-sm font-semibold rounded-lg transition ${loading ? 'bg-red-900 cursor-not-allowed' : 'bg-[#9B2033] hover:bg-[#7c1a2a]'
+              }`}
           >
             {loading ? 'Saving...' : 'Save & Continue'}
           </button>

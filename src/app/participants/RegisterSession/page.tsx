@@ -134,14 +134,17 @@ export default function ConferenceSchedulePage() {
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <p className="text-lg">Loading sessions...</p>
+        <div className="flex justify-center items-center h-64">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+      </div>
+
         </div>
       ) : filteredSessions.length === 0 ? (
         <div className="flex justify-center items-center h-64">
           <p className="text-lg">No sessions found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3">
           {filteredSessions.map((session, index) => {
             const status = getSessionStatus(session.sessionId)
             return (
@@ -149,20 +152,20 @@ export default function ConferenceSchedulePage() {
                 key={`${session.sessionId}-${index}`}
                 className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col justify-between h-[460px]"
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between ">
                   <h2 className="text-sm font-semibold text-black">{session.title}</h2>
                 </div>
 
-                <p className="text-xs text-gray-500 mb-3">
+                <p className="text-xs text-gray-500">
                   {session.description || "No description"}
                 </p>
-                <div className="border border-b-gray-300 mb-3"></div>
+                <div className="border border-b-gray-300 "></div>
 
                 {session.speakers && session.speakers.length > 0 ? (
                   session.speakers.map((sp: any, idx: number) => (
                     <div
                       key={`${sp.speakerId}-${idx}`}
-                      className="flex items-center text-xs text-gray-600 mb-1 space-x-2"
+                      className="flex items-center text-xs text-gray-600"
                     >
                       {sp.user.file ? (
                         <img
@@ -179,7 +182,7 @@ export default function ConferenceSchedulePage() {
                     </div>
                   ))
                 ) : (
-                  <div className="flex items-center text-xs text-gray-600 mb-1 space-x-2">
+                  <div className="flex items-center text-xs text-gray-600 ">
                     <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
                       <FaUser className="w-4 h-4 text-blue-500" />
                     </div>
@@ -187,7 +190,7 @@ export default function ConferenceSchedulePage() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between mt-3 mb-2">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center text-xs text-gray-600">
                     <FaCalendarAlt className="text-blue-700" />
                     <span className="ml-1">
@@ -196,20 +199,20 @@ export default function ConferenceSchedulePage() {
                       {new Date(session.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
-                  <span className="px-2 py-1 rounded-xl text-xs font-semibold bg-blue-100 text-blue-700">
+                  <span className="rounded-xl text-xs font-semibold bg-blue-100 text-blue-700">
                     {session.category}
                   </span>
                 </div>
 
-                <div className="text-xs text-gray-900 mb-1 flex justify-between">
+                <div className="text-xs text-gray-900  flex justify-between">
                   <span>Duration:</span>
                   <span>
                     {Math.round((new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / 60000)} minutes
                   </span>
                 </div>
 
-                <div className="text-xs text-gray-900 mb-3 flex justify-between">
-                  <span>Room:</span>
+                <div className="text-xs text-gray-900 flex justify-between">
+                  <span>Room</span>
                   <span>{session.location || "Not specified"}</span>
                 </div>
 

@@ -108,24 +108,37 @@ export default function ProfileCard({
 
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col">
-          <p className="text-sm text-gray-500">Full Name</p>
-          <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm">
+          <p className="text-sm text-red-900 m-1">Full Name*</p>
+          <p className="px-1 py-2  rounded-lg bg-gray-50 text-black text-sm">
             {user.name}
           </p>
         </div>
 
         <div className="flex flex-col">
-          <p className="text-sm text-gray-500">Organization</p>
-          <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm">
+          <p className="text-sm text-red-900 m-1">Organization*</p>
+          <p className="px-1 py-2  rounded-lg bg-gray-50 text-black text-sm">
             {user.organization || 'No organization exists yet'}
           </p>
         </div>
 
         <div className="flex flex-col sm:col-span-2">
-          <p className="text-sm text-gray-500">Email</p>
-          <p className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-black text-sm break-all">
+          <p className="text-sm  text-red-900 m-1">Email*</p>
+          <p className="px-1 py-2 rounded-lg bg-gray-50 text-black text-sm break-all">
             {user.email}
           </p>
+       
+       <div className="flex flex-col sm:col-span-2">
+          <p className="text-sm  text-red-900 m-1">Bio*</p>
+          <p className="px-1 py-2  rounded-lg bg-gray-50 text-black text-sm break-all">
+            {user.Bio || 'No bio exists yet'}
+          </p>
+        </div>
+       <div className="flex flex-col sm:col-span-2">
+          <p className="text-sm  text-red-900 m-1">phone*</p>
+          <p className="px-1 py-2 rounded-lg bg-gray-50 text-black text-sm break-all">
+            {user.phone || 'No phone exists yet'}
+          </p>
+        </div>
         </div>
       </div>
     </div>

@@ -7,7 +7,6 @@ import { FaShop } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
 import useSWR from 'swr'
 import api from '@/config/api'
-import RelatedSessionsGrid from "@/app/components/relatedsession"
 
 interface Booth {
   id: number
@@ -256,10 +255,7 @@ const ExhibitorDetailsScreen: React.FC<PageProps> = ({ params }) => {
         {mounted && firstBooth && <DynamicMapCard booth={firstBooth}/>}
 
         {/* Sessions */}
-        <div className="mb-8 sm:mb-10">
-          <RelatedSessionsGrid />
-        </div>
-
+  
         {/* Social Media */}
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-8">
           {exhibitor.socialMedia.map(sm => {

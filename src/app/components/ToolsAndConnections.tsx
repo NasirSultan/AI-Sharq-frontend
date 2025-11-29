@@ -54,7 +54,7 @@ const [showAll, setShowAll] = useState(false)
         `/participant-directory-opt-in-out/opted-in-in-event/${eventId}?userId=${userId}`
       )
       .then((res) => {
-        console.log(res.data)
+ 
         const uniqueParticipants = Array.from(
           new Map(res.data.map((p: any) => [p.id, p])).values()
         )

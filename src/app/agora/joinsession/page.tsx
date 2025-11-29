@@ -72,8 +72,10 @@ const AgoraTokenCard = () => {
   }
 
 const handleSkip = () => {
-  router.back()
+  const previousPage = sessionStorage.getItem("previousPage") || "/defaultPage"
+  router.push(previousPage)
 }
+
 
   const handleRefresh = () => {
     window.location.reload()
@@ -134,7 +136,7 @@ const handleSkip = () => {
           {error && <p className="text-red-900">Error: {error}</p>}
           {showSuccessPopup && (
             <p className="text-green-600 font-semibold">
-              Token created successfully! Redirecting...
+              successfully! Redirecting...
             </p>
           )}
         </div>

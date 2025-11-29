@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import ImageComponent from '../../components/Images'
-import { FaUser, FaEnvelope, FaEyeSlash, FaGoogle, FaFacebookF, FaApple } from 'react-icons/fa'
+import { FaUser, FaEnvelope,FaEye, FaEyeSlash, FaGoogle, FaFacebookF, FaApple } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
 import { setUserId } from '@/lib/store/features/user/userSlice'
@@ -24,7 +24,8 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [userIdInput, setUserIdInput] = useState('')
-
+const [showPassword, setShowPassword] = useState(false)
+const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   // handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -65,7 +66,7 @@ export default function SignUp() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center px-3 pt-6 pb-16 relative bg-gray-50 gap-4">
       {/* Left Image for large screens */}
-      <div className="hidden lg:flex lg:flex-shrink-0 lg:mr-4">
+    <div className="hidden lg:flex lg:flex-shrink-0">
         <ImageComponent />
       </div>
 
@@ -134,60 +135,71 @@ export default function SignUp() {
             />
           </div>
 
-          {/* Password */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-700">Password*</label>
-            <div className="relative">
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter Your Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
-                required
-              />
-              <FaEyeSlash className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-            </div>
-          </div>
+<div className="flex flex-col gap-1">
+  <label className="text-xs text-gray-700">Password*</label>
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      placeholder="Enter Your Password"
+      value={formData.password}
+      onChange={handleChange}
+      className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
+      required
+    />
+    <div className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 w-4 h-4">
+      {showPassword ? (
+        <FaEye onClick={() => setShowPassword(false)} />
+      ) : (
+        <FaEyeSlash onClick={() => setShowPassword(true)} />
+      )}
+    </div>
+  </div>
+</div>
 
-          {/* Confirm Password */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-700">Confirm Password*</label>
-            <div className="relative">
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Your Password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
-                required
-              />
-              <FaEyeSlash className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-            </div>
-          </div>
+<div className="flex flex-col gap-1">
+  <label className="text-xs text-gray-700">Confirm Password*</label>
+  <div className="relative">
+    <input
+      type={showConfirmPassword ? "text" : "password"}
+      name="confirmPassword"
+      placeholder="Confirm Your Password"
+      value={formData.confirmPassword}
+      onChange={handleChange}
+      className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
+      required
+    />
+    <div className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 w-4 h-4">
+      {showConfirmPassword ? (
+        <FaEye onClick={() => setShowConfirmPassword(false)} />
+      ) : (
+        <FaEyeSlash onClick={() => setShowConfirmPassword(true)} />
+      )}
+    </div>
+  </div>
+</div>
+
 
           {error && <p className="text-red-600 text-xs text-center">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full h-9 text-white text-sm font-medium rounded-md transition ${loading
+            className={`w-full h-9 text-white cursor-pointer text-sm font-medium rounded-md transition ${loading
                 ? 'bg-red-900 cursor-not-allowed'
-                : 'bg-red-800 hover:bg-red-900'
+                : 'bg-red-900 hover:bg-red-900'
               }`}
           >
             {loading ? 'Creating...' : 'Create Account'}
           </button>
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <hr className="flex-1 border-gray-300 opacity-20" />
             <span className="text-xs text-gray-500">Or</span>
             <hr className="flex-1 border-gray-300 opacity-20" />
-          </div>
+          </div> */}
 
-           <div className="flex flex-col sm:flex-row gap-1 w-full mt-2">
+           {/* <div className="flex flex-col sm:flex-row gap-1 w-full mt-2">
             <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
               <FaGoogle className="w-4 h-4 text-red-500" />
               Google
@@ -202,13 +214,13 @@ export default function SignUp() {
               <FaApple className="w-4 h-4 text-black" />
               Apple
             </button>
-          </div>
+          </div> */}
 
 
           <p className="text-xs text-gray-800 text-center mt-1">
             Already have an account?{' '}
-            <a className="text-blue-600 hover:underline" href="/authentication/SignIn">
-              Sign In
+            <a className="text-blue-600 cursor-pointer hover:underline" href="/authentication/SignIn">
+          Login
             </a>
           </p>
         </form>

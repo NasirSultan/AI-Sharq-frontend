@@ -1,0 +1,227 @@
+"use client"
+
+import React, { useState, useEffect } from "react"
+import api from "@/config/api"
+import QrCard from "./QrCard"
+import Link from "next/link"
+import { FaRegListAlt, FaBookmark, FaPlay } from "react-icons/fa"
+import { useRouter } from "next/navigation"
+import { FaQrcode } from "react-icons/fa"
+type User = {
+  id: number
+  name: string
+  email: string
+  bio: string
+  file?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export default function Page() {
+  const [users, setUsers] = useState<User[]>([])
+  const [selected, setSelected] = useState<User | null>(null)
+  const [search, setSearch] = useState("")
+  const [activeFilter, setActiveFilter] = useState("All Time")
+  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState({
+    totalParticipants: 0,
+    totalBookmarks: 0,
+    totalSessionRegistrations: 0
+  })
+  const router = useRouter()
+  const filters = ["Daily", "Weekly", "10 Days", "90 Days", "All Time"]
+
+  useEffect(() => {
+    const cached = sessionStorage.getItem("participantsData")
+    if (cached) {
+      const parsed = JSON.parse(cached)
+      const now = new Date().getTime()
+      if (now - parsed.timestamp < 10 * 60 * 1000) {
+        setUsers(parsed.users)
+        setStats(parsed.stats)
+        setLoading(false)
+        return
+      }
+    }
+    fetchUsers()
+  }, [])
+
+  const fetchUsers = async () => {
+    setLoading(true)
+    try {
+      const res = await api.get("/admin/users/participants")
+      setUsers(res.data.users || [])
+      const newStats = {
+        totalParticipants: res.data.totalParticipants || 0,
+        totalBookmarks: res.data.totalBookmarks || 0,
+        totalSessionRegistrations: res.data.totalSessionRegistrations || 0
+      }
+      setStats(newStats)
+      sessionStorage.setItem(
+        "participantsData",
+        JSON.stringify({ users: res.data.users, stats: newStats, timestamp: new Date().getTime() })
+      )
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const openQr = (user: User) => setSelected(user)
+  const closeQr = () => setSelected(null)
+
+  const statsItems = [
+    { label: "Total Participants", value: stats.totalParticipants, icon: <FaRegListAlt className="text-blue-600" />, iconBg: "bg-blue-100" },
+    { label: "Total Sessions Bookmark", value: stats.totalBookmarks, icon: <FaBookmark className="text-yellow-600" />, iconBg: "bg-yellow-100" },
+    { label: "Sessions Registration", value: stats.totalSessionRegistrations, icon: <FaPlay className="text-green-600" />, iconBg: "bg-green-100" }
+  ]
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(search.toLowerCase()) || user.email.toLowerCase().includes(search.toLowerCase())
+    const now = new Date()
+    const createdDate = new Date(user.createdAt)
+    const updatedDate = new Date(user.updatedAt)
+    const matchesFilter = (() => {
+      if (activeFilter === "Daily") {
+        const start = new Date(now)
+        start.setHours(0, 0, 0, 0)
+        const end = new Date(now)
+        end.setHours(23, 59, 59, 999)
+        return (createdDate >= start && createdDate <= end) || (updatedDate >= start && updatedDate <= end)
+      }
+      if (activeFilter === "Weekly") {
+        const weekAgo = new Date()
+        weekAgo.setDate(now.getDate() - 7)
+        return (createdDate >= weekAgo && createdDate <= now) || (updatedDate >= weekAgo && updatedDate <= now)
+      }
+      if (activeFilter === "10 Days") {
+        const tenAgo = new Date()
+        tenAgo.setDate(now.getDate() - 10)
+        return (createdDate >= tenAgo && createdDate <= now) || (updatedDate >= tenAgo && updatedDate <= now)
+      }
+      if (activeFilter === "90 Days") {
+        const ninetyAgo = new Date()
+        ninetyAgo.setDate(now.getDate() - 90)
+        return (createdDate >= ninetyAgo && createdDate <= now) || (updatedDate >= ninetyAgo && updatedDate <= now)
+      }
+      return true
+    })()
+    return matchesSearch && matchesFilter
+  })
+
+  return (
+   <div className="min-h-screen bg-[#FAFAFA] p-6 max-w-6xl mx-auto space-y-6">
+  <div className="flex items-center justify-between">
+    <h1 className="text-xl font-bold text-gray-900">Participants list</h1>
+    <Link
+      href="/Organizer/QrScanner"
+     className="flex items-center gap-2 bg-white border border-red-900 text-red-900 px-4 py-2 rounded-full hover:bg-red-900 hover:text-white"
+
+    >
+      <FaQrcode size={20} />
+      Scan QR
+    </Link>
+  </div>
+
+  <div className="flex flex-col sm:flex-row gap-4 items-center">
+    <div className="bg-white border border-gray-300 rounded-md px-3 py-2 flex items-center flex-1">
+      <input
+        type="text"
+        placeholder="Search participants"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="outline-none text-sm w-full text-black"
+      />
+    </div>
+    <div className="flex gap-2 flex-wrap">
+      {filters.map(filter => (
+        <button
+          key={filter}
+          onClick={() => setActiveFilter(filter)}
+          className={`px-5 py-2 rounded-full text-sm font-medium ${
+            activeFilter === filter
+              ? "bg-[#86002B] text-white"
+              : "bg-white border border-gray-300 text-gray-800"
+          }`}
+        >
+          {filter}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {loading ? (
+    <div className="flex justify-center items-center h-64">
+      <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+    </div>
+  ) : (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {statsItems.map((item, idx) => (
+          <div
+            key={idx}
+            className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition"
+          >
+            <div
+              className={`w-10 h-10 rounded-md ${item.iconBg} flex items-center justify-center mr-3 sm:mr-4`}
+            >
+              {item.icon}
+            </div>
+            <div className="flex-1">
+              <p className="text-lg sm:text-[22px] font-bold text-black leading-none">{item.value}</p>
+              <p className="text-sm text-gray-600">{item.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-4 mt-6">
+        {filteredUsers.map(user => (
+          <div
+            key={user.id}
+            className="flex items-center justify-between bg-white p-4 rounded-md shadow-sm"
+          >
+            <div className="flex items-center space-x-3">
+              <img
+                src={
+                  user.file ||
+                  "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png"
+                }
+                alt={user.name}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div className="flex flex-col">
+                <p className="font-semibold text-gray-900">{user.name}</p>
+                <p className="text-sm text-gray-500">{user.email}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => openQr(user)}
+                className="border border-red-900 cursor-pointer text-red-900 px-4 py-1 rounded-md hover:bg-red-50 transition"
+              >
+                QR Code
+              </button>
+
+              <Link
+                href={`/Organizer/ManageParticipants/ParticipantProfile`}
+                onClick={() => localStorage.setItem("participantId", user.id.toString())}
+                className="border border-red-900 cursor-pointer bg-red-900 text-white px-4 py-1 rounded-md hover:bg-white hover:text-red-900 transition"
+              >
+                View Profile
+              </Link>
+            </div>
+          </div>
+        ))}
+        {filteredUsers.length === 0 && <p className="text-center text-gray-500">No participants found</p>}
+      </div>
+    </>
+  )}
+
+  {selected && <QrCard user={selected} onClose={closeQr} />}
+</div>
+
+  )
+}

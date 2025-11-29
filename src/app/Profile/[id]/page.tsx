@@ -24,7 +24,7 @@ export default function ProfilePage({ params, searchParams }: ProfilePageProps) 
     if (role === 'sponsor') {
     return <SponsorProfileCard sponsorId={id} />
   }
-  if (role === 'participant' || role === 'organizer') {
+  if (role === 'participant' || role === 'organizer' || role === 'registrationteam') {
     return <ProfileCard profileId={id} role={role} />
   }
 

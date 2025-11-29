@@ -7,7 +7,7 @@ import api from '@/config/api'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { FaUser, FaQrcode } from 'react-icons/fa'
-import { QRCodeCanvas as QRCode } from 'qrcode.react'
+
 import { FaPen } from 'react-icons/fa'
 import LoadingButton from './../../components/LoadingButton'
 import LogoutButton from './../../components/LogoutButton'
@@ -77,17 +77,12 @@ export default function UserProfileView() {
   <button
     type="button"
     onClick={() => router.push('/participants/SetUpYourProfile')}
-    className="p-3 bg-red-800 text-white rounded-full shadow hover:bg-red-900 transition"
+    className="p-3 bg-red-800 text-white rounded-full  cursor-pointer shadow hover:bg-red-900 transition"
   >
     <FaPen className="w-5 h-5 sm:w-4 sm:h-4" />
   </button>
 
-  <button
-    onClick={() => setShowQR(true)}
-    className="p-3 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900 transition"
-  >
-    <FaQrcode className="w-5 h-5 sm:w-4 sm:h-4" />
-  </button>
+  
 </div>
 
 
@@ -148,7 +143,7 @@ export default function UserProfileView() {
       />
 
       {/* QR Modal */}
-      <UserQRModal show={showQR} userId={userId} onClose={() => setShowQR(false)} />
+   
 
     </>
   )

@@ -9,9 +9,9 @@ import {
   FaHandshake,
   FaTv,
   FaBullhorn,
-  FaUserPlus,
-  FaCheckCircle,
-  FaArrowRight,FaFileAlt,FaQuestionCircle
+  FaUserPlus, FaQrcode,
+  FaCheckCircle, FaClipboardList,
+  FaArrowRight, FaFileAlt, FaQuestionCircle
 } from "react-icons/fa";
 import OptIn from "./../../components/opt-in"
 
@@ -25,9 +25,9 @@ const quickAccessItems = [
   { label: "Manage Sessions", desc: "Create & edit sessions", Icon: FaCalendarAlt, color: "text-green-500", Link: "/Organizer/ManageSessions" },
   { label: "Manage Speakers", desc: "Update profiles & bios", Icon: FaMicrophone, color: "text-red-500", Link: "/Organizer/ManageSpeaker" },
   { label: "Sponsors", desc: "Manage exhibitors", Icon: FaHandshake, color: "text-yellow-500", Link: "/Organizer/ManageSponsor" },
-  { label: "Venue Maps", desc: "Upload & update maps", Icon: FaTv, color: "text-purple-500", Link: "/Organizer/VenueMaps" },
+  { label: "Manage Teams", desc: "Manage and update participant details", Icon: FaClipboardList, color: "text-purple-500", Link: "/Organizer/Registrationteam" },
   { label: "Announcement", desc: "Send Updates", Icon: FaBullhorn, color: "text-orange-500", Link: "/Organizer/ManageAnnouncements" },
-    { label: "Opt In/Out", desc: "Manage preferences", Icon: OptIn, color: "text-pink-500", Link: null }
+  { label: "Opt In/Out", desc: "Manage preferences", Icon: OptIn, color: "text-pink-500", Link: null }
 ];
 
 type Participant = {
@@ -134,64 +134,66 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Access */}
-<section className="bg-white p-6 rounded-xl shadow">
-  <h2 className="text-xl font-semibold mb-6 text-black">Quick Access</h2>
-  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-    {quickAccessItems.map((item) => {
-      const Icon = item.Icon
-      const content = (
-        <div className="flex flex-col justify-center items-center text-center bg-white border border-gray-300 rounded-xl p-4 hover:shadow-md hover:border-red-900 transition cursor-pointer h-full">
-          <Icon className={`text-3xl mb-2 ${item.color}`} />
-          <p className="font-semibold text-black text-sm">{item.label}</p>
-          <p className="text-xs text-gray-500">{item.desc}</p>
-        </div>
-      )
+      <section className="bg-white p-6 rounded-xl shadow">
+        <h2 className="text-xl font-semibold mb-6 text-black">Quick Access</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+          {quickAccessItems.map((item) => {
+            const Icon = item.Icon
+            const content = (
+              <div className="flex flex-col justify-center items-center text-center bg-white border border-gray-300 rounded-xl p-4 hover:shadow-md hover:border-red-900 transition cursor-pointer h-full">
+                <Icon className={`text-3xl mb-2 ${item.color}`} />
+                <p className="font-semibold text-black text-sm">{item.label}</p>
+                <p className="text-xs text-gray-500">{item.desc}</p>
+              </div>
+            )
 
-      return item.Link ? (
-        <Link href={item.Link} key={item.label} className="h-full">
-          {content}
-        </Link>
-      ) : (
-        <div key={item.label} className="h-full">
-          {content}
+            return item.Link ? (
+              <Link href={item.Link} key={item.label} className="h-full">
+                {content}
+              </Link>
+            ) : (
+              <div key={item.label} className="h-full">
+                {content}
+              </div>
+            )
+          })}
         </div>
-      )
-    })}
-  </div>
-</section>
+      </section>
 
 
       {/* Tools & Support */}
-<section className="bg-white p-6 rounded-xl shadow">
-  <h2 className="text-xl font-semibold mb-6 text-black">Tools & Support</h2>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {loading ? (
-      Array.from({ length: 2 }).map((_, idx) => (
-        <div key={idx} className="flex items-center justify-between border border-gray-300 rounded-xl p-4 animate-pulse h-20" />
-      ))
-    ) : (
-      [
-        { title: "Reports", desc: "Analytics & exports", icon: <FaFileAlt size={24} color="#0B3D91" />, bg: "bg-[#E3FFF7]", href: "/Organizer/Report" },
-        { title: "Manage FAQ", desc: "Help & guidance", icon: <FaQuestionCircle size={24} color="#9B2033" />, bg: "bg-[#FFF3F3]", href: "/Organizer/ManageFAQS" },
-      ].map((item, idx) => (
-        <div key={idx} className="flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md hover:border-red-900 transition cursor-pointer">
-          <div className="flex items-center gap-3">
-            <div className={`${item.bg} p-2 rounded-md`}>
-              {item.icon}
-            </div>
-            <div>
-              <p className="font-semibold text-black text-sm">{item.title}</p>
-              <p className="text-xs text-gray-500">{item.desc}</p>
-            </div>
-          </div>
-          <Link href={item.href} className="text-[#9B2033] text-lg font-bold">
-            <FaArrowRight color="#000" />
-          </Link>
+      <section className="bg-white p-6 rounded-xl shadow">
+        <h2 className="text-xl font-semibold mb-6 text-black">Tools & Support</h2>
+        <div className="flex flex-wrap gap-4">
+          {loading ? (
+            Array.from({ length: 3 }).map((_, idx) => (
+              <div key={idx} className="flex-1 min-w-[250px] flex items-center justify-between border border-gray-300 rounded-xl p-4 animate-pulse h-20" />
+            ))
+          ) : (
+            [
+              { title: "Reports", desc: "Analytics & exports", icon: <FaFileAlt size={24} color="#0B3D91" />, bg: "bg-[#E3FFF7]", href: "/Organizer/Report" },
+              { title: "Manage FAQ", desc: "Help & guidance", icon: <FaQuestionCircle size={24} color="#9B2033" />, bg: "bg-[#FFF3F3]", href: "/Organizer/ManageFAQS" },
+              { title: "QR Scanner", desc: "Scan QR codes live", icon: <FaQrcode size={24} color="#0B3D91" />, bg: "bg-[#FFF8E3]", href: "/Organizer/QrScanner" },
+            ].map((item, idx) => (
+              <div key={idx} className="flex-1 min-w-[250px] flex items-center justify-between border border-gray-300 rounded-xl p-4 hover:shadow-md hover:border-red-900 transition cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className={`${item.bg} p-2 rounded-md`}>
+                    {item.icon}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-black text-sm">{item.title}</p>
+                    <p className="text-xs text-gray-500">{item.desc}</p>
+                  </div>
+                </div>
+                <Link href={item.href} className="text-red-900 text-lg font-bold">
+                  <FaArrowRight />
+                </Link>
+
+              </div>
+            ))
+          )}
         </div>
-      ))
-    )}
-  </div>
-</section>
+      </section>
 
       {/* Recent Participants */}
       <div className="flex justify-between items-center">
