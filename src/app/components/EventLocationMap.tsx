@@ -124,7 +124,7 @@ export default function EventLocationMap() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto sm:p-6 md:p-0 sm:m-2">
+    <div className="w-full max-w-6xl mx-auto sm:p-6 md:p-0 sm:m-2">
       <div className="relative w-full h-83 rounded-2xl border border-gray-300 overflow-hidden bg-gray-100">
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">

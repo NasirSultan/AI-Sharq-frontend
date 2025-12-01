@@ -34,6 +34,12 @@ const AddNewVenuePopup = ({ isOpen, onClose, eventId }: AddNewVenuePopupProps) =
   const [location, setLocation] = useState('')
   const [googleMapLink, setGoogleMapLink] = useState('')
   const [mapStatus, setMapStatus] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [sponsorSearch, setSponsorSearch] = useState('')
+  const [exhibitorSearch, setExhibitorSearch] = useState('')
+
+
+
 
   useEffect(() => {
     if (isOpen && eventId) {
@@ -90,6 +96,8 @@ const AddNewVenuePopup = ({ isOpen, onClose, eventId }: AddNewVenuePopupProps) =
       return
     }
 
+    setLoading(true)
+
     const payload = {
       title,
       description,
@@ -102,14 +110,16 @@ const AddNewVenuePopup = ({ isOpen, onClose, eventId }: AddNewVenuePopupProps) =
 
     try {
       const res = await api.patch(`/event/${eventId}`, payload)
-      console.log('Event updated successfully:', res.data)
       alert('Event updated successfully')
       onClose()
     } catch (err) {
       console.error('Failed to update event', err)
       alert('Failed to update event')
+    } finally {
+      setLoading(false)
     }
   }
+
 
   return (
     <>
@@ -142,36 +152,84 @@ const AddNewVenuePopup = ({ isOpen, onClose, eventId }: AddNewVenuePopupProps) =
             </div>
 
             <div>
-              <label className="block text-[16px] text-[#262626] mb-2">Assign Sponsors*</label>
-              <div className="flex flex-col gap-2">
-                {sponsors.map(s => (
-                  <label key={s.id} className="flex items-center gap-2 text-[#616161]">
-                    <input
-                      type="checkbox"
-                      checked={selectedSponsors.includes(s.id)}
-                      onChange={() => handleSponsorSelect(s.id)}
-                    />
-                    {s.name} ({s.email})
-                  </label>
-                ))}
-              </div>
-            </div>
+  <label className="block text-[16px] text-[#262626] mb-2">Assign Sponsors*</label>
+  <input
+    type="text"
+    value={sponsorSearch}
+    onChange={e => setSponsorSearch(e.target.value)}
+    placeholder="Search Sponsors"
+    className="w-full border border-[#DEDEDE] rounded-lg px-4 py-2 mb-2"
+  />
+  <div className="flex flex-col gap-2">
+    {sponsors
+      .filter(s => sponsorSearch && !selectedSponsors.includes(s.id) ? s.name.toLowerCase().includes(sponsorSearch.toLowerCase()) : false)
+      .map(s => (
+        <label key={s.id} className="flex items-center gap-2 text-[#616161]">
+          <input
+            type="checkbox"
+            checked={selectedSponsors.includes(s.id)}
+            onChange={() => handleSponsorSelect(s.id)}
+          />
+          {s.name} ({s.email})
+        </label>
+      ))}
 
-            <div>
-              <label className="block text-[16px] text-[#262626] mb-2">Assign Exhibitors*</label>
-              <div className="flex flex-col gap-2">
-                {exhibitors.map(ex => (
-                  <label key={ex.id} className="flex items-center gap-2 text-[#616161]">
-                    <input
-                      type="checkbox"
-                      checked={selectedExhibitors.includes(ex.id)}
-                      onChange={() => handleExhibitorSelect(ex.id)}
-                    />
-                    {ex.name} ({ex.email})
-                  </label>
-                ))}
-              </div>
-            </div>
+    {selectedSponsors
+      .map(id => sponsors.find(s => s.id === id))
+      .filter(Boolean)
+      .map(s => (
+        <label key={s.id} className="flex items-center gap-2 text-[#616161]">
+          <input
+            type="checkbox"
+            checked={true}
+            onChange={() => handleSponsorSelect(s.id)}
+          />
+          {s.name} ({s.email})
+        </label>
+      ))}
+  </div>
+</div>
+
+
+           <div>
+  <label className="block text-[16px] text-[#262626] mb-2">Assign Exhibitors*</label>
+  <input
+    type="text"
+    value={exhibitorSearch}
+    onChange={e => setExhibitorSearch(e.target.value)}
+    placeholder="Search Exhibitors"
+    className="w-full border border-[#DEDEDE] rounded-lg px-4 py-2 mb-2"
+  />
+  <div className="flex flex-col gap-2">
+    {exhibitors
+      .filter(e => exhibitorSearch ? e.name.toLowerCase().includes(exhibitorSearch.toLowerCase()) : false)
+      .map(e => (
+        <label key={e.id} className="flex items-center gap-2 text-[#616161]">
+          <input
+            type="checkbox"
+            checked={selectedExhibitors.includes(e.id)}
+            onChange={() => handleExhibitorSelect(e.id)}
+          />
+          {e.name} ({e.email})
+        </label>
+      ))}
+
+    {selectedExhibitors
+      .map(id => exhibitors.find(e => e.id === id))
+      .filter((e): e is Exhibitor => e !== undefined)
+      .map(e => (
+        <label key={e.id} className="flex items-center gap-2 text-[#616161]">
+          <input
+            type="checkbox"
+            checked={true}
+            onChange={() => handleExhibitorSelect(e.id)}
+          />
+          {e.name} ({e.email})
+        </label>
+      ))}
+  </div>
+</div>
+
 
             <div>
               <label className="block text-[16px] text-[#262626] mb-2">Location*</label>
@@ -227,10 +285,12 @@ const AddNewVenuePopup = ({ isOpen, onClose, eventId }: AddNewVenuePopupProps) =
 
             <button
               onClick={handleSubmit}
-              className="w-full h-[54px] bg-[#9B2033] text-white text-[16px] font-medium rounded-lg"
+              className="w-full h-[54px] bg-[#9B2033] text-white text-[16px] font-medium rounded-lg flex items-center justify-center"
+              disabled={loading}
             >
-              Update
+              {loading ? 'Saving...' : 'Update'}
             </button>
+
           </div>
         </div>
       </div>
