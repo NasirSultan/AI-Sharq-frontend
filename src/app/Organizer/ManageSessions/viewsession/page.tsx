@@ -29,18 +29,18 @@ export default function EditSessionModal({ sessionId, onClose }: Props) {
   const [locationType, setLocationType] = useState("Online")
   const [address, setAddress] = useState("")
   const [loading, setLoading] = useState(false)
-const [speakerSearch, setSpeakerSearch] = useState("")
-const [filteredSpeakers, setFilteredSpeakers] = useState<any[]>([])
-useEffect(() => {
-  if (speakerSearch.trim() === "") {
-    setFilteredSpeakers([])
-  } else {
-    const filtered = speakers.filter((speaker) =>
-      speaker.user.name.toLowerCase().includes(speakerSearch.toLowerCase())
-    )
-    setFilteredSpeakers(filtered)
-  }
-}, [speakerSearch, speakers])
+  const [speakerSearch, setSpeakerSearch] = useState("")
+  const [filteredSpeakers, setFilteredSpeakers] = useState<any[]>([])
+  useEffect(() => {
+    if (speakerSearch.trim() === "") {
+      setFilteredSpeakers([])
+    } else {
+      const filtered = speakers.filter((speaker) =>
+        speaker.user.name.toLowerCase().includes(speakerSearch.toLowerCase())
+      )
+      setFilteredSpeakers(filtered)
+    }
+  }, [speakerSearch, speakers])
 
 
   // Fetch events and speakers
@@ -105,37 +105,37 @@ useEffect(() => {
     setTags(prev => prev.filter(t => t !== tag))
   }
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setLoading(true)
-  try {
-    const payload = {
-      title: form.title,
-      description: form.description,
-      startTime: new Date(form.startTime).toISOString(),
-      endTime: new Date(form.endTime).toISOString(),
-      location: locationType === "Online" ? "Online" : address,
-      category: form.category,
-      capacity: Number(form.capacity),
-      tags,
-      registrationRequired: form.registrationRequired,
-      speakerIds: form.speakerIds,
-      // Use Prisma relation format for event
-      event: form.eventId ? { connect: { id: Number(form.eventId) } } : undefined
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const payload = {
+        title: form.title,
+        description: form.description,
+        startTime: new Date(form.startTime).toISOString(),
+        endTime: new Date(form.endTime).toISOString(),
+        location: locationType === "Online" ? "Online" : address,
+        category: form.category,
+        capacity: Number(form.capacity),
+        tags,
+        registrationRequired: form.registrationRequired,
+        speakerIds: form.speakerIds,
+        // Use Prisma relation format for event
+        event: form.eventId ? { connect: { id: Number(form.eventId) } } : undefined
+      }
+
+      console.log("Sending payload:", payload)
+
+      await api.patch(`/sessions/${sessionId}`, payload)
+      alert("Session updated successfully")
+      onClose()
+    } catch (err) {
+      console.error("Error details:", err)
+      alert("Failed to update session")
+    } finally {
+      setLoading(false)
     }
-
-    console.log("Sending payload:", payload)
-
-    await api.patch(`/sessions/${sessionId}`, payload)
-    alert("Session updated successfully")
-    onClose()
-  } catch (err) {
-    console.error("Error details:", err)
-    alert("Failed to update session")
-  } finally {
-    setLoading(false)
   }
-}
   return (
     <>
       <div className="fixed inset-0 z-[9998]">
@@ -236,80 +236,80 @@ const handleSubmit = async (e: React.FormEvent) => {
               ></textarea>
             </div>
 
-           <div>
-  <label className="block font-semibold mb-2">
-    Speakers<span className="text-red-700 ml-1">*</span>
-  </label>
+            <div>
+              <label className="block font-semibold mb-2">
+                Speakers<span className="text-red-700 ml-1">*</span>
+              </label>
 
-  <input
-    type="text"
-    placeholder="Search speakers by name"
-    value={speakerSearch}
-    onChange={(e) => setSpeakerSearch(e.target.value)}
-    className="border border-gray-300 rounded-lg px-4 py-2 w-full mb-3 focus:outline-none focus:ring-2 focus:ring-[#9B2033] focus:border-[#9B2033]"
-  />
+              <input
+                type="text"
+                placeholder="Search speakers by name"
+                value={speakerSearch}
+                onChange={(e) => setSpeakerSearch(e.target.value)}
+                className="border border-gray-300 rounded-lg px-4 py-2 w-full mb-3 focus:outline-none focus:ring-2 focus:ring-[#9B2033] focus:border-[#9B2033]"
+              />
 
-  {filteredSpeakers.length > 0 && (
-    <div className="flex flex-col gap-2 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-3 mb-3">
-      {filteredSpeakers.map((speaker) => (
-        <label
-          key={speaker.speakerid}
-          className="flex flex-col cursor-pointer bg-gray-50 hover:bg-gray-100 rounded-lg p-2"
-        >
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="speakerIds"
-              value={speaker.speakerid}
-              checked={form.speakerIds.includes(speaker.speakerid)}
-              onChange={handleChange}
-              className="w-4 h-4"
-            />
-            <span className="text-gray-800 font-medium">{speaker.user.name}</span>
-          </div>
-          <span className="text-gray-500 text-sm ml-6">
-            {speaker.designations.join(", ")}
-          </span>
-        </label>
-      ))}
-    </div>
-  )}
+              {filteredSpeakers.length > 0 && (
+                <div className="flex flex-col gap-2 max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-3 mb-3">
+                  {filteredSpeakers.map((speaker) => (
+                    <label
+                      key={speaker.speakerid}
+                      className="flex flex-col cursor-pointer bg-gray-50 hover:bg-gray-100 rounded-lg p-2"
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          name="speakerIds"
+                          value={speaker.speakerid}
+                          checked={form.speakerIds.includes(speaker.speakerid)}
+                          onChange={handleChange}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-gray-800 font-medium">{speaker.user.name}</span>
+                      </div>
+                      <span className="text-gray-500 text-sm ml-6">
+                        {speaker.designations.join(", ")}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
 
-  {form.speakerIds.length > 0 && (
-    <div className="border border-gray-300 rounded-lg p-3 bg-gray-50">
-      <h3 className="font-semibold mb-2 text-gray-700 text-sm">
-        Selected Speakers
-      </h3>
-      <div className="flex flex-col gap-2">
-        {form.speakerIds.map((id) => {
-          const sp = speakers.find((s) => s.speakerid === id)
-          if (!sp) return null
-          return (
-            <label
-              key={id}
-              className="flex flex-col bg-white border border-gray-200 rounded-lg p-2 cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="speakerIds"
-                  value={sp.speakerid}
-                  checked={form.speakerIds.includes(sp.speakerid)}
-                  onChange={handleChange}
-                  className="w-4 h-4"
-                />
-                <span className="text-gray-800 font-medium">{sp.user.name}</span>
-              </div>
-              <span className="text-gray-500 text-sm ml-6">
-                {sp.designations.join(", ")}
-              </span>
-            </label>
-          )
-        })}
-      </div>
-    </div>
-  )}
-</div>
+              {form.speakerIds.length > 0 && (
+                <div className="border border-gray-300 rounded-lg p-3 bg-gray-50">
+                  <h3 className="font-semibold mb-2 text-gray-700 text-sm">
+                    Selected Speakers
+                  </h3>
+                  <div className="flex flex-col gap-2">
+                    {form.speakerIds.map((id) => {
+                      const sp = speakers.find((s) => s.speakerid === id)
+                      if (!sp) return null
+                      return (
+                        <label
+                          key={id}
+                          className="flex flex-col bg-white border border-gray-200 rounded-lg p-2 cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              name="speakerIds"
+                              value={sp.speakerid}
+                              checked={form.speakerIds.includes(sp.speakerid)}
+                              onChange={handleChange}
+                              className="w-4 h-4"
+                            />
+                            <span className="text-gray-800 font-medium">{sp.user.name}</span>
+                          </div>
+                          <span className="text-gray-500 text-sm ml-6">
+                            {sp.designations.join(", ")}
+                          </span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div>
               <label className="block font-semibold mb-2">Location<span className="text-red-700 ml-1">*</span></label>
@@ -366,7 +366,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   type="text"
                   value={tagInput}
                   onChange={e => setTagInput(e.target.value)}
-                  placeholder="Add tag"
+                  placeholder="Enter each question for this session separately"
                   className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#9B2033] focus:border-[#9B2033]"
                 />
                 <button
@@ -400,7 +400,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full ${loading ? "bg-gray-400" : "bg-[#9B2033] hover:bg-[#7c062a]"} text-white text-sm font-semibold py-2 rounded-lg shadow-md transition`}
+              className={`w-full ${loading ? "bg-red-800" : "bg-[#9B2033] hover:bg-[#7c062a]"} text-white text-sm font-semibold py-2 rounded-lg shadow-md transition`}
             >
               {loading ? "Updating..." : "Update"}
             </button>

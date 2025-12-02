@@ -107,7 +107,7 @@ export default function MyAgendaPage() {
     if (session.location?.toLowerCase() === "online") {
       return session.isLive ? "Live Now" : "Finished"
     } else {
-      return `Onsite at ${session.location || "TBD"}`
+      return `Upcoming`
     }
   }
 
@@ -277,10 +277,10 @@ export default function MyAgendaPage() {
                   <button
                     className={`w-full py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 relative
                       ${session.location?.toLowerCase() === "online" && session.isLive
-                        ? "bg-white text-red-500 hover:bg-red-500 hover:text-white font-bold cursor-pointer overflow-hidden"
+                        ? "bg-white text-red-900 hover:bg-red-900 hover:text-white font-bold cursor-pointer overflow-hidden"
                         : session.location?.toLowerCase() === "online" && !session.isLive
                           ? "bg-gray-300 text-gray-700 cursor-not-allowed"
-                          : "bg-blue-100 text-blue-700 cursor-default"
+                          : "bg-blue-100 text-green-600 cursor-default"
                       }`}
                     disabled={session.location?.toLowerCase() === "online" && !session.isLive}
                   >
@@ -289,7 +289,7 @@ export default function MyAgendaPage() {
                     {session.isLive && session.location?.toLowerCase() === "online" && (
                       <span className="relative flex h-2 w-2">
                         <span className="absolute inset-0 rounded-full bg-white opacity-75 animate-ping pointer-events-none"></span>
-                        <span className="relative rounded-full h-2 w-2 bg-red-500 pointer-events-none"></span>
+                        <span className="relative rounded-full h-2 w-2 bg-red-900 pointer-events-none"></span>
                       </span>
                     )}
                   </button>

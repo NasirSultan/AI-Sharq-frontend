@@ -389,7 +389,7 @@ export default function AddSessionModal({ onClose }: AddSessionProps) {
                   type="text"
                   value={tagInput}
                   onChange={e => setTagInput(e.target.value)}
-                  placeholder="Add tag"
+       placeholder="Enter each question for this session separately"
                   className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#9B2033] focus:border-[#9B2033]"
                 />
                 <button
@@ -423,7 +423,7 @@ export default function AddSessionModal({ onClose }: AddSessionProps) {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full ${loading ? "bg-gray-400" : "bg-[#9B2033] hover:bg-[#7c062a]"} text-white text-sm font-semibold py-2 rounded-lg shadow-md transition disabled:cursor-not-allowed`}
+              className={`w-full ${loading ? "bg-red-800" : "bg-[#9B2033] hover:bg-[#7c062a]"} text-white text-sm font-semibold py-2 rounded-lg shadow-md transition disabled:cursor-not-allowed`}
             >
               {loading ? "Creating..." : "Create Session"}
             </button>

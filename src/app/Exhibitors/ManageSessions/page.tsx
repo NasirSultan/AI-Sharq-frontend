@@ -142,36 +142,37 @@ export default function SpeakerSessions() {
   </div>
 
   <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 mb-6">
-    <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-96">
-      <FaSearch className="text-red-900 mr-2" />
-      <input
-        type="text"
-        placeholder="Search"
-        value={searchText}
-        onChange={e => setSearchText(e.target.value)}
-        className="outline-none text-sm w-full"
-      />
-    </div>
+   <div className="flex flex-col w-full gap-4 md:flex-row md:items-center md:gap-2">
+  <div className="flex w-full md:w-1/3 bg-white border border-gray-300 rounded-md px-3 py-2">
+    <FaSearch className="text-red-900 mr-2" />
+    <input
+      type="text"
+      placeholder="Search"
+      value={searchText}
+      onChange={e => setSearchText(e.target.value)}
+      className="outline-none text-sm w-full"
+    />
+  </div>
 
-    <div className="flex flex-wrap gap-2 md:gap-5">
-      {filters.map(filter => (
-        <button
-          key={filter}
-          onClick={() => setActiveFilter(filter)}
-          className={`px-4 py-2 rounded-xl text-sm font-medium ${activeFilter === filter
+  <div className="flex w-full md:w-2/3 gap-2">
+    {filters.map(filter => (
+      <button
+        key={filter}
+        onClick={() => setActiveFilter(filter)}
+        className={`flex-1 text-center px-4 py-2 rounded-xl text-sm font-medium ${
+          activeFilter === filter
             ? "bg-[#86002B] text-white"
             : "bg-white border border-gray-300 text-black"
-            }`}
-        >
-          {filter}
-        </button>
-      ))}
-    </div>
+        }`}
+      >
+        {filter}
+      </button>
+    ))}
+  </div>
+</div>
 
-    <div className="flex items-center border border-gray-300 bg-white px-3 py-2 rounded-md text-sm text-gray-700">
-      <FaCalendarAlt className="mr-2 text-red-500" />
-      Jan 2024 - Dec 2024
-    </div>
+
+    
   </div>
 
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

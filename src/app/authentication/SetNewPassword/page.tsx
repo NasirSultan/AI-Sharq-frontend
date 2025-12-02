@@ -1,169 +1,130 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import Image from 'next/image';
-import ImageComponent from '../../components/Images';
-import Link from 'next/link';
-import {  FaEyeSlash, FaExclamationCircle, } from 'react-icons/fa';
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import ImageComponent from '../../components/Images'
+import api from '@/config/api'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
-export default function SetNewPassword() {
-  const [formData, setFormData] = useState({
-    newPassword: '',
-    confirmPassword: ''
-  });
+export default function SetPassword() {
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [userId, setUserId] = useState<number | null>(null)
+  const router = useRouter()
 
-  const [errors, setErrors] = useState({
-    newPassword: '',
-    confirmPassword: ''
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-    // Clear errors on change
-    if (errors[name as keyof typeof errors]) {
-      setErrors({
-        ...errors,
-        [name]: ''
-      });
+  useEffect(() => {
+    const user = localStorage.getItem('user')
+    if (user) {
+      const parsed = JSON.parse(user)
+      setUserId(parsed.id)
     }
-  };
+  }, [])
 
-  const validateForm = () => {
-    const newErrors = { newPassword: '', confirmPassword: '' };
-    if (!formData.newPassword) {
-      newErrors.newPassword = 'New password is required';
-    } else if (formData.newPassword.length < 8) {
-      newErrors.newPassword = 'Password must be at least 8 characters';
-    }
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Confirm password is required';
-    } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-    setErrors(newErrors);
-    return !newErrors.newPassword && !newErrors.confirmPassword;
-  };
+  const validatePassword = (pass: string) => {
+    const upper = /[A-Z]/
+    const lower = /[a-z]/
+    const number = /[0-9]/
+    const special = /[!@#$%^&*()_+\[\]{}|;:,.<>?]/
+    if (!upper.test(pass)) return 'Include at least one uppercase letter'
+    if (!lower.test(pass)) return 'Include at least one lowercase letter'
+    if (!number.test(pass)) return 'Include at least one number'
+    if (!special.test(pass)) return 'Include at least one special character'
+    if (pass.length < 8) return 'Password must be at least 8 characters'
+    return ''
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      // Handle form submission here
-      console.log('Form submitted:', formData);
-      // You can add API call or navigation here
+  const handleSetPassword = async () => {
+    if (!userId) return
+    const validationError = validatePassword(password)
+    if (validationError) {
+      setError(validationError)
+      return
     }
-  };
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+    try {
+      await api.patch(`/auth/set-password/${userId}`, { password })
+         localStorage.removeItem('user')
+      setPassword('')
+      setConfirmPassword('')
+      router.push('/')
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to set password')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center gap-20 p-3 bg-gray-50 relative">
-      {/* Need help? Contact Support */}
-      <span className="absolute w-[191px] h-[11px] left-[calc(50%-191px/2+0.5px)] top-[916px] font-['SF_Pro_Display'] font-normal text-[16px] leading-[30px] text-center text-[#282828]">
-        Need help? <strong className='text-red-700'>Contact Support</strong>
-      </span>
-      {/* Left side - Image */}
-      <div className="hidden md:block flex-shrink-0 mt-[100px]">
-        <ImageComponent />
-      </div>
-
-      {/* Right side - Form Container */}
-      <div className="bg-white border border-gray-300 shadow-lg rounded-2xl p-8 max-w-md w-full">
-        {/* Logo and Title */}
-        <div className="flex flex-col items-center mb-4">
-          <Image
-            src="/images/logo1.png"
-            alt="Al Sharq Logo"
-            width={157}
-            height={47}
-            className="object-contain mb-[30px]"
-          />
-          <h1 className="mt-2 text-2xl font-semibold text-gray-800 text-center">
-            Setup New Password
-          </h1>
+    <div className="min-h-screen flex justify-center items-center bg-gray-50 px-4">
+      <div className="flex flex-col lg:flex-row items-center gap-20 max-w-6xl w-full">
+        <div className="hidden lg:flex flex-1 justify-center">
+          <ImageComponent />
         </div>
 
-        {/* Description */}
-        <p className="mb-6 text-center text-gray-700 text-base leading-relaxed">
-          Choose a strong password to secure your account. Make sure it's something you'll remember.
-        </p>
+        <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center gap-6 w-full max-w-md">
+          <Image src="/images/logo1.png" alt="Logo" width={150} height={45} className="mb-4" />
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* New Password */}
-          <div>
-            <label htmlFor="newPassword" className="block text-gray-700 font-medium mb-2">
-              New Password*
-            </label>
-            <div className="relative">
-              <input
-                type="password"
-                id="newPassword"
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleChange}
-                placeholder="Enter new password"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-700 ${
-                  errors.newPassword ? 'border-red-600' : 'border-gray-300'
-                }`}
-              />
-              <FaEyeSlash className="absolute right-3 top-3 text-gray-400" size={20} />
-            </div>
-            {errors.newPassword && (
-              <p className="mt-1 text-red-600 text-sm flex items-center gap-1">
-                <FaExclamationCircle /> {errors.newPassword}
-              </p>
-            )}
-          </div>
+          <h1 className="text-xl font-medium text-gray-800 text-center">Set Your Password</h1>
+          <p className="text-sm text-gray-600 text-center mb-4">
+            Enter a strong password following the suggestions
+          </p>
 
-          {/* Confirm New Password */}
-          <div>
-            <label htmlFor="confirmPassword" className="block text-gray-700 font-medium mb-2">
-              Confirm New Password*
-            </label>
-            <div className="relative">
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm new password"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-700 ${
-                  errors.confirmPassword ? 'border-red-600' : 'border-gray-300'
-                }`}
-              />
-              <FaEyeSlash className="absolute right-3 top-3 text-gray-400" size={20} />
-            </div>
-            {errors.confirmPassword && (
-              <p className="mt-1 text-red-600 text-sm flex items-center gap-1">
-                <FaExclamationCircle /> {errors.confirmPassword}
-              </p>
-            )}
-          </div>
+          <div className="relative w-full mb-2">
+  <input
+    type={showPassword ? 'text' : 'password'}
+    value={password}
+    onChange={e => setPassword(e.target.value)}
+    placeholder="Enter Password"
+    className="w-full border border-red-800 rounded-lg p-2 pr-10 text-center focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-red-900"
+  />
+  <span
+    onClick={() => setShowPassword(prev => !prev)}
+    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 cursor-pointer"
+  >
+    {showPassword ? <FaEyeSlash /> : <FaEye />}
+  </span>
+</div>
 
-          {/* Password requirements */}
-          <div className="flex items-start gap-2 text-gray-500 text-sm mb-6">
-            <FaExclamationCircle className="mt-1 text-red-700" size={20} />
-            <p>
-              Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.
-            </p>
-          </div>
+<div className="relative w-full mb-2">
+  <input
+    type={showConfirm ? 'text' : 'password'}
+    value={confirmPassword}
+    onChange={e => setConfirmPassword(e.target.value)}
+    placeholder="Confirm Password"
+    className="w-full border border-red-800 rounded-lg p-2 pr-10 text-center focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-red-900"
+  />
+  <span
+    onClick={() => setShowConfirm(prev => !prev)}
+    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 cursor-pointer"
+  >
+    {showConfirm ? <FaEyeSlash /> : <FaEye />}
+  </span>
+</div>
 
-          {/* Save Change Button */}
-          <Link href="/participants/SetUpYourProfile">
+
+          {error && <p className="text-red-900 text-sm text-center mb-2">{error}</p>}
+
           <button
-            type="submit"
-            className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-3 rounded-lg transition-colors"
+            onClick={handleSetPassword}
+            disabled={loading}
+            className={`w-full py-2 rounded-lg text-white transition ${!loading ? 'bg-[#9B2033] hover:bg-[#7f1a28]' : 'bg-gray-400 cursor-not-allowed'}`}
           >
-            Save Change
+            {loading ? 'Updating...' : 'Set Password'}
           </button>
-          </Link>
-        </form>
+        </div>
       </div>
-      <Image src="/images/line.png" alt="Line" width={1729} height={127} className="absolute top-[1010px]" />
     </div>
-  );
+  )
 }
-

@@ -111,39 +111,38 @@ export default function Page() {
   })
 
   return (
-   <div className="min-h-screen bg-[#FAFAFA] p-6 max-w-6xl mx-auto space-y-6">
-  <div className="flex items-center justify-between">
-    <h1 className="text-xl font-bold text-gray-900">Participants list</h1>
+    <div className="min-h-screen bg-[#FAFAFA] p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Participants list</h1>
     <Link
       href="/Organizer/QrScanner"
-     className="flex items-center gap-2 bg-white border border-red-900 text-red-900 px-4 py-2 rounded-full hover:bg-red-900 hover:text-white"
-
+      className="flex items-center gap-2 bg-white border border-red-900 text-red-900 px-4 py-2 rounded-full hover:bg-red-900 hover:text-white text-sm sm:text-base"
     >
       <FaQrcode size={20} />
       Scan QR
     </Link>
   </div>
 
-  <div className="flex flex-col sm:flex-row gap-4 items-center">
-    <div className="bg-white border border-gray-300 rounded-md px-3 py-2 flex items-center flex-1">
+  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center">
+    <div className="bg-white border border-gray-300 rounded-md px-3 py-2 flex items-center w-full sm:flex-1">
       <input
         type="text"
         placeholder="Search participants"
         value={search}
         onChange={e => setSearch(e.target.value)}
-        className="outline-none text-sm w-full text-black"
+        className="outline-none text-sm sm:text-base w-full text-black"
       />
     </div>
+
     <div className="flex gap-2 flex-wrap">
       {filters.map(filter => (
         <button
           key={filter}
           onClick={() => setActiveFilter(filter)}
-          className={`px-5 py-2 rounded-full text-sm font-medium ${
-            activeFilter === filter
+          className={`px-4 sm:px-5 py-2 rounded-full text-sm sm:text-base font-medium ${activeFilter === filter
               ? "bg-[#86002B] text-white"
               : "bg-white border border-gray-300 text-gray-800"
-          }`}
+            }`}
         >
           {filter}
         </button>
@@ -161,11 +160,9 @@ export default function Page() {
         {statsItems.map((item, idx) => (
           <div
             key={idx}
-            className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition"
+            className="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition w-full"
           >
-            <div
-              className={`w-10 h-10 rounded-md ${item.iconBg} flex items-center justify-center mr-3 sm:mr-4`}
-            >
+            <div className={`w-10 h-10 rounded-md ${item.iconBg} flex items-center justify-center mr-3 sm:mr-4`}>
               {item.icon}
             </div>
             <div className="flex-1">
@@ -180,48 +177,47 @@ export default function Page() {
         {filteredUsers.map(user => (
           <div
             key={user.id}
-            className="flex items-center justify-between bg-white p-4 rounded-md shadow-sm"
+            className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 rounded-md shadow-sm gap-3 sm:gap-0 w-full"
           >
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 w-full sm:flex-1">
               <img
-                src={
-                  user.file ||
-                  "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png"
-                }
+                src={user.file || "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png"}
                 alt={user.name}
                 className="w-12 h-12 rounded-full object-cover"
               />
               <div className="flex flex-col">
                 <p className="font-semibold text-gray-900">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="text-sm sm:text-base text-gray-500">{user.email}</p>
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => openQr(user)}
-                className="border border-red-900 cursor-pointer text-red-900 px-4 py-1 rounded-md hover:bg-red-50 transition"
-              >
-                QR Code
-              </button>
+           <div className="flex gap-2 mt-3 flex-col sm:flex-row w-full sm:w-auto">
+  <button
+    onClick={() => openQr(user)}
+    className="border border-red-900 cursor-pointer text-red-900 px-4 py-1 rounded-md hover:bg-red-50 transition text-sm sm:text-base w-full sm:w-auto"
+  >
+    Generate QR Code
+  </button>
 
-              <Link
-                href={`/Organizer/ManageParticipants/ParticipantProfile`}
-                onClick={() => localStorage.setItem("participantId", user.id.toString())}
-                className="border border-red-900 cursor-pointer bg-red-900 text-white px-4 py-1 rounded-md hover:bg-white hover:text-red-900 transition"
-              >
-                View Profile
-              </Link>
-            </div>
+  <Link
+    href={`/Organizer/ManageParticipants/ParticipantProfile`}
+    onClick={() => localStorage.setItem("participantId", user.id.toString())}
+    className="border border-red-900 text-center cursor-pointer bg-red-900 text-white px-4 py-1 rounded-md hover:bg-white hover:text-red-900 transition text-sm sm:text-base w-full sm:w-auto"
+  >
+    View Profile
+  </Link>
+</div>
+
           </div>
         ))}
-        {filteredUsers.length === 0 && <p className="text-center text-gray-500">No participants found</p>}
+        {filteredUsers.length === 0 && <p className="text-center text-gray-500 text-sm sm:text-base">No participants found</p>}
       </div>
     </>
   )}
 
   {selected && <QrCard user={selected} onClose={closeQr} />}
 </div>
+
 
   )
 }

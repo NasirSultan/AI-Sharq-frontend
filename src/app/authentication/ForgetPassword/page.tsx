@@ -1,111 +1,132 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import Image from 'next/image';
-import ImageComponent from '../../components/Images';
-import { FaEnvelope,  } from 'react-icons/fa';
-import Link from 'next/link';
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import ImageComponent from '../../components/Images'
+import api from '@/config/api'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
-export default function SignIn() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
-  });
+export default function SetNewPassword() {
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [userId, setUserId] = useState<number | null>(null)
+  const [role, setRole] = useState<string | null>(null)
+  const router = useRouter()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
-  };
+  useEffect(() => {
+    const user = localStorage.getItem('user')
+    if (user) {
+      const parsed = JSON.parse(user)
+      console.log(`user id from localStorage: ${parsed.id}, role: ${parsed.role}`)
+      setUserId(parsed.id)
+      setRole(parsed.role)
+    }
+  }, [])
+
+  const validatePassword = (pass: string) => {
+    const upper = /[A-Z]/
+    const lower = /[a-z]/
+    const number = /[0-9]/
+    const special = /[!@#$%^&*()_+\[\]{}|;:,.<>?]/
+    if (!upper.test(pass)) return 'Include at least one uppercase letter'
+    if (!lower.test(pass)) return 'Include at least one lowercase letter'
+    if (!number.test(pass)) return 'Include at least one number'
+    if (!special.test(pass)) return 'Include at least one special character'
+    if (pass.length < 8) return 'Password must be at least 8 characters'
+    return ''
+  }
+
+  const handleSetPassword = async () => {
+    if (!userId || !role) return
+
+    const validationError = validatePassword(password)
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+    try {
+      if (role === 'sponsor') {
+        await api.patch(`/sponsors/${userId}/reset-password`, { newPassword: password })
+      } else if (role === 'exhibitor') {
+        await api.patch(`/exhibiteros/${userId}/password`, { password })
+      } else {
+        setError('Invalid role')
+        return
+      }
+
+      localStorage.removeItem('user')
+      setPassword('')
+      setConfirmPassword('')
+      router.push('/')
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to set password')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div className="flex gap-20 mt-10">
-      {/* Need help? Contact Support */}
-      <span className="absolute w-[191px] h-[11px] left-[calc(50%-191px/2+0.5px)] top-[916px] font-['SF_Pro_Display'] font-normal text-[16px] leading-[30px] text-center text-[#282828]">
-        Need help? <strong className='text-red-700'>Contact Support</strong>
-      </span>
-      {/* Left side - Image */}
-      <ImageComponent />
-
-      {/* Right side - Form Container */}
-      <div className="absolute w-[525px] h-[480px] left-[800px] top-[calc(50%-300px/2)] bg-white border border-[#D4D4D4] shadow-[0px_4px_110.3px_rgba(68,68,68,0.25)] rounded-[20px] flex flex-col items-center p-[32px_48px] gap-[24px] box-border">
-        {/* Frame 1000004789 */}
-        <div className="flex flex-col items-center gap-[20px] w-[358px] h-[94px]">
-          {/* al sharq guidelines-3 copy */}
-          <Image
-            src="/images/logo1.png"
-            alt="Al Sharq Logo"
-            width={157}
-            height={47}
-            className='mb-[20px]'
-          />
-          {/* Forgot Password */}
-          <h1 className="w-[180px] h-[17px] font-['IBM_Plex_Sans'] font-medium text-[24px] leading-[24px] text-center text-[#282828] tracking-[-0.01em] ">
-           <b>Forgot Password</b>
-          </h1>
+    <div className="min-h-screen flex justify-center items-center bg-gray-50 px-4">
+      <div className="flex flex-col lg:flex-row items-center gap-20 max-w-6xl w-full">
+        <div className="hidden lg:flex flex-1 justify-center">
+          <ImageComponent />
         </div>
 
-        {/* We've sent a 4-digit verification code... */}
-        <p className="w-[381px] h-[59px] mt-4 font-['IBM_Plex_Sans'] font-normal text-[16px] leading-[150%] text-center text-[#282828]">
-          We've sent a 4-digit verification code to your email address. Please enter the code below to continue. Code sent to: <b>user@example.com</b> 
-        </p>
+        <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center gap-6 w-full max-w-md">
+          <Image src="/images/logo1.png" alt="Logo" width={150} height={45} className="mb-4" />
+          <h1 className="text-xl font-medium text-gray-800 text-center">Set Your Password</h1>
+          <p className="text-sm text-gray-600 text-center mb-4">Enter a strong password following the suggestions</p>
 
-        {/* Input */}
-        <div className="flex flex-col justify-center items-center gap-[16px] w-[405px] h-[120px]">
-          {/* Frame 33834 */}
-          <div className="flex flex-col items-start gap-[8px] w-[405px] h-[76px]">
-            {/* Email Address* */}
-            <label className="w-[405px] h-[11px] font-['IBM_Plex_Sans'] font-normal text-[16px] leading-[21px] text-[#262626]">
-              Email Address*
-            </label>
-            {/* Frame 38 */}
-            <div className="flex flex-row items-start gap-[6px] w-[405px] h-[53px] mt-2">
-              {/* Frame 5 */}
-              <div className="flex flex-col justify-center items-start p-[14px_16px] gap-[8px] w-[405px] h-[53px] border border-[#DEDEDE] rounded-[10px]">
-                {/* Frame 2 */}
-                <div className="flex flex-row items-center gap-[10px] w-[367px] h-[20px]">
-                  {/* Frame 33829 */}
-                  <div className="flex flex-col items-start gap-[8px] w-[335px] h-[11px]">
-                    {/* Enter Your Email Address */}
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="Enter Your Email Address"
-                      className="w-[190px] h-[11px] font-['IBM_Plex_Sans'] font-normal text-[16px] leading-[21px] text-[#616161] border-none outline-none bg-transparent"
-                    />
-                  </div>
-                  {/* Mail Icon */}
-                  <FaEnvelope size={20} color="#9C9C9C" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Frame 34 */}
-        <div className="flex flex-row items-center gap-[10px] w-[405px] h-[59px]">
-          {/* Frame 8 */}
-          <button className="flex flex-row justify-center items-center p-[16px] gap-[10px] w-[405px] h-[59px] bg-[#9B2033] rounded-[12px] border-none outline-none">
-            {/* Send Code */}
-            <Link href="/authentication/Code">
-            <span className="w-[78px] h-[11px] font-['IBM_Plex_Sans'] font-medium text-[16px] leading-[11px] text-center text-white tracking-[-0.01em]">
-              Send Code
+          <div className="relative w-full mb-2">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Enter Password"
+              className="w-full border border-red-800 rounded-lg p-2 pr-10 text-center focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-red-900"
+            />
+            <span onClick={() => setShowPassword(prev => !prev)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 cursor-pointer">
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
-            </Link>
+          </div>
 
+          <div className="relative w-full mb-2">
+            <input
+              type={showConfirm ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              placeholder="Confirm Password"
+              className="w-full border border-red-800 rounded-lg p-2 pr-10 text-center focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-red-900"
+            />
+            <span onClick={() => setShowConfirm(prev => !prev)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 cursor-pointer">
+              {showConfirm ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
+
+          {error && <p className="text-red-900 text-sm text-center mb-2">{error}</p>}
+
+          <button
+            onClick={handleSetPassword}
+            disabled={loading}
+            className={`w-full py-2 rounded-lg text-white transition ${!loading ? 'bg-[#9B2033] hover:bg-[#7f1a28]' : 'bg-gray-400 cursor-not-allowed'}`}
+          >
+            {loading ? 'Updating...' : 'Set Password'}
           </button>
         </div>
       </div>
-      
-      <Image src="/images/line.png" alt="Logo" width={1729} height={127} className="absolute top-[1010px]" />
     </div>
-  );
+  )
 }
-
-
-

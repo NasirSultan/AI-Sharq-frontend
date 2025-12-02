@@ -90,47 +90,70 @@ const SetUpYourProfile: React.FC<SetUpYourProfileProps> = ({ speakerId, onClose 
   const removeDesignation = (d: string) => setDesignations(prev => prev.filter(item => item !== d))
   const removeTag = (t: string) => setTags(prev => prev.filter(item => item !== t))
 
-  const handleSpeakerSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+const handleSpeakerSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setLoading(true)
 
-    const payload = {
-      designations,
-      bio: formData.bio,
-      expertise: formData.expertise.split(',').map(e => e.trim()).filter(Boolean),
-      website: formData.website || null,
-      facebook: formData.facebook || null,
-      linkedin: formData.linkedin || null,
-      tags,
-      country: formData.country,
-      featured: true,
-      verified: true,
-      priority: 1,
-      isActive: true,
-    }
-
-    try {
-      const res = await api.patch(`/speakers/${speakerId}`, payload)
-      console.log('Speaker updated successfully:', res.data)
-      if (onClose) onClose()
-      else router.push('/Organizer/ManageSpeaker')
-    } catch (err: any) {
-      console.error('Error updating speaker:', err.response?.data || err.message)
-    } finally {
-      setLoading(false)
-    }
+  const payload = {
+    designations,
+    bio: formData.bio,
+    expertise: formData.expertise.split(',').map(e => e.trim()).filter(Boolean),
+    website: formData.website || null,
+    facebook: formData.facebook || null,
+    linkedin: formData.linkedin || null,
+    tags,
+    country: formData.country,
+    featured: true,
+    verified: true,
+    priority: 1,
+    isActive: true,
   }
+
+  try {
+    await api.patch(`/speakers/${speakerId}`, payload)
+    if (onClose) onClose()
+    else router.push('/Organizer/ManageSpeaker')
+  } catch (err: any) {
+    console.error('Error updating speaker:', err.response?.data || err.message)
+  } finally {
+    setLoading(false)
+  }
+}
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
+      <button
+  type="button"
+  onClick={() => onClose && onClose()}
+>
+  ×
+</button>
+      
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg max-h-[90vh] overflow-auto p-8 md:p-10">
-        <div className="flex justify-center mb-6">
-          <Image src="/images/logo1.png" alt="Logo" width={100} height={100} />
-        </div>
+       <div className="relative mb-6 flex justify-center">
+  <div className="w-34 h-24 relative">
+    <Image
+      src="/images/logo1.png"
+      alt="Logo"
+      fill
+      className="object-contain"
+    />
+  </div>
 
-        <h1 className="text-2xl font-medium text-gray-900 text-center mb-4">
-          Set Up Speaker Profile
-        </h1>
+  <button
+    type="button"
+    onClick={() => onClose && onClose()}
+    className="absolute top-0 right-0 text-gray-500 hover:text-red-700 text-2xl font-bold"
+  >
+    ×
+  </button>
+</div>
+
+<h1 className="text-2xl font-medium text-gray-900 text-center mb-10">
+  Set Up Speaker Profile
+</h1>
+
 
         {loading && (
           <p className="text-center text-gray-500 mb-4">Loading...</p>
@@ -235,7 +258,7 @@ const SetUpYourProfile: React.FC<SetUpYourProfileProps> = ({ speakerId, onClose 
             <button
               type="submit"
               disabled={loading}
-              className="py-4 bg-red-600 text-white rounded-xl hover:bg-red-700 mt-4"
+              className="py-4 bg-red-900 text-white rounded-xl hover:bg-red-800 mt-4"
             >
               {loading ? 'Saving...' : 'Save & Finish'}
             </button>

@@ -26,6 +26,7 @@ const SetUpYourProfile: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [showPassword, setShowPassword] = useState(false)
   const [profileImage, setProfileImage] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -58,7 +59,7 @@ const handleInputChanges = (
     const payload = { ...formData }
 
     if (!profileImage && !formData.Pic_url) {
-      payload.Pic_url = 'https://example.com/default-image.png'
+      payload.Pic_url = 'https://al-sharq.fra1.digitaloceanspaces.com/images%20%2814%29.jpg'
     } else if (profileImage) {
       payload.Pic_url = URL.createObjectURL(profileImage)
     }
@@ -90,8 +91,10 @@ const handleInputChanges = (
         console.log('Unexpected response', response.data)
       }
     } catch (err: any) {
-      console.log(err.response?.data || err.message)
-    } finally {
+  const message = err.response?.data?.message || 'Something went wrong'
+  setError(message)
+}
+finally {
       setLoading(false)
     }
   }
@@ -264,12 +267,17 @@ const handleInputChanges = (
             <div className="flex flex-col gap-4 pt-4">
               <button
                 type="submit"
-                className="py-4 bg-red-600 text-white rounded-xl flex justify-center items-center gap-2"
+                className="py-4 bg-red-900 text-white rounded-xl flex justify-center items-center gap-2"
                 disabled={loading}
               >
                 {loading ? 'Saving...' : 'Save & Continue'}
               </button>
+           
             </div>
+          {error && (
+  <p className="text-red-600 text-center text-sm">{error}</p>
+)}
+
           </form>
         </div>
       </div>

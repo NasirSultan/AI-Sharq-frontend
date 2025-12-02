@@ -26,6 +26,7 @@ const SetUpYourProfile: React.FC<Props> = ({ onClose }) => {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+const [error, setError] = useState<string>('')
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -51,11 +52,15 @@ const SetUpYourProfile: React.FC<Props> = ({ onClose }) => {
         router.push('/Organizer/ManageSponsor')
       }
     } catch (err: any) {
-      console.log(err.response?.data || err.message)
-      window.alert('Something went wrong. Please try again')
-    } finally {
-      setLoading(false)
+    // type-safe handling
+    if (err.response && err.response.data && typeof err.response.data.message === 'string') {
+      setError(err.response.data.message)
+    } else {
+      setError('Something went wrong. Please try again.')
     }
+  } finally {
+    setLoading(false)
+  }
   }
 
   const handleSkip = () => onClose()
@@ -218,9 +223,15 @@ const SetUpYourProfile: React.FC<Props> = ({ onClose }) => {
           </div>
 
           <div className="flex flex-col gap-4 pt-4">
+
+{error && (
+  <p className="text-red-600 text-center text-sm">{error}</p>
+)}
+
+
             <button
               type="submit"
-              className="py-4 bg-red-600 text-white rounded-xl"
+              className="py-4 bg-red-900 text-white rounded-xl"
               disabled={loading}
             >
               {loading ? 'Saving...' : 'Save & Continue'}

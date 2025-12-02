@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { FaArrowLeft, FaSearch,FaUser, FaPlay, FaRegListAlt, FaLock, FaUnlock, FaQrcode, FaCalendarAlt } from 'react-icons/fa'
+import { FaArrowLeft, FaSearch, FaUser, FaPlay, FaRegListAlt, FaLock, FaUnlock, FaQrcode, FaCalendarAlt } from 'react-icons/fa'
+import { FaTv } from 'react-icons/fa'
 import api from '@/config/api'
 import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
@@ -98,66 +99,76 @@ export default function SessionsSchedule() {
   }, [sessions])
 
   // Filter sessions based on all criteria
-  useEffect(() => {
-    let filtered = [...sessions]
-    const now = new Date()
+useEffect(() => {
+  let filtered = [...sessions]
+  const now = new Date()
 
-    // Filter out past sessions (only show current and future)
+  // Apply time-based filters
+  if (activeFilter === "Daily") {
+    filtered = filtered.filter(s => new Date(s.startTime).toDateString() === now.toDateString())
+  } else if (activeFilter === "Weekly") {
+    const weekStart = new Date(now)
+    weekStart.setDate(now.getDate() - now.getDay())
+    const weekEnd = new Date(weekStart)
+    weekEnd.setDate(weekStart.getDate() + 6)
     filtered = filtered.filter(s => {
-      const end = new Date(s.endTime)
-      return end >= now
+      const start = new Date(s.startTime)
+      return start >= weekStart && start <= weekEnd
     })
+  } else if (activeFilter === "10 Days") {
+    const start = new Date()
+    const end = new Date()
+    end.setDate(start.getDate() + 10)
+    filtered = filtered.filter(s => {
+      const startTime = new Date(s.startTime)
+      return startTime >= start && startTime <= end
+    })
+  } else if (activeFilter === "90 Days") {
+    const start = new Date()
+    const end = new Date()
+    end.setDate(start.getDate() + 90)
+    filtered = filtered.filter(s => {
+      const startTime = new Date(s.startTime)
+      return startTime >= start && startTime <= end
+    })
+  }
 
-    // Apply time-based filters
-    if (activeFilter === "Daily") {
-      filtered = filtered.filter(s => new Date(s.startTime).toDateString() === now.toDateString())
-    } else if (activeFilter === "Weekly") {
-      const weekStart = new Date(now)
-      weekStart.setDate(now.getDate() - now.getDay())
-      const weekEnd = new Date(weekStart)
-      weekEnd.setDate(weekStart.getDate() + 6)
-      filtered = filtered.filter(s => {
-        const start = new Date(s.startTime)
-        return start >= weekStart && start <= weekEnd
-      })
-    } else if (activeFilter === "10 Days") {
-      const start = new Date()
-      const end = new Date()
-      end.setDate(start.getDate() + 10)
-      filtered = filtered.filter(s => {
-        const startTime = new Date(s.startTime)
-        return startTime >= start && startTime <= end
-      })
-    } else if (activeFilter === "90 Days") {
-      const start = new Date()
-      const end = new Date()
-      end.setDate(start.getDate() + 90)
-      filtered = filtered.filter(s => {
-        const startTime = new Date(s.startTime)
-        return startTime >= start && startTime <= end
-      })
-    }
+  // Apply date range filter
+  if (startDate) {
+    const start = new Date(startDate)
+    filtered = filtered.filter(s => new Date(s.startTime) >= start)
+  }
+  if (endDate) {
+    const end = new Date(endDate)
+    filtered = filtered.filter(s => new Date(s.startTime) <= end)
+  }
 
-    // Apply date range filter
-    if (startDate) {
-      const start = new Date(startDate)
-      filtered = filtered.filter(s => new Date(s.startTime) >= start)
-    }
-    if (endDate) {
-      const end = new Date(endDate)
-      filtered = filtered.filter(s => new Date(s.startTime) <= end)
-    }
+  // Apply search filter
+  if (searchText) {
+    filtered = filtered.filter(s =>
+      s.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      s.speakers.some(sp => sp.name.toLowerCase().includes(searchText.toLowerCase()))
+    )
+  }
 
-    // Apply search filter
-    if (searchText) {
-      filtered = filtered.filter(s =>
-        s.title.toLowerCase().includes(searchText.toLowerCase()) ||
-        s.speakers.some(sp => sp.name.toLowerCase().includes(searchText.toLowerCase()))
-      )
-    }
+  // Sort sessions: upcoming first, live next, finished last
+  filtered.sort((a, b) => {
+    const now = new Date()
+    const aStart = new Date(a.startTime)
+    const aEnd = new Date(a.endTime)
+    const bStart = new Date(b.startTime)
+    const bEnd = new Date(b.endTime)
 
-    setFilteredSessions(filtered)
-  }, [activeFilter, searchText, sessions, startDate, endDate])
+    const aStatus = aEnd < now ? 2 : aStart > now ? 0 : 1
+    const bStatus = bEnd < now ? 2 : bStart > now ? 0 : 1
+
+    if (aStatus !== bStatus) return aStatus - bStatus
+    return aStart.getTime() - bStart.getTime()
+  })
+
+  setFilteredSessions(filtered)
+}, [activeFilter, searchText, sessions, startDate, endDate])
+
 
   // Initial fetch
   useEffect(() => {
@@ -390,9 +401,9 @@ export default function SessionsSchedule() {
                       <FaUnlock className="text-green-600 flex-shrink-0 ml-2" />
                     )
                   ) : (
-                    <a 
-                      href={`/join/${session.joinToken}`} 
-                      target="_blank" 
+                    <a
+                      href={`/join/${session.joinToken}`}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-green-600 hover:text-green-700 flex-shrink-0 ml-2"
                     >
@@ -407,21 +418,21 @@ export default function SessionsSchedule() {
                 {/* Speaker Info */}
                 {speaker && (
                   <div className="flex items-center text-xs text-gray-600 mb-1 space-x-2">
-{speaker.file ? (
-  <img
-    src={speaker.file}
-    alt={speaker.name || "Default Avatar"}
-    className="w-6 h-6 rounded-full object-cover flex-shrink-0"
-    onError={(e) => {
-      e.currentTarget.style.display = "none"
-    }}
-  />
-) : (
-<div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-  <FaUser className="w-4 h-4 text-blue-500" />
-</div>
+                    {speaker.file ? (
+                      <img
+                        src={speaker.file}
+                        alt={speaker.name || "Default Avatar"}
+                        className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none"
+                        }}
+                      />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                        <FaUser className="w-4 h-4 text-blue-500" />
+                      </div>
 
-)}
+                    )}
 
                     <span className="truncate">{speaker.name}</span>
                   </div>
@@ -438,16 +449,16 @@ export default function SessionsSchedule() {
                     </span>
                   )}
                 </div>
- <div className="flex text-xs text-gray-900 mb-2 items-center justify-between">
+                <div className="flex text-xs text-gray-900 mb-2 items-center justify-between">
                   <span className="font-medium">Duration</span>
-                <div className="flex items-center text-gray-600 gap-2">
- <span>
-  {Math.floor(
-    (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / 60000
-  )} min
-</span>
+                  <div className="flex items-center text-gray-600 gap-2">
+                    <span>
+                      {Math.floor(
+                        (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / 60000
+                      )} min
+                    </span>
 
-</div>
+                  </div>
 
                 </div>
                 {/* Location */}
@@ -458,30 +469,48 @@ export default function SessionsSchedule() {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-3 mt-4">
-                  <button
-                    onClick={() => setViewSessionId(session.id)}
-                    disabled={btnLoading}
-                    className="bg-[#9B2033] hover:bg-[#7c062a] text-white text-sm px-4 py-2 rounded-md w-full flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    Edit
-                  </button>
+  <button
+    onClick={() => setViewSessionId(session.id)}
+    disabled={btnLoading}
+    className="bg-[#9B2033] hover:bg-[#7c062a] text-white text-sm px-4 py-2 rounded-md w-full flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed transition"
+  >
+    Edit
+  </button>
 
-                  <button
-                    onClick={() => handleDelete(session.id)}
-                    disabled={loadingDelete === session.id}
-                    className="border border-gray-300 text-gray-700 hover:bg-gray-100 text-sm px-4 py-2 rounded-md w-full flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    {loadingDelete === session.id ? <LoadingSpinner /> : 'Delete'}
-                  </button>
+  <button
+    onClick={() => handleDelete(session.id)}
+    disabled={loadingDelete === session.id}
+    className="border border-gray-300 text-gray-700 hover:bg-gray-100 text-sm px-4 py-2 rounded-md w-full flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed transition"
+  >
+    {loadingDelete === session.id ? <LoadingSpinner /> : 'Delete'}
+  </button>
 
-                  <button
-                    onClick={() => handleView(session)}
-                    disabled={btnLoading}
-                    className="border border-gray-300 text-gray-700 hover:bg-gray-100 text-sm px-4 py-2 rounded-md w-full flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    View
-                  </button>
-                </div>
+  <button
+    onClick={() => handleView(session)}
+    disabled={btnLoading}
+    className="border border-gray-300 text-gray-700 hover:bg-gray-100 text-sm px-4 py-2 rounded-md w-full flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed transition"
+  >
+    View
+  </button>
+</div>
+
+{/* Status Row */}
+<div className="mt-2 w-full flex justify-center">
+{(() => {
+  const now = new Date()
+  const start = new Date(session.startTime)
+  const end = new Date(session.endTime)
+  if (start <= now && end >= now) {
+    return <span className="w-full text-center px-4 py-2 bg-red-100 text-red-600 rounded-full text-sm font-semibold">Live</span>
+  } else if (start > now) {
+    return <span className="w-full text-center px-4 py-2 bg-green-50 text-green-600 rounded-full text-sm font-semibold">Upcoming</span>
+  } else {
+    return <span className="w-full text-center px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold">Finished</span>
+  }
+})()}
+
+</div>
+
               </div>
             )
           })
@@ -490,9 +519,9 @@ export default function SessionsSchedule() {
 
       {/* View Session Modal */}
       {viewSessionId && (
-        <ViewSession 
-          sessionId={viewSessionId} 
-          onClose={handleViewSessionClose} 
+        <ViewSession
+          sessionId={viewSessionId}
+          onClose={handleViewSessionClose}
         />
       )}
     </div>

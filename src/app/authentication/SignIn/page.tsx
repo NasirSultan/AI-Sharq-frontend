@@ -176,7 +176,7 @@ const [showPassword, setShowPassword] = useState(false)
              
             </label>
 
-            <Link href="/authentication/ForgetPassword">
+            <Link href="/authentication/OtpVarification">
               <span className="text-sm text-[#9B2033] hover:underline">
                 Forget Password?
               </span>
