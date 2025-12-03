@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+
+@import "leaflet/dist/leaflet.css";
+
+@import "tailwindcss";
+
+
+
+
+
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+:root {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'IBM Plex Sans', sans-serif;
+  background-color: rgb(252, 250, 250);
+}
+@keyframes wave {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  70% {
+    transform: scale(2.5);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes wave-delayed {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  70% {
+    transform: scale(2.8);
+    opacity: 0.1;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+.animate-wave {
+  animation: wave 5s ease-out infinite;
+}
+
+.animate-wave-delayed {
+  animation: wave-delayed 5.2s ease-out infinite;
+  animation-delay: 1.5s;
+}
+
+@keyframes pulse-smooth {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+.animate-pulse-smooth {
+  animation: pulse-smooth 2s ease-in-out infinite;
+}
