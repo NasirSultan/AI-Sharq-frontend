@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react'
 import api from '@/config/api'
-import { FaUser, FaLinkedin, FaTwitter, FaYoutube } from 'react-icons/fa'
+import { FaUser, FaLinkedin, FaTwitter, FaYoutube, FaEdit } from 'react-icons/fa'
 import Image from 'next/image'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store/store'
@@ -83,82 +83,82 @@ const SponsorProfileView: React.FC = () => {
           )}
 
           <div className="absolute top-4 right-4 flex gap-2">
-           <Link href="/sponsors/edit">
-  <button className="w-12 h-12 flex items-center justify-center bg-red-600 text-white rounded-full shadow hover:bg-red-700">
-    Edit
-  </button>
-</Link>
+            <Link href="/sponsors/edit">
+              <button className="w-12 h-12 flex items-center justify-center bg-red-900 text-white rounded-full shadow hover:bg-red-700">
+                <FaEdit />
+              </button>
+            </Link>
 
-            <button
-              onClick={() => setShowQR(true)}
-              className="w-12 h-12 flex items-center justify-center bg-gray-800 text-white rounded-full shadow hover:bg-gray-900"
-            >
-              QR
-            </button>
 
             <LogoutButton />
           </div>
         </div>
 
-        <div className="bg-white border border-gray-300 rounded-2xl shadow-lg p-10 w-full max-w-5xl mb-16">
-          <div className="flex flex-col items-center gap-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              <div>
-                <p className="font-bold p-1">Sponsor Name</p>
-                <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.name}</p>
-              </div>
+       <div className="bg-white border border-gray-300 rounded-2xl shadow-lg p-10 w-full max-w-5xl mb-16">
+  <div className="flex flex-col items-center gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+      <div>
+        <p className="font-bold p-1">Sponsor Name</p>
+        <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.name || 'N/A'}</p>
+      </div>
 
-              <div>
-                <p className="font-bold p-1">Email</p>
-                <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.email}</p>
-              </div>
+      <div>
+        <p className="font-bold p-1">Email</p>
+        <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.email || 'N/A'}</p>
+      </div>
 
-              <div>
-                <p className="font-bold p-1">Phone</p>
-                <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.phone}</p>
-              </div>
+      <div>
+        <p className="font-bold p-1">Phone</p>
+        <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.phone || 'N/A'}</p>
+      </div>
 
-              <div>
-                <p className="font-bold p-1">Category</p>
-                <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.category}</p>
-              </div>
+      <div>
+        <p className="font-bold p-1">Category</p>
+        <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.category || 'N/A'}</p>
+      </div>
 
-              <div>
-                <p className="font-bold p-1">Website</p>
-                <a
-                  href={sponsor.website}
-                  target="_blank"
-                  className="px-4 py-3 border border-gray-300 rounded-xl text-red-600 hover:underline block"
-                >
-                  {sponsor.website}
-                </a>
-              </div>
+      <div>
+        <p className="font-bold p-1">Website</p>
+        {sponsor.website ? (
+          <a
+            href={sponsor.website}
+            target="_blank"
+            className="px-4 py-3 border border-gray-300 rounded-xl text-red-600 hover:underline block"
+          >
+            {sponsor.website}
+          </a>
+        ) : (
+          <p className="px-4 py-3 border border-gray-300 rounded-xl">N/A</p>
+        )}
+      </div>
 
-              <div className="md:col-span-2">
-                <p className="font-bold p-1">Description</p>
-                <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.description}</p>
-              </div>
+      <div className="md:col-span-2">
+        <p className="font-bold p-1">Description</p>
+        <p className="px-4 py-3 border border-gray-300 rounded-xl">{sponsor.description || 'N/A'}</p>
+      </div>
 
-              <div className="md:col-span-2 flex gap-6 mt-6 justify-center">
-                {sponsor.linkedin && (
-                  <a href={sponsor.linkedin} target="_blank" className="text-blue-700 hover:text-blue-900 text-2xl">
-                    <FaLinkedin />
-                  </a>
-                )}
-                {sponsor.twitter && (
-                  <a href={sponsor.twitter} target="_blank" className="text-blue-500 hover:text-blue-700 text-2xl">
-                    <FaTwitter />
-                  </a>
-                )}
-                {sponsor.youtube && (
-                  <a href={sponsor.youtube} target="_blank" className="text-red-600 hover:text-red-800 text-2xl">
-                    <FaYoutube />
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="md:col-span-2 flex gap-6 mt-6 justify-center">
+        {sponsor.linkedin && (
+          <a href={sponsor.linkedin} target="_blank" className="text-blue-700 hover:text-blue-900 text-2xl">
+            <FaLinkedin />
+          </a>
+        )}
+        {sponsor.twitter && (
+          <a href={sponsor.twitter} target="_blank" className="text-blue-500 hover:text-blue-700 text-2xl">
+            <FaTwitter />
+          </a>
+        )}
+        {sponsor.youtube && (
+          <a href={sponsor.youtube} target="_blank" className="text-red-600 hover:text-red-800 text-2xl">
+            <FaYoutube />
+          </a>
+        )}
+        {!sponsor.linkedin && !sponsor.twitter && !sponsor.youtube && <p>N/A</p>}
+      </div>
+    </div>
+  </div>
+</div>
+
       </div>
 
       <div className="w-full flex justify-center fix bottom-0">

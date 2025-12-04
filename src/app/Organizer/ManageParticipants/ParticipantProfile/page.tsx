@@ -98,11 +98,6 @@ useEffect(() => {
       <p className="px-4 py-2 rounded-xl bg-gray-50 text-black text-sm break-all">{displayValue(user.phone)}</p>
     </div>
 
-    <div className="flex flex-col">
-      <p className="text-gray-500 text-sm">Organization</p>
-      <p className="px-4 py-2 rounded-xl bg-gray-50 text-black text-sm">{displayValue(user.organization)}</p>
-    </div>
-
     <div className="flex flex-col sm:col-span-2">
       <p className="text-gray-500 text-sm">Bio</p>
       <p className="px-4 py-2 rounded-xl bg-gray-50 text-black text-sm">{displayValue(user.bio)}</p>

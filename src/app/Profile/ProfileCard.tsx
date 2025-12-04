@@ -114,12 +114,15 @@ export default function ProfileCard({
           </p>
         </div>
 
-        <div className="flex flex-col">
-          <p className="text-sm text-red-900 m-1">Organization*</p>
-          <p className="px-1 py-2  rounded-lg bg-gray-50 text-black text-sm">
-            {user.organization || 'No organization exists yet'}
-          </p>
-        </div>
+      {role !== 'participant' && (
+  <div className="flex flex-col">
+    <p className="text-sm text-red-900 m-1">Organization*</p>
+    <p className="px-1 py-2 rounded-lg bg-gray-50 text-black text-sm">
+      {user.organization || 'No organization exists yet'}
+    </p>
+  </div>
+)}
+
 
         <div className="flex flex-col sm:col-span-2">
           <p className="text-sm  text-red-900 m-1">Email*</p>

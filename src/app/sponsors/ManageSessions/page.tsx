@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect, useMemo } from "react"
-import { FaArrowRight, FaCalendarAlt, FaClock, FaPlay, FaEdit, FaSearch, FaStar, FaLock, FaCopy } from "react-icons/fa"
+import { FaArrowRight, FaCalendarAlt, FaClock, FaPlay, FaUser, FaEdit, FaSearch, FaStar, FaLock, FaCopy } from "react-icons/fa"
 import { FaMessage, FaCalendar as FaCalendarIcon } from "react-icons/fa6"
 import Image from "next/image"
 import { useSelector, useDispatch } from "react-redux"
@@ -148,8 +148,8 @@ export default function SpeakerSessions() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 mb-6">
-        <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 w-full md:w-96">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-4 mb-6">
+        <div className="flex bg-white border border-gray-300 rounded-md px-3 py-2 flex-1 min-w-[200px]">
           <FaSearch className="text-red-900 mr-2" />
           <input
             type="text"
@@ -160,12 +160,12 @@ export default function SpeakerSessions() {
           />
         </div>
 
-        <div className="flex flex-wrap gap-2 md:gap-5">
+        <div className="flex flex-wrap gap-2 sm:gap-3 justify-start sm:justify-end">
           {filters.map(filter => (
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-black"}`}
+              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap ${activeFilter === filter ? "bg-[#86002B] text-white" : "bg-white border border-gray-300 text-black"}`}
             >
               {filter}
             </button>
@@ -207,25 +207,30 @@ export default function SpeakerSessions() {
                     </div>
 
                     <div className="flex items-center space-x-2 mb-2">
-                     {event.speakers && event.speakers.length > 0 ? (
-  <div className="flex items-center space-x-2">
-    {event.speakers[0].file && (
-     <Image
-  src={event.speakers[0].file}
-  alt={event.speakers[0].name}
-  width={24}
-  height={24}
-  style={{ width: "24px", height: "auto" }}
-  className="rounded-full object-cover"
-/>
+                      {event.speakers && event.speakers.length > 0 ? (
+                        <div className="flex items-center space-x-2">
+                          {event.speakers[0].file ? (
+                            <Image
+                              src={event.speakers[0].file}
+                              alt={event.speakers[0].name}
+                              width={24}
+                              height={24}
+                              style={{ width: "24px", height: "24px" }}
+                              className="rounded-full object-cover"
+                            />
 
-    )}
-    <span className="text-xs text-gray-600">{event.speakers[0].name}</span>
-    {event.speakers.length > 1 && <span className="text-xs text-gray-500">+{event.speakers.length - 1}</span>}
-  </div>
-) : (
-  <span className="text-xs text-gray-500">No speakers</span>
-)}
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                              <FaUser className="w-4 h-4 text-blue-500" />
+                            </div>
+                          )}
+
+                          <span className="text-xs text-gray-600">{event.speakers[0].name}</span>
+                          {event.speakers.length > 1 && <span className="text-xs text-gray-500">+{event.speakers.length - 1}</span>}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-500">No speakers</span>
+                      )}
 
                     </div>
                   </div>

@@ -132,95 +132,96 @@ export default function SetUpYourProfile() {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg max-h-[90vh] overflow-auto p-8 md:p-10">
-        <div className="flex justify-center mb-6">
-          <Image src="/images/logo1.png" alt="Logo" width={100} height={100} />
-        </div>
-
-        {loading && <p className="text-center text-gray-500 mb-6">Loading data, please wait...</p>}
-
-        {!loading && (
-          <>
-            <h1 className="text-2xl font-medium text-gray-900 text-center mb-4">
-              Update Speaker Profile
-            </h1>
-            <form onSubmit={handleSpeakerSubmit} className="flex flex-col gap-4">
-              <label className="font-medium text-gray-700">Designations</label>
-              <input
-                type="text"
-                name="orgInput"
-                value={formData.orgInput}
-                onChange={handleInputChange}
-                onKeyDown={handleOrgKeyDown}
-                placeholder="Type and press Enter"
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500"
-              />
-              <div className="flex flex-wrap gap-2 mt-2">
-                {designations.map((d, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full flex items-center gap-2 text-sm"
-                  >
-                    {d}
-                    <button type="button" onClick={() => removeDesignation(d)}>×</button>
-                  </span>
-                ))}
-              </div>
-
-              <label className="font-medium text-gray-700 mt-4">Tags</label>
-              <input
-                type="text"
-                name="tagInput"
-                value={formData.tagInput}
-                onChange={handleInputChange}
-                onKeyDown={handleTagKeyDown}
-                placeholder="Keynote Speaker, Workshop"
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500"
-              />
-              <div className="flex flex-wrap gap-2 mt-2">
-                {tags.map((t, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 bg-green-200 text-green-800 rounded-full flex items-center gap-2 text-sm"
-                  >
-                    {t}
-                    <button type="button" onClick={() => removeTag(t)}>×</button>
-                  </span>
-                ))}
-              </div>
-
-              <label className="font-medium text-gray-700 mt-4">Expertise</label>
-              <input
-                type="text"
-                name="expertise"
-                value={formData.expertise}
-                onChange={handleInputChange}
-                placeholder="AI, ML, NLP"
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500"
-              />
-
-              <label className="font-medium text-gray-700 mt-4">Bio</label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-                placeholder="Describe yourself"
-                rows={6}
-                className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 resize-none"
-              />
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="py-4 bg-red-600 text-white rounded-xl hover:bg-red-700 mt-4"
-              >
-                {loading ? 'Saving...' : 'Save & Finish'}
-              </button>
-            </form>
-          </>
-        )}
-      </div>
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
+  <div className="bg-white rounded-2xl shadow-lg w-full max-w-md md:max-w-lg lg:max-w-xl mx-4 max-h-[90vh] overflow-auto p-6 md:p-10">
+    <div className="flex justify-center mb-6">
+      <Image src="/images/logo1.png" alt="Logo" width={100} height={100} />
     </div>
+
+    {loading && <p className="text-center text-gray-500 mb-6">Loading data, please wait...</p>}
+
+    {!loading && (
+      <>
+        <h1 className="text-2xl font-medium text-gray-900 text-center mb-2">
+          Update Speaker Profile
+        </h1>
+        <form onSubmit={handleSpeakerSubmit} className="flex flex-col gap-2">
+          <label className="font-medium text-gray-700">Designations</label>
+          <input
+            type="text"
+            name="orgInput"
+            value={formData.orgInput}
+            onChange={handleInputChange}
+            onKeyDown={handleOrgKeyDown}
+            placeholder="Type and press Enter"
+            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500"
+          />
+          <div className="flex flex-wrap gap-1 mt-1">
+            {designations.map((d, i) => (
+              <span
+                key={i}
+                className="px-2 py-0.5 bg-yellow-200 text-yellow-800 rounded-full flex items-center gap-1 text-sm"
+              >
+                {d}
+                <button type="button" onClick={() => removeDesignation(d)}>×</button>
+              </span>
+            ))}
+          </div>
+
+          <label className="font-medium text-gray-700 mt-2">Tags</label>
+          <input
+            type="text"
+            name="tagInput"
+            value={formData.tagInput}
+            onChange={handleInputChange}
+            onKeyDown={handleTagKeyDown}
+            placeholder="Keynote Speaker, Workshop"
+            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500"
+          />
+          <div className="flex flex-wrap gap-1 mt-1">
+            {tags.map((t, i) => (
+              <span
+                key={i}
+                className="px-2 py-0.5 bg-green-200 text-green-800 rounded-full flex items-center gap-1 text-sm"
+              >
+                {t}
+                <button type="button" onClick={() => removeTag(t)}>×</button>
+              </span>
+            ))}
+          </div>
+
+          <label className="font-medium text-gray-700 mt-2">Expertise</label>
+          <input
+            type="text"
+            name="expertise"
+            value={formData.expertise}
+            onChange={handleInputChange}
+            placeholder="AI, ML, NLP"
+            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500"
+          />
+
+          <label className="font-medium text-gray-700 mt-2">Bio</label>
+          <textarea
+            name="bio"
+            value={formData.bio}
+            onChange={handleInputChange}
+            placeholder="Describe yourself"
+            rows={4}
+            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 resize-none"
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="py-3 bg-red-900 text-white rounded-xl hover:bg-red-800 mt-3"
+          >
+            {loading ? 'Saving...' : 'Save & Finish'}
+          </button>
+        </form>
+      </>
+    )}
+  </div>
+</div>
+
   )
 }

@@ -1,327 +1,283 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { FiSearch, FiFilter, FiChevronDown, FiEdit, FiTrash2, FiPlus, FiCheck, FiClock, FiFileText } from 'react-icons/fi';
-import { BiBell } from 'react-icons/bi';
-import EditAnnouncementModal from '../../components/EditAnnouncementModal';
-import AddAnnouncementModal from '../../components/AddAnnouncementModal';
-import { FaArrowLeft } from 'react-icons/fa';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react'
+import api from '@/config/api'
+import { FiSearch, FiFilter, FiEdit, FiTrash2, FiPlus, FiClock } from 'react-icons/fi'
+import { BiBell } from 'react-icons/bi'
+import { FiMail, FiTrendingUp } from 'react-icons/fi'
+import EditAnnouncementModal from '../../components/EditAnnouncementModal'
+import AddAnnouncementModal from '../../components/AddAnnouncementModal'
+import { FaArrowLeft } from 'react-icons/fa'
+import Link from 'next/link'
 
 interface Announcement {
-  id: string;
-  title: string;
-  message: string;
-  audience: string;
-  date: string;
-  status: 'sent' | 'scheduled' | 'draft';
+  id: number
+  title: string
+  message: string
+  roles?: string[]
+  scheduledAt: string | null
+  isSent: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 const ManageAnnouncements: React.FC = () => {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [filteredAnnouncements, setFilteredAnnouncements] = useState<Announcement[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const [filteredAnnouncements, setFilteredAnnouncements] = useState<Announcement[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [activeFilter, setActiveFilter] = useState('all')
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  // Calculate statistics
-  const totalSent = announcements.filter(ann => ann.status === 'sent').length;
-  const totalScheduled = announcements.filter(ann => ann.status === 'scheduled').length;
-  const totalDrafts = announcements.filter(ann => ann.status === 'draft').length;
-
-  // Load announcements from localStorage on component mount
-  useEffect(() => {
-    const storedAnnouncements = localStorage.getItem('announcements');
-    if (storedAnnouncements) {
-      const parsed = JSON.parse(storedAnnouncements);
-      setAnnouncements(parsed);
-      setFilteredAnnouncements(parsed);
-    } else {
-      // Sample data
-      const sampleAnnouncements: Announcement[] = [
-        {
-          id: '1',
-          title: 'Keynote Session Reminder',
-          message: "Don't miss today's keynote at 10:00 AM in Hall A. Dr. Ahmed Hassan will present the latest insights on digital transformation.",
-          audience: 'All Participants',
-          date: 'Feb 15, 9:30 AM',
-          status: 'sent'
-        },
-        {
-          id: '2',
-          title: 'Networking Event',
-          message: 'Join us for the networking session in the main hall at 2:00 PM.',
-          audience: 'All Participants',
-          date: 'Feb 16, 2:00 PM',
-          status: 'scheduled'
-        },
-        {
-          id: '3',
-          title: 'Workshop Update',
-          message: 'The AI workshop has been rescheduled to 4:00 PM.',
-          audience: 'All Participants',
-          date: 'Feb 17, 4:00 PM',
-          status: 'draft'
-        }
-      ];
-      setAnnouncements(sampleAnnouncements);
-      setFilteredAnnouncements(sampleAnnouncements);
-      localStorage.setItem('announcements', JSON.stringify(sampleAnnouncements));
+  const fetchAnnouncements = async () => {
+    setIsLoading(true)
+    try {
+      const response = await api.get('/announcements')
+      setAnnouncements(response.data)
+      setFilteredAnnouncements(response.data)
+    } catch (err) {
+      console.error('Failed to fetch announcements', err)
+    } finally {
+      setIsLoading(false)
     }
-  }, []);
+  }
 
-  // Filter announcements based on search and active filter
   useEffect(() => {
-    let filtered = announcements;
+    fetchAnnouncements()
+  }, [])
 
-    // Filter by status
-    if (activeFilter !== 'all') {
-      filtered = filtered.filter(ann => ann.status === activeFilter);
-    }
+  useEffect(() => {
+    let filtered = announcements
+    if (activeFilter === 'sent') filtered = filtered.filter(ann => ann.isSent)
+    else if (activeFilter === 'draft') filtered = filtered.filter(ann => !ann.isSent)
 
-    // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(ann =>
-        ann.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ann.message.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filtered.filter(
+        ann =>
+          ann.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          ann.message.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     }
 
-    setFilteredAnnouncements(filtered);
-  }, [announcements, searchTerm, activeFilter]);
+    setFilteredAnnouncements(filtered)
+  }, [announcements, searchTerm, activeFilter])
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this announcement?')) {
-      const updatedAnnouncements = announcements.filter(ann => ann.id !== id);
-      setAnnouncements(updatedAnnouncements);
-      localStorage.setItem('announcements', JSON.stringify(updatedAnnouncements));
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this announcement?')) return
+    try {
+      await api.delete(`/announcements/${id}`)
+      await fetchAnnouncements()
+    } catch (err) {
+      console.error('Failed to delete announcement', err)
     }
-  };
+  }
 
   const handleEdit = (announcement: Announcement) => {
-    setEditingAnnouncement(announcement);
-    setIsEditModalOpen(true);
-  };
+    if (announcement.isSent) return
+    setEditingAnnouncement(announcement)
+    setIsEditModalOpen(true)
+  }
 
-  const handleSaveEdit = (updatedAnnouncement: Announcement) => {
-    const existingIndex = announcements.findIndex(ann => ann.id === updatedAnnouncement.id);
+  const handleAddNew = () => setIsAddModalOpen(true)
 
-    let updatedAnnouncements;
-    if (existingIndex >= 0) {
-      // Update existing announcement
-      updatedAnnouncements = announcements.map(ann =>
-        ann.id === updatedAnnouncement.id ? updatedAnnouncement : ann
-      );
-    } else {
-      // Add new announcement
-      updatedAnnouncements = [...announcements, updatedAnnouncement];
+  const handleSaveEdit = async (updated: Announcement) => {
+    try {
+      await api.patch(`/announcements/${updated.id}`, updated)
+      return true
+    } catch (err) {
+      console.error('Failed to update announcement', err)
+      return false
     }
+  }
 
-    setAnnouncements(updatedAnnouncements);
-    localStorage.setItem('announcements', JSON.stringify(updatedAnnouncements));
-    setIsEditModalOpen(false);
-    setEditingAnnouncement(null);
-  };
+  const handleSaveNew = async (newAnnouncement: Announcement) => {
+    try {
+      await api.post('/announcements', newAnnouncement)
+      return true
+    } catch (err) {
+      console.error('Failed to add announcement', err)
+      return false
+    }
+  }
 
-  const handleAddNew = () => {
-    setIsAddModalOpen(true);
-  };
+  const onEditModalClose = () => {
+    setIsEditModalOpen(false)
+    setEditingAnnouncement(null)
+    fetchAnnouncements()
+  }
+
+  const onAddModalClose = () => {
+    setIsAddModalOpen(false)
+    fetchAnnouncements()
+  }
+
+  const totalCount = announcements.length
+  const sentCount = announcements.filter(a => a.isSent).length
+  const draftCount = announcements.filter(a => !a.isSent).length
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-6 mb-8">
-               <Link href="/Organizer/Dashboard">  <FaArrowLeft className="text-red-700 w-7 h-7" /></Link>
-          
-          
-          <h1 className="text-2xl font-medium text-gray-900">Manage Announcements</h1>
-        </div>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+  <div className="max-w-6xl mx-auto">
 
-        {/* Search and Filters */}
-        <div className="mb-6">
-          <div className="flex items-center gap-6">
-            {/* Search Bar */}
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search announcements..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                />
+    <div className="flex items-center gap-4 mb-8">
+      <Link href="/Organizer/Dashboard">
+        <FaArrowLeft className="text-red-700 w-7 h-7" />
+      </Link>
+      <h1 className="text-2xl font-medium text-gray-900">Manage Announcements</h1>
+    </div>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div className="bg-white p-4 h-24 rounded-lg shadow flex items-center justify-center gap-3 hover:shadow-lg transition">
+        <FiMail className="w-6 h-6 text-gray-500" />
+        <div className="text-center">
+          <p className="text-gray-500">Total</p>
+          <p className="text-lg font-bold text-gray-900">{totalCount}</p>
+        </div>
+      </div>
+
+      <div className="bg-white p-4 h-24 rounded-lg shadow flex items-center justify-center gap-3 hover:shadow-lg transition">
+        <FiTrendingUp className="w-6 h-6 text-green-600" />
+        <div className="text-center">
+          <p className="text-gray-500">Sent</p>
+          <p className="text-lg font-bold text-green-600">{sentCount}</p>
+        </div>
+      </div>
+
+      <div className="bg-white p-4 h-24 rounded-lg shadow flex items-center justify-center gap-3 hover:shadow-lg transition">
+        <FiEdit className="w-6 h-6 text-gray-900" />
+        <div className="text-center">
+          <p className="text-gray-500">Draft</p>
+          <p className="text-lg font-bold text-gray-900">{draftCount}</p>
+        </div>
+      </div>
+    </div>
+
+    <div className="w-full mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative w-full flex-1">
+        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <input
+          type="text"
+          placeholder="Search announcements..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-red-900 focus:border-red-900"
+        />
+      </div>
+
+      <div className="flex gap-2 flex-wrap">
+        {['all', 'sent', 'draft'].map(filter => (
+          <button
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`px-4 py-2 rounded-lg border text-sm font-medium ${
+              activeFilter === filter
+                ? 'bg-red-900 text-white border-red-900'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {filter.charAt(0).toUpperCase() + filter.slice(1)}
+          </button>
+        ))}
+
+        <button
+          onClick={handleAddNew}
+          className="flex items-center gap-2 px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-700"
+        >
+          <FiPlus className="w-4 h-4" />
+          Add New
+        </button>
+      </div>
+    </div>
+
+    <div className="space-y-4">
+      {isLoading ? (
+        <div className="bg-white rounded-lg p-12 flex flex-col items-center justify-center">
+          <div className="w-12 h-12 border-4 border-red-700 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading announcements...</p>
+        </div>
+      ) : filteredAnnouncements.length === 0 ? (
+        <div className="text-center py-12">
+          <BiBell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500">No announcements found</p>
+        </div>
+      ) : (
+        filteredAnnouncements.map(ann => (
+          <div key={ann.id} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <BiBell className="w-5 h-5 text-red-700" />
+                <h3 className="text-lg font-semibold text-gray-900">{ann.title}</h3>
+              </div>
+
+              <p className="text-gray-600 mb-2">{ann.message}</p>
+
+              <div className="flex gap-6 text-sm flex-wrap">
+                <span
+                  className={`flex items-center gap-1 px-2 py-1 rounded-lg border ${
+                    ann.isSent
+                      ? 'bg-green-100 text-green-700 border-green-300'
+                      : ann.scheduledAt
+                      ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
+                      : 'bg-red-100 text-red-700 border-red-300'
+                  }`}
+                >
+                  <FiClock className="w-4 h-4" />
+                  {ann.isSent
+                    ? 'Sent'
+                    : ann.scheduledAt
+                    ? 'Scheduled at ' + new Date(ann.scheduledAt).toLocaleString()
+                    : 'Draft'}
+                </span>
+
+                <span className="flex items-center gap-1 text-gray-500">
+                  <FiFilter className="w-4 h-4" />
+                  {(ann.roles || []).join(', ')}
+                </span>
               </div>
             </div>
 
-            {/* Filter Buttons */}
-            <div className="flex gap-2">
-              {['all', 'sent', 'scheduled', 'drafts'].map((filter) => (
+            <div className="flex items-center gap-2">
+              {!ann.isSent && (
                 <button
-                  key={filter}
-                  onClick={() => setActiveFilter(filter)}
-                  className={`px-4 py-3 rounded-lg border text-sm font-medium ${
-                    activeFilter === filter
-                      ? 'bg-red-700 text-white border-red-700'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
+                  onClick={() => handleEdit(ann)}
+                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                 >
-                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  <FiEdit className="w-5 h-5" />
                 </button>
-              ))}
-            </div>
+              )}
 
-            {/* Filter Dropdown */}
-            <div className="relative">
-              <button className="flex items-center gap-2 px-4 py-3 border border-gray-300 rounded-lg bg-white hover:bg-gray-50">
-                <FiFilter className="w-4 h-4 text-red-700" />
-                <span className="text-sm text-gray-700">Filter</span>
-                <FiChevronDown className="w-4 h-4 text-gray-400" />
+              <button
+                onClick={() => handleDelete(ann.id)}
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+              >
+                <FiTrash2 className="w-5 h-5" />
               </button>
             </div>
           </div>
-
-          {/* Add New Button */}
-          <div className="mt-6">
-            <button
-              onClick={handleAddNew}
-              className="flex items-center gap-2 px-6 py-3 bg-red-700 text-white rounded-lg hover:bg-red-800"
-            >
-              <FiPlus className="w-4 h-4" />
-              <span className="text-sm font-medium">Add New</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {/* Total Sent Card */}
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <FiCheck className="w-5 h-5 text-green-600" />
-              </div>
-              <div className="flex flex-col gap-2 min-w-0">
-                <div className="flex items-end gap-2">
-                  <span className="text-3xl font-semibold text-gray-700">{totalSent}</span>
-                  <span className="text-sm font-medium text-green-500">+2</span>
-                </div>
-                <span className="text-sm text-gray-600 truncate">Total Sent</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Scheduled Card */}
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <FiClock className="w-5 h-5 text-yellow-600" />
-              </div>
-              <div className="flex flex-col gap-2 min-w-0">
-                <div className="flex items-end gap-2">
-                  <span className="text-3xl font-semibold text-gray-700">{totalScheduled}</span>
-                  <span className="text-sm font-medium text-green-500">+2</span>
-                </div>
-                <span className="text-sm text-gray-600 truncate">Scheduled</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Drafts Card */}
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <FiFileText className="w-5 h-5 text-gray-600" />
-              </div>
-              <div className="flex flex-col gap-2 min-w-0">
-                <div className="flex items-end gap-2">
-                  <span className="text-3xl font-semibold text-gray-700">{totalDrafts}</span>
-                  <span className="text-sm font-medium text-green-500">+2</span>
-                </div>
-                <span className="text-sm text-gray-600 truncate">Drafts</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Announcements List */}
-        <div className="space-y-4">
-          {filteredAnnouncements.map((announcement) => (
-            <div key={announcement.id} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <BiBell className="w-5 h-5 text-red-700" />
-                    <h3 className="text-lg font-semibold text-gray-900">{announcement.title}</h3>
-                  </div>
-                  <p className="text-gray-600 mb-4">{announcement.message}</p>
-                  <div className="flex items-center gap-6 text-sm text-gray-500">
-                    <span className="flex items-center gap-2">
-                      <BiBell className="w-4 h-4" />
-                      {announcement.date}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <FiFilter className="w-4 h-4" />
-                      {announcement.audience}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleEdit(announcement)}
-                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
-                  >
-                    <FiEdit className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(announcement.id)}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                  >
-                    <FiTrash2 className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {filteredAnnouncements.length === 0 && (
-          <div className="text-center py-12">
-            <BiBell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No announcements found</p>
-          </div>
-        )}
-      </div>
-
-      {/* Edit Modal */}
-      {isEditModalOpen && editingAnnouncement && (
-        <EditAnnouncementModal
-          announcement={editingAnnouncement}
-          onSave={handleSaveEdit}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setEditingAnnouncement(null);
-          }}
-        />
-      )}
-
-      {/* Add Modal */}
-      {isAddModalOpen && (
-        <AddAnnouncementModal
-          onSave={(newAnnouncement: Announcement) => {
-            const updatedAnnouncements = [...announcements, newAnnouncement];
-            setAnnouncements(updatedAnnouncements);
-            localStorage.setItem('announcements', JSON.stringify(updatedAnnouncements));
-            setIsAddModalOpen(false);
-          }}
-          onClose={() => setIsAddModalOpen(false)}
-        />
+        ))
       )}
     </div>
-  );
-};
+  </div>
 
-export default ManageAnnouncements;
+  {isEditModalOpen && editingAnnouncement && (
+    <EditAnnouncementModal
+      announcement={editingAnnouncement}
+      onSave={handleSaveEdit}
+      onClose={onEditModalClose}
+    />
+  )}
+
+  {isAddModalOpen && (
+    <AddAnnouncementModal
+      onSave={handleSaveNew}
+      onClose={onAddModalClose}
+    />
+  )}
+</div>
+
+  )
+}
+
+export default ManageAnnouncements

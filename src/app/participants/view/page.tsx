@@ -101,28 +101,47 @@ export default function UserProfileView() {
     </div>
 
     {/* Details */}
-    <div className="w-full mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div className="flex flex-col gap-1">
-        <p className="text-sm text-gray-500">Full Name</p>
-        <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50">
-          {user.name}
-        </p>
-      </div>
+   <div className="w-full mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
 
-      <div className="flex flex-col gap-1">
-        <p className="text-sm text-gray-500">Organization</p>
-        <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50">
-          {user.organization ? user.organization : 'No organization exists yet'}
-        </p>
-      </div>
+  <div className="flex flex-col gap-1 w-full">
+    <p className="text-sm text-gray-500">Full Name</p>
+    <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50 break-words w-full">
+      {user.name}
+    </p>
+  </div>
 
-      <div className="flex flex-col gap-1 sm:col-span-2">
-        <p className="text-sm text-gray-500">Email</p>
-        <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50 break-all">
-          {user.email}
-        </p>
-      </div>
+  <div className="flex flex-col gap-1 w-full">
+    <p className="text-sm text-gray-500">Email</p>
+    <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50 break-words w-full">
+      {user.email}
+    </p>
+  </div>
+
+  {user.role !== 'participant' && (
+    <div className="flex flex-col gap-1 w-full">
+      <p className="text-sm text-gray-500">Organization</p>
+      <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50 break-words w-full">
+        {user.organization ? user.organization : 'No organization exists yet'}
+      </p>
     </div>
+  )}
+
+  <div className={`flex flex-col gap-1 w-full ${user.role === 'participant' ? 'sm:col-span-2' : ''}`}>
+    <p className="text-sm text-gray-500">Phone</p>
+    <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50 break-words w-full">
+      {user.phone ? user.phone : 'No phone added'}
+    </p>
+  </div>
+
+  <div className="flex flex-col gap-1 sm:col-span-2 w-full">
+    <p className="text-sm text-gray-500">Bio</p>
+    <p className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 bg-gray-50 break-words w-full">
+      {user.bio ? user.bio : 'No bio added yet'}
+    </p>
+  </div>
+
+</div>
+
 
     {/* Logout */}
     <div className="w-full mt-6 flex justify-center">

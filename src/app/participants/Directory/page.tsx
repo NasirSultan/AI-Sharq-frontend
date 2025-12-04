@@ -5,6 +5,10 @@ import { useSelector } from "react-redux"
 import { RootState } from "@/lib/store/store"
 import api from "@/config/api"
 import { FaSpinner, FaSearch, FaArrowLeft } from "react-icons/fa"
+import { FaArrowRight } from "react-icons/fa"
+import { FaMessage } from "react-icons/fa6"
+import Link from "next/link"
+
 import { useRouter } from "next/navigation"
 type Toast = {
     message: string
@@ -104,15 +108,49 @@ export default function DashboardPage() {
             )}
 
             <div className="mb-4">
-                <div className="flex items-center gap-2 mb-2 cursor-pointer" onClick={() => router.back()}>
-                    <FaArrowLeft className="text-[#9B2033]" />
-                    <h2 className="text-lg font-semibold">Opted-in Participants</h2>
+
+
+
+                <div className="flex items-center gap-3 bg-[#FFEEEE] p-4 my-3 rounded-2xl shadow">
+                    <div className="w-12 h-12 bg-[#FFBEBE] rounded-lg flex items-center justify-center">
+                        <FaMessage className="text-[#9B2033] text-xl" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-[#9B2033]">Chats List</h2>
+                    <Link href="/participants/Masseges" className="ml-auto">
+                        <FaArrowRight className="text-[#9B2033] text-2xl" />
+                    </Link>
+                </div>
+
+
+
+
+
+                <div className="flex items-center gap-4 my-2">
+                    <FaArrowLeft
+                        onClick={() => router.back()}
+                        className="text-red-800 w-5 h-5 cursor-pointer hover:text-red-900 transition"
+                    />
+                    <h1 className="text-2xl p-2 font-medium text-[#282828]">Networking</h1>
                 </div>
                 <div className="flex items-center gap-2">
-                    <h3 className="bg-red-900 text-white font-bold py-2 px-6 rounded-xl inline-block">
-                        Directory
-                    </h3>
 
+                    <div className="flex flex-wrap items-center gap-4">
+                        <Link href="/participants/Networking">
+                            <button className="bg-[#9B2033] text-white font-bold py-2 px-6 rounded-xl">
+                                Directory
+                            </button>
+                        </Link>
+                        <Link href="/participants/Networking">
+                            <button className="border border-[#E8E8E8] text-[#282828] font-medium py-2 px-6 rounded-xl">
+                                Requests        </button>
+                        </Link>
+                        <Link href="/participants/MyConnections">
+                            <button className="border border-[#E8E8E8] text-[#282828] font-medium py-2 px-6 rounded-xl">
+                                My Connections
+                            </button>
+                        </Link>
+
+                    </div>
                     <div className="flex items-center gap-2 border border-[#E8E8E8] rounded-xl px-3 py-2 flex-1 min-w-[200px]">
                         <FaSearch className="text-[#9B2033]" />
                         <input

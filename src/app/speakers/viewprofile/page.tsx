@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/store/store'
 import api from '@/config/api'
 import Image from 'next/image'
+import Link from 'next/link'
 import {
   FaUser,
   FaLinkedin,
@@ -72,34 +73,31 @@ export default function SpeakerProfileView() {
   <div className="relative flex flex-col items-center min-h-screen bg-gray-50 p-4">
     <div className="relative bg-white border border-gray-300 rounded-2xl shadow-lg p-10 w-full max-w-6xl mb-16">
 <div className="absolute top-4 right-4 flex gap-2">
-  <button
-    type="button"
-    onClick={() => (window.location.href = '/participants/SetUpYourProfile')}
-    className="p-3 bg-red-900 text-white rounded-full shadow hover:bg-red-700 cursor-pointer"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="w-5 h-5"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-9.193 9.193a4.5 4.5 0 01-1.897 1.13l-3.323.94.94-3.323a4.5 4.5 0 011.13-1.897l9.193-9.193z"
-      />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 7.125L16.875 4.5" />
-    </svg>
-  </button>
 
-  <button
-    onClick={() => setShowQR(true)}
-    className="p-3 bg-gray-800 text-white rounded-full shadow hover:bg-gray-900"
+
+<Link
+  href="/participants/SetUpYourProfile"
+  className="p-3 bg-red-900 text-white rounded-full shadow hover:bg-red-700 flex items-center justify-center"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="w-5 h-5"
   >
-    <FaQrcode className="w-5 h-5" />
-  </button>
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-9.193 9.193a4.5 4.5 0 01-1.897 1.13l-3.323.94.94-3.323a4.5 4.5 0 011.13-1.897l9.193-9.193z"
+    />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 7.125L16.875 4.5" />
+  </svg>
+</Link>
+
+
+ 
 </div>
 
 
@@ -222,7 +220,7 @@ export default function SpeakerProfileView() {
     localStorage.setItem('role', 'participant');
     window.location.href = '/participants/Home';
   }}
-  className="bg-white text-red-700 border border-red-700 px-4 py-2  hover:bg-red-700 hover:text-white hover:rounded-full  rounded-full transition-all cursor-pointer"
+  className="bg-white text-red-900 border border-red-900 px-4 py-4  hover:bg-red-800 hover:text-white hover:rounded-full  rounded-full transition-all cursor-pointer"
 >
   Participant Home
 </button>
@@ -260,6 +258,10 @@ export default function SpeakerProfileView() {
       </div>
     </div>
   )}
+
+<div className="w-full flex justify-center bottom-0">
+    <Image src="/images/line.png" alt="Line" width={1700} height={127} className="w-full max-w-screen-xl" />
+  </div>
 </>
 
   )

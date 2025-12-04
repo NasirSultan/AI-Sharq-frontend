@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import ImageComponent from '../../components/Images'
-import { FaUser, FaEnvelope,FaEye, FaEyeSlash, FaGoogle, FaFacebookF, FaApple } from 'react-icons/fa'
+import { FaUser, FaEnvelope, FaPhone } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
 import { useDispatch } from 'react-redux'
 import { setUserId } from '@/lib/store/features/user/userSlice'
@@ -17,24 +17,39 @@ export default function SignUp() {
     fullName: '',
     email: '',
     phone: '',
-    password: '',
-    confirmPassword: '',
   })
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [userIdInput, setUserIdInput] = useState('')
-const [showPassword, setShowPassword] = useState(false)
-const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  // handle input change
+
+  const defaultPassword = 'YourDefaultPassword123'
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value
+    if (e.target.name === 'phone') {
+      if (!value.startsWith('+')) value = '+' + value
+    }
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     })
   }
 
-  // handle submit
+  const sendOtp = async (email: string) => {
+    if (!email) return
+    setError('')
+    setLoading(true)
+    try {
+      const { data } = await api.post('/auth/send-otp', { email })
+      if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
+      router.push('/authentication/SignUp/OtpVarification')
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to send OTP')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -45,17 +60,16 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false)
         name: formData.fullName,
         email: formData.email,
         phone: formData.phone,
-        password: formData.password,
+        password: defaultPassword,
         role: 'participant',
       })
 
       const userId = response?.data?.user?.id
       if (userId) {
         dispatch(setUserId(userId))
-        setUserIdInput(userId)
       }
 
-      router.push('/authentication/verificationcode')
+      await sendOtp(formData.email)
     } catch (err: any) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {
@@ -65,22 +79,13 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center px-3 pt-6 pb-16 relative bg-gray-50 gap-4">
-      {/* Left Image for large screens */}
-    <div className="hidden lg:flex lg:flex-shrink-0">
+      <div className="hidden lg:flex lg:flex-shrink-0">
         <ImageComponent />
       </div>
 
-      {/* Sign-up Card */}
-      <div className="w-full max-w-[320px] bg-white border border-gray-300 rounded-lg shadow-md p-3 sm:p-4 flex flex-col gap-4 relative z-10">
+      <div className="w-full max-w-[400px] bg-white border border-gray-300 rounded-lg shadow-md p-3 sm:p-4 flex flex-col gap-4 relative z-10">
         <div className="flex flex-col items-center gap-3">
-          <Image
-            src="/images/logo1.png"
-            alt="Al Sharq Logo"
-            width={120}
-            height={36}
-            className="object-contain"
-          />
-
+          <Image src="/images/logo1.png" alt="Logo" width={120} height={36} className="object-contain" />
           <h1 className="text-base sm:text-lg font-medium text-gray-800 text-center leading-snug">
             Sign Up to <br />
             <strong className="text-[#9B2033]">AL SHARQ CONFERENCE</strong>
@@ -125,118 +130,45 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false)
           {/* Phone */}
           <div className="flex flex-col gap-1">
             <label className="text-xs text-gray-700">Phone Number</label>
-            <input
-              type="text"
-              name="phone"
-              placeholder="Enter Your Phone Number"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full h-9 border border-gray-300 rounded-md px-2.5 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                name="phone"
+                placeholder="Enter Your Phone Number"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
+              />
+              <FaPhone className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            </div>
           </div>
-
-<div className="flex flex-col gap-1">
-  <label className="text-xs text-gray-700">Password*</label>
-  <div className="relative">
-    <input
-      type={showPassword ? "text" : "password"}
-      name="password"
-      placeholder="Enter Your Password"
-      value={formData.password}
-      onChange={handleChange}
-      className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
-      required
-    />
-    <div className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 w-4 h-4">
-      {showPassword ? (
-        <FaEye onClick={() => setShowPassword(false)} />
-      ) : (
-        <FaEyeSlash onClick={() => setShowPassword(true)} />
-      )}
-    </div>
-  </div>
-</div>
-
-<div className="flex flex-col gap-1">
-  <label className="text-xs text-gray-700">Confirm Password*</label>
-  <div className="relative">
-    <input
-      type={showConfirmPassword ? "text" : "password"}
-      name="confirmPassword"
-      placeholder="Confirm Your Password"
-      value={formData.confirmPassword}
-      onChange={handleChange}
-      className="w-full h-9 border border-gray-300 rounded-md px-2.5 pr-9 text-sm text-gray-600 focus:outline-none focus:border-gray-500"
-      required
-    />
-    <div className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 w-4 h-4">
-      {showConfirmPassword ? (
-        <FaEye onClick={() => setShowConfirmPassword(false)} />
-      ) : (
-        <FaEyeSlash onClick={() => setShowConfirmPassword(true)} />
-      )}
-    </div>
-  </div>
-</div>
-
 
           {error && <p className="text-red-600 text-xs text-center">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full h-9 text-white cursor-pointer text-sm font-medium rounded-md transition ${loading
-                ? 'bg-red-900 cursor-not-allowed'
-                : 'bg-red-900 hover:bg-red-900'
-              }`}
-          >
-            {loading ? 'Creating...' : 'Create Account'}
-          </button>
-
-          {/* <div className="flex items-center gap-2">
-            <hr className="flex-1 border-gray-300 opacity-20" />
-            <span className="text-xs text-gray-500">Or</span>
-            <hr className="flex-1 border-gray-300 opacity-20" />
-          </div> */}
-
-           {/* <div className="flex flex-col sm:flex-row gap-1 w-full mt-2">
-            <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
-              <FaGoogle className="w-4 h-4 text-red-500" />
-              Google
-            </button>
-
-            <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
-              <FaFacebookF className="w-4 h-4 text-blue-600" />
-              Facebook
-            </button>
-
-            <button className="flex items-center justify-center gap-1 flex-1 border border-[#DEDEDE] rounded-lg text-sm text-[#1E1E1E] px-2 py-1.5 hover:bg-gray-100 transition">
-              <FaApple className="w-4 h-4 text-black" />
-              Apple
-            </button>
-          </div> */}
+       <button
+  type="submit"
+  disabled={loading}
+  className={`w-full h-9 py-3 px-6 flex items-center justify-center text-center text-white cursor-pointer text-sm font-medium rounded-md transition ${loading
+    ? 'bg-red-900 cursor-not-allowed'
+    : 'bg-red-900 hover:bg-red-900'
+  }`}
+>
+  {loading ? 'Creating...' : 'Create Account'}
+</button>
 
 
           <p className="text-xs text-gray-800 text-center mt-1">
             Already have an account?{' '}
             <a className="text-blue-600 cursor-pointer hover:underline" href="/authentication/SignIn">
-          Login
+              Login
             </a>
           </p>
         </form>
       </div>
 
-      {/* Bottom line image */}
       <div className="absolute bottom-0 left-0 w-full">
-        <Image
-          src="/images/line.png"
-          alt="Line"
-          width={1729}
-          height={127}
-          className="w-full object-contain"
-        />
+        <Image src="/images/line.png" alt="Line" width={1729} height={127} className="w-full object-contain" />
       </div>
     </div>
-
   )
 }

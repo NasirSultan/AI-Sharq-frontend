@@ -100,17 +100,16 @@ const renderParticipantCard = () => {
                         <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 text-center sm:text-left">{data.name || "N/A"}</h2>
                         <div className="space-y-1">
                             <p className="text-xs sm:text-sm md:text-base text-gray-700 break-words">
-                                <span className="font-semibold text-red-900">Email: </span>
+                                <span className="font-semibold text-red-900">Email </span>
                                 {data.email || "N/A"}
                             </p>
                             <p className="text-xs sm:text-sm md:text-base text-gray-700">
-                                <span className="font-semibold text-red-900">Role: </span>
+                                <span className="font-semibold text-red-900">Role </span>
                                 {data.role || "N/A"}
                             </p>
-                            <p className="text-xs sm:text-sm md:text-base text-gray-700 break-words">
-                                <span className="font-semibold text-red-900">Bio: </span>
-                                {data.bio || "-"}
-                            </p>
+                              {data.bio && data.bio !== "-" && (
+        <p><span className="font-semibold text-red-900">Bio </span>{data.bio}</p>
+    )}
                         </div>
                     </div>
                 </div>
@@ -164,7 +163,7 @@ const renderParticipantCard = () => {
             {renderParticipantCard()}
 
             <div id="qr-reader" className="mb-6 w-full max-w-md"></div>
-            <div id="qr-reader-file"></div>
+         <div id="qr-reader-file" className="hidden"></div>
         </div>
     )
 }

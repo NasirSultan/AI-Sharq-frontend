@@ -92,11 +92,18 @@ const Networking: React.FC = () => {
 
       {/* Search & Filter */}
       <div className="flex flex-wrap items-center gap-4 mb-4">
+        <Link href="/participants/Directory">
+          <button className="border border-[#E8E8E8] text-[#282828] font-medium py-2 px-6 rounded-xl">
+            Directory            </button>
+        </Link>
+
         <Link href="/participants/Networking">
           <button className="border border-[#E8E8E8] rounded-xl px-6 py-2 text-black">
-     Requests
+            Requests
           </button>
         </Link>
+
+
         <Link href="/participants/MyConnections">
           <button className="bg-[#9B2033] text-white rounded-xl px-6 py-2 font-bold">
             My Connections
@@ -127,24 +134,24 @@ const Networking: React.FC = () => {
             className="flex flex-row items-center gap-3 bg-white p-3 rounded-xl shadow border border-[#D4D4D4] w-full"
           >
             {/* Profile Picture or Fallback Icon */}
-           <div className="w-10 h-10 relative flex-shrink-0">
-  {conn.user.file ? (
-    <img
-      src={conn.user.file}
-      alt={conn.user.name}
-      onError={(e) => {
-        const target = e.currentTarget as HTMLImageElement
-        target.onerror = null
-        target.style.display = "none"
-      }}
-      className="w-8 h-8 rounded-full object-cover mx-auto my-auto"
-    />
-  ) : (
-    <div className="absolute top-1 left-1 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-      <FaUser className="w-4 h-4 text-blue-500" />
-    </div>
-  )}
-</div>
+            <div className="w-10 h-10 relative flex-shrink-0">
+              {conn.user.file ? (
+                <img
+                  src={conn.user.file}
+                  alt={conn.user.name}
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement
+                    target.onerror = null
+                    target.style.display = "none"
+                  }}
+                  className="w-8 h-8 rounded-full object-cover mx-auto my-auto"
+                />
+              ) : (
+                <div className="absolute top-1 left-1 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                  <FaUser className="w-4 h-4 text-blue-500" />
+                </div>
+              )}
+            </div>
 
 
             {/* Name and Email */}

@@ -100,7 +100,9 @@ export default function ProfileSetup() {
 
       if (role === 'speaker') router.push('/speakers/SetUpYourProfile')
       else if (role === 'registrationteam') router.push('/registrationteam')
-      else router.push('/participants/Home')
+      else if (role === 'organizer') router.push('/Organizer/Dashboard')
+      else if (role === 'participant') router.push('/participants/Home')
+      else router.push('/')
 
     } catch (err) {
       console.error('Error updating profile', err)
@@ -140,67 +142,69 @@ export default function ProfileSetup() {
         </label>
         <input type="file" id="file" accept="image/*" className="hidden" onChange={handleFileChange} />
 
-        <div className="w-full flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-700">Full Name*</label>
-            <input
-              type="text"
-              name="fullName"
-              placeholder="Enter your full name"
-              value={formData.fullName}
-              onChange={handleChange}
-              className={inputClass(errors.fullName)}
-            />
-          </div>
+       <div className="w-full flex flex-col gap-3">
+  <div className="flex flex-col gap-1">
+    <label className="text-sm text-gray-700">Full Name*</label>
+    <input
+      type="text"
+      name="fullName"
+      placeholder="Enter your full name"
+      value={formData.fullName}
+      onChange={handleChange}
+      className={`w-full h-10 px-3 border rounded-lg text-sm text-gray-800 ${errors.fullName ? 'border-red-600 bg-red-50' : 'border-gray-300 bg-white'}`}
+    />
+  </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-700">Organization*</label>
-            <input
-              type="text"
-              name="organization"
-              placeholder="Enter your organization"
-              value={formData.organization}
-              onChange={handleChange}
-              className={inputClass(errors.organization)}
-            />
-          </div>
+  {role !== 'participant' && (
+    <div className="flex flex-col gap-1">
+      <label className="text-sm text-gray-700">Organization*</label>
+      <input
+        type="text"
+        name="organization"
+        placeholder="Enter your organization"
+        value={formData.organization}
+        onChange={handleChange}
+        className={`w-full h-10 px-3 border rounded-lg text-sm text-gray-800 ${errors.organization ? 'border-red-600 bg-red-50' : 'border-gray-300 bg-white'}`}
+      />
+    </div>
+  )}
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-700">Phone*</label>
-            <input
-              type="text"
-              name="phone"
-              placeholder="Enter your phone number"
-              value={formData.phone}
-              onChange={handleChange}
-              className={inputClass(errors.phone)}
-            />
-          </div>
+  <div className="flex flex-col gap-1">
+    <label className="text-sm text-gray-700">Phone*</label>
+    <input
+      type="text"
+      name="phone"
+      placeholder="Enter your phone number"
+      value={formData.phone}
+      onChange={handleChange}
+      className={`w-full h-10 px-3 border rounded-lg text-sm text-gray-800 ${errors.phone ? 'border-red-600 bg-red-50' : 'border-gray-300 bg-white'}`}
+    />
+  </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-700">Bio*</label>
-            <textarea
-              name="bio"
-              placeholder="Enter a short bio"
-              value={formData.bio}
-              onChange={handleChange}
-              className={textareaClass(errors.bio)}
-            />
-          </div>
+  <div className="flex flex-col gap-1">
+    <label className="text-sm text-gray-700">Bio*</label>
+    <textarea
+      name="bio"
+      placeholder="Enter a short bio"
+      value={formData.bio}
+      onChange={handleChange}
+      className={`w-full h-20 px-3 py-2 border rounded-lg text-sm text-gray-800 resize-none ${errors.bio ? 'border-red-600 bg-red-50' : 'border-gray-300 bg-white'}`}
+    />
+  </div>
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className={`w-full h-12 text-white text-sm font-semibold rounded-lg transition ${loading ? 'bg-red-900 cursor-not-allowed' : 'bg-[#9B2033] hover:bg-[#7c1a2a]'
-              }`}
-          >
-            {loading ? 'Saving...' : 'Save & Continue'}
-          </button>
+  <button
+    onClick={handleSubmit}
+    disabled={loading}
+    className={`w-full h-10 text-white text-sm font-semibold rounded-lg transition ${loading ? 'bg-red-900 cursor-not-allowed' : 'bg-[#9B2033] hover:bg-[#7c1a2a]'}`}
+  >
+    {loading ? 'Saving...' : 'Save & Continue'}
+  </button>
 
-          <p onClick={handleSkip} className="text-sm text-center text-gray-500 cursor-pointer hover:underline">
-            Skip for now
-          </p>
-        </div>
+  <p onClick={handleSkip} className="text-sm text-center text-gray-500 cursor-pointer hover:underline">
+    Skip for now
+  </p>
+</div>
+
       </div>
     </div>
   )

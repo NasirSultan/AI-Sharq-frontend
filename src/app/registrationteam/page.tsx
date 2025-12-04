@@ -31,42 +31,48 @@ export default function Page() {
   const router = useRouter()
   const filters = ["Daily", "Weekly", "10 Days", "90 Days", "All Time"]
 
-  useEffect(() => {
-    const cached = sessionStorage.getItem("participantsData")
-    if (cached) {
-      const parsed = JSON.parse(cached)
-      const now = new Date().getTime()
-      if (now - parsed.timestamp < 10 * 60 * 1000) {
-        setUsers(parsed.users)
-        setStats(parsed.stats)
-        setLoading(false)
-        return
-      }
-    }
-    fetchUsers()
-  }, [])
-
-  const fetchUsers = async () => {
-    setLoading(true)
-    try {
-      const res = await api.get("/admin/users/participants")
-      setUsers(res.data.users || [])
-      const newStats = {
-        totalParticipants: res.data.totalParticipants || 0,
-        totalBookmarks: res.data.totalBookmarks || 0,
-        totalSessionRegistrations: res.data.totalSessionRegistrations || 0
-      }
-      setStats(newStats)
-      sessionStorage.setItem(
-        "participantsData",
-        JSON.stringify({ users: res.data.users, stats: newStats, timestamp: new Date().getTime() })
-      )
-    } catch (err) {
-      console.error(err)
-    } finally {
+useEffect(() => {
+  const cached = sessionStorage.getItem("participantsCache")
+  if (cached) {
+    const parsed = JSON.parse(cached)
+    const now = new Date().getTime()
+    const valid = now - parsed.time < 10 * 60 * 1000
+    if (valid) {
+      setUsers(parsed.users)
+      setStats(parsed.stats)
       setLoading(false)
+      return
     }
   }
+  loadUsers()
+}, [])
+
+const loadUsers = async () => {
+  setLoading(true)
+  try {
+    const res = await api.get("/admin/users/participants")
+    const list = res.data.users || []
+    const info = {
+      totalParticipants: res.data.totalParticipants || 0,
+      totalBookmarks: res.data.totalBookmarks || 0,
+      totalSessionRegistrations: res.data.totalSessionRegistrations || 0
+    }
+    setUsers(list)
+    setStats(info)
+    const data = {
+      users: list,
+      stats: info,
+      time: new Date().getTime()
+    }
+    sessionStorage.setItem("participantsCache", JSON.stringify(data))
+  } catch (e) {
+    console.log(e)
+  }
+  setLoading(false)
+}
+
+
+
 
   const openQr = (user: User) => setSelected(user)
   const closeQr = () => setSelected(null)
@@ -109,11 +115,26 @@ export default function Page() {
     })()
     return matchesSearch && matchesFilter
   })
+useEffect(() => {
+  const savedSearch = sessionStorage.getItem("participantsSearch")
+  if (savedSearch) setSearch(savedSearch)
+  const savedFilter = sessionStorage.getItem("participantsFilter")
+  if (savedFilter) setActiveFilter(savedFilter)
+}, [])
+
+useEffect(() => {
+  sessionStorage.setItem("participantsSearch", search)
+}, [search])
+
+useEffect(() => {
+  sessionStorage.setItem("participantsFilter", activeFilter)
+}, [activeFilter])
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Participants list</h1>
+  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Participants list</h1>
+  <div className="flex gap-2">
     <Link
       href="/Organizer/QrScanner"
       className="flex items-center gap-2 bg-white border border-red-900 text-red-900 px-4 py-2 rounded-full hover:bg-red-900 hover:text-white text-sm sm:text-base"
@@ -121,7 +142,16 @@ export default function Page() {
       <FaQrcode size={20} />
       Scan QR
     </Link>
+    <Link
+      href="/registrationteam/Sessions"
+      className="flex items-center gap-2 bg-white border border-green-700 text-green-700 px-4 py-2 rounded-full hover:bg-green-700 hover:text-white text-sm sm:text-base"
+    >
+      <FaPlay size={20} />
+      Check Session
+    </Link>
   </div>
+</div>
+
 
   <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center">
     <div className="bg-white border border-gray-300 rounded-md px-3 py-2 flex items-center w-full sm:flex-1">

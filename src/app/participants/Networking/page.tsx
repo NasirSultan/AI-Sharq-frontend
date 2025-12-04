@@ -89,11 +89,17 @@ const Networking: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
+         
+          <Link href="/participants/Directory">
+            <button className="border border-[#E8E8E8] text-[#282828] font-medium py-2 px-6 rounded-xl">
+              Directory            </button>
+          </Link>
           <Link href="/participants/Networking">
             <button className="bg-[#9B2033] text-white font-bold py-2 px-6 rounded-xl">
-Requests
+              Requests
             </button>
           </Link>
+         
           <Link href="/participants/MyConnections">
             <button className="border border-[#E8E8E8] text-[#282828] font-medium py-2 px-6 rounded-xl">
               My Connections
