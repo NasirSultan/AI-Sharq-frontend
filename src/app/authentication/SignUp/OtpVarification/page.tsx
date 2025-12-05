@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -9,12 +9,13 @@ export default function TwoStepVerification() {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('')
   const router = useRouter()
   const inputRefs = useRef<Array<HTMLInputElement | null>>([])
 
-  const email = JSON.parse(localStorage.getItem('user') || '{}')?.email || ''
-
   useEffect(() => {
+    const savedEmail = JSON.parse(localStorage.getItem('user') || '{}')?.email || ''
+    setEmail(savedEmail)
     if (inputRefs.current[0]) inputRefs.current[0].focus()
   }, [])
 
@@ -78,8 +79,8 @@ export default function TwoStepVerification() {
 
           <button
             type="submit"
-            disabled={otp.some(d => !d) || loading}
-            className={`w-full py-2 rounded-lg text-white transition ${otp.every(d => d !== '') && !loading ? 'bg-[#9B2033] hover:bg-[#7f1a28]' : 'bg-gray-400 cursor-not-allowed'}`}
+            disabled={otp.some(d => !d) || loading || !email}
+            className={`w-full py-2 rounded-lg text-white transition ${otp.every(d => d !== '') && !loading && email ? 'bg-[#9B2033] hover:bg-[#7f1a28]' : 'bg-gray-400 cursor-not-allowed'}`}
           >
             {loading ? 'Verifying...' : 'Verify'}
           </button>

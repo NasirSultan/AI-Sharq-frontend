@@ -131,34 +131,36 @@ const renderParticipantCard = () => {
 
             <h1 className="text-2xl font-bold mb-6">QR Code Scanner</h1>
 
-            <div className="flex gap-3 mb-6 w-full max-w-md">
-                <button
-                    onClick={startCameraScan}
-                    className="flex-1 bg-red-900 hover:bg-red-800 text-white px-4 py-2 rounded-full cursor-pointer flex items-center justify-center gap-2"
-                    disabled={scanning}
-                >
-                    <Camera className="w-4 h-4" />
-                    {scanning ? "Scanning..." : "Camera"}
-                </button>
+          <div className="flex flex-col sm:flex-row gap-3 mb-6 w-full max-w-md">
+    <button
+        onClick={startCameraScan}
+        className="flex-1 bg-red-900 hover:bg-red-800 text-white px-4 py-2 rounded-full cursor-pointer flex items-center justify-center gap-2"
+        disabled={scanning}
+    >
+        <Camera className="w-4 h-4" />
+        {scanning ? "Scanning..." : "Camera"}
+    </button>
 
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="flex-1 border border-red-900 cursor-pointer p-2 rounded-full  hover:bg-red-900 hover:text-white"
+    <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileUpload}
+        className="flex-1 border border-red-900 cursor-pointer p-2 rounded-full hover:bg-red-900 hover:text-white"
+    />
 
-                />
+    {(scanning || result) && (
+        <button
+    onClick={removeAllData}
+    className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-2 rounded-full cursor-pointer flex items-center justify-center gap-2"
+>
+    <X className="w-4 h-4" />
+  
+</button>
 
-                {(scanning || result) && (
-                    <button
-                        onClick={removeAllData}
-                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-2 rounded-full cursor-pointer flex items-center"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
-                )}
-            </div>
+    )}
+</div>
+
 
             {renderParticipantCard()}
 
