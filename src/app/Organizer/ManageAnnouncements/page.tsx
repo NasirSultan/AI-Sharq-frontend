@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import api from '@/config/api'
-import { FiSearch, FiFilter, FiEdit, FiTrash2, FiPlus, FiClock } from 'react-icons/fi'
+import { FiSearch, FiFilter, FiEdit, FiTrendingUp,FiMail,FiTrash2, FiPlus, FiClock } from 'react-icons/fi'
 import { BiBell } from 'react-icons/bi'
-import { FiMail, FiTrendingUp } from 'react-icons/fi'
+
 import EditAnnouncementModal from '../../components/EditAnnouncementModal'
 import AddAnnouncementModal from '../../components/AddAnnouncementModal'
 import { FaArrowLeft } from 'react-icons/fa'
